@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''status:'''', d.get\\(''''status''''\\)\\); items=d.get\\(''''data'''',{}\\).get\\(''''data'''',[]\\); print\\(''''products:'''', len\\(items\\)\\)\")",
+      "Bash(curl -s \"http://localhost:8000/api/v1/products?per_page=4\" -H \"x-api-key: i9u99tt4-f0w6-71w7-8394-y968t02516r11\")",
+      "Bash(head -5 grep -rn \"@2x\\\\|data-srcset\\\\|lazyload\" /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/public/js/main.js)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql --version)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysqladmin status:*)",
+      "Bash(curl -s \"http://localhost:3000/shop\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3000/shop\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3000/\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3000/collections\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3000/cart\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s \"http://localhost:8000/api/frontend/product-category\" -H \"x-api-key: i9u99tt4-f0w6-71w7-8394-y968t02516r11\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\('''' -'''', b[''''name'''']\\) for b in d.get\\(''''data'''',[]\\)]\")",
+      "Bash(grep -l \"StaticPage\" /Applications/XAMPP/xamppfiles/htdocs/behome/database/seeders/*.php)",
+      "Bash(grep -l \"StaticPage\" /Applications/XAMPP/xamppfiles/htdocs/behome/app/Http/Controllers/Frontend/*.php)",
+      "Bash(grep -n \"return\\\\|Return\\\\|action\\\\|useSearchParams\\\\|searchParams\" /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/app/account/order/[id]/page.tsx)",
+      "Bash(grep -n \"success\\\\|placed\\\\|confirmation\\\\|status=success\\\\|banner\\\\|alert\" /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/app/account/order/[id]/page.tsx)",
+      "Bash(grep -n \"no-layout-pad\\\\|paddingTop\\\\|padding-top\" /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/app/account/order/[id]/page.tsx)",
+      "Bash(find /Applications/XAMPP/xamppfiles/htdocs/behome/app/Enums -type f -name *.php)",
+      "Bash(find /Applications/XAMPP/xamppfiles/htdocs/behome/app/Http/PaymentGateways -type f -name *.php)",
+      "Bash(grep -l \"wishlist\\\\|Wishlist\" /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/components/*.tsx)",
+      "Bash(grep -n \"BlogCommentForm\\\\|comment\\\\|Comment\" /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/app/blog/[slug]/page.tsx)",
+      "Bash(grep -n \"activeTab === ''security''\" /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/app/account/page.tsx)",
+      "Bash(find /Applications/XAMPP/xamppfiles/htdocs/behome -name *ReturnAndRefundWebController* -o -name *ReturnAndRefund*Controller*)",
+      "Bash(find /Applications/XAMPP/xamppfiles/htdocs/behome/app/Http/PaymentGateways -name Credit*)"
+    ]
+  }
+}

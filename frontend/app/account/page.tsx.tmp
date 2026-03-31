@@ -1,0 +1,174 @@
+{/*  start section  */}
+<section>
+<div className="container">
+<div className="row g-0 justify-content-center">
+<div className="col-xl-4 col-lg-5 col-md-10 contact-form-style-04 md-mb-50px" data-anime='{ "translateY": [0, 0], "opacity": [0,1], "duration": 600, "delay":100, "staggervalue": 150, "easing": "easeOutQuad" }'>
+<span className="fs-26 xs-fs-24 alt-font fw-600 text-white mb-20px d-block">Member login</span>
+<form action="https://craftohtml.themezaa.com/email-templates/contact-form.php" method="post">
+<label className="text-white mb-10px fw-500">Username or email address<span className="text-red">*</span></label>
+<input className="mb-20px bg-dark-gray form-control required" name="name" placeholder="Enter your username" type="email"/>
+<label className="text-white mb-10px fw-500">Password<span className="text-red">*</span></label>
+<input className="mb-20px bg-dark-gray form-control required" name="password" placeholder="Enter your password" type="password"/>
+<div className="position-relative terms-condition-box text-start d-flex align-items-center mb-20px">
+<label>
+<input className="terms-condition check-box align-middle required" id="terms_condition" name="terms_condition" type="checkbox" value="1"/>
+<span className="box fs-14">Remember me</span>
+</label>
+<a className="fs-14 text-white fw-500 text-decoration-line-bottom ms-auto" href="/account#">Forget your
+                                password?</a>
+</div>
+<input name="redirect" type="hidden" value=""/>
+<button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow submit w-100 text-transform-none" type="submit">Login</button>
+<div className="form-results mt-20px d-none"></div>
+</form>
+</div>
+<div className="col-lg-6 col-md-10 offset-xl-2 offset-lg-1 p-6 box-shadow-extra-large border-radius-6px" data-anime='{ "translateY": [0, 0], "opacity": [0,1], "duration": 600, "delay":150, "staggervalue": 150, "easing": "easeOutQuad" }'>
+<span className="fs-26 xs-fs-24 alt-font fw-600 text-white mb-20px d-block">Create an account</span>
+<form action="https://craftohtml.themezaa.com/email-templates/contact-form.php" method="post">
+<label className="text-white mb-10px fw-500">Username<span className="text-red">*</span></label>
+<input className="mb-20px bg-dark-gray form-control required" name="name" placeholder="Enter your username" type="text"/>
+<label className="text-white mb-10px fw-500">Email address<span className="text-red">*</span></label>
+<input className="mb-20px bg-dark-gray form-control required" name="email" placeholder="Enter your email" type="email"/>
+<label className="text-white mb-10px fw-500">Password<span className="text-red">*</span></label>
+<input className="mb-20px bg-dark-gray form-control required" name="password" placeholder="Enter your password" type="password" />
+<span className="fs-13 lh-22 w-90 lg-w-100 md-w-90 sm-w-100 d-block mb-30px">Your personal data will
+                            be used to support your experience throughout this website, to manage access to your
+                            account, and for other purposes described in our <a className="text-white text-decoration-line-bottom fw-500" href="/account#">privacy policy.</a></span>
+<input name="redirect" type="hidden" value="" />
+<button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow submit w-100 text-transform-none" type="submit">Register</button>
+<div className="form-results mt-20px d-none"></div>
+</form>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start footer  */}
+<footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'images/new/bg/bg1.png\')' }}>
+<div className="container pt-4 pb-4 md-pt-45px md-pb-45px">
+<div className="row justify-content-center">
+{/*  start footer column  */}
+<div className="col-6 col-lg-3 last-paragraph-no-margin order-sm-1 md-mb-50px xs-mb-30px">
+<a className="footer-logo mb-30px d-inline-block" href="/">
+<img alt="Behome Logo" src="images/new/logo/Behome%20Final%20.png" style={{ maxHeight: '200px' }}/>
+</a>
+<p className="w-80 sm-w-100">Exquisite architectural decor and premium furniture for the modern luxury
+                        interior.</p>
+<div className="elements-social social-icon-style-02 mt-15px">
+<ul className="small-icon light">
+<li><a className="facebook" href="https://www.facebook.com/" target="_blank"><i className="fa-brands fa-facebook-f"></i></a></li>
+<li><a className="dribbble" href="http://www.dribbble.com" target="_blank"><i className="fa-brands fa-dribbble"></i></a></li>
+<li><a className="twitter" href="https://www.twitter.com" target="_blank"><i className="fa-brands fa-twitter"></i></a></li>
+<li><a className="instagram" href="https://www.instagram.com" target="_blank"><i className="fa-brands fa-instagram"></i></a></li>
+</ul>
+</div>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Categories</span>
+<ul>
+<li><a href="/shop">Bed room</a></li>
+<li><a href="/shop">Living room</a></li>
+<li><a href="/shop">Lightning</a></li>
+<li><a href="/shop">Fabrics sofa</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Information</span>
+<ul>
+<li><a href="/about">About us</a></li>
+<li><a href="/contact">Contact us</a></li>
+<li><a href="/faq">FAQs</a></li>
+<li><a href="/faq">Payment</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Account</span>
+<ul>
+<li><a href="/account">My account</a></li>
+<li><a href="/cart">Orders</a></li>
+<li><a href="/checkout">Checkout</a></li>
+<li><a href="/wishlist">My wishlists</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-lg-3 col-sm-6 ps-20px sm-ps-15px md-mb-50px xs-mb-0 order-sm-2 order-lg-5">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Newsletter</span>
+<div className="mb-20px">Get everything you need succeed!</div>
+<div className="d-inline-block w-100 newsletter-style-02 position-relative mb-15px">
+<form action="https://craftohtml.themezaa.com/email-templates/subscribe-newsletter.php" className="position-relative w-100" method="post">
+<input className="bg-transparent border-color-transparent-white-light w-100 form-control pe-50px ps-20px lg-ps-15px required" name="email" placeholder="Enter your email" type="email"/>
+<input name="redirect" type="hidden" value="" />
+<button aria-label="submit" className="btn pe-20px submit"><i className="icon feather icon-feather-mail icon-small text-white"></i></button>
+<div className="form-results border-radius-4px pt-5px pb-5px ps-15px pe-15px fs-14 lh-22 mt-10px w-100 text-center position-absolute d-none">
+</div>
+</form>
+</div>
+<div className="footer-card">
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-01.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-02.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-03.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-04.png"/></a>
+</div>
+</div>
+{/*  end footer column  */}
+</div>
+</div>
+<div className="border-top border-color-transparent-white-light pt-30px pb-30px">
+<div className="container">
+<div className="row align-items-center justify-content-center">
+<div className="col-xl-8 last-paragraph-no-margin text-center text-xl-start lg-mt-20px order-3 order-xl-1">
+<p className="fs-14 w-90 xl-w-100">© 2026 Behome. All rights reserved.</p>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-1 order-xl-2">
+<span className="lh-26 alt-font d-block">Need support?</span>
+<a className="fs-16 text-white fw-500" href="tel:911234567890">+91 12345 67890</a>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-2 order-xl-3">
+<span className="lh-26 alt-font d-block">Customer care</span>
+<a className="fs-16 text-white fw-500" href="mailto:info@dummy.com">info@dummy.com</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+{/*  end footer  */}
+{/*  start cookie message  */}
+<div className="cookie-message bg-dark-gray border-radius-8px" id="cookies-model">
+<div className="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing
+            experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you
+            consent to our use of cookies. </div>
+<div className="cookie-btn">
+<a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/account#">
+<span>
+<span className="btn-double-text" data-text="Cookie policy">Cookie policy</span>
+</span>
+</a>
+<a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="" href="/account#">
+<span>
+<span className="btn-double-text" data-text="Allow cookies">Allow cookies</span>
+</span>
+</a>
+</div>
+</div>
+{/*  end cookie message  */}
+{/*  start scroll progress  */}
+<div className="scroll-progress d-none d-xxl-block">
+<a aria-label="scroll" className="scroll-top" href="/account#">
+<span className="scroll-text">Scroll</span><span className="scroll-line"><span className="scroll-point"></span></span>
+</a>
+</div>
+{/*  end scroll progress  */}
+{/*  javascript libraries  */}
+{/*  Mega Menu Alignment Fix  */}
+    {/*  Behome Premium Animation System  */}
+    
+        </main>
+    );
+}

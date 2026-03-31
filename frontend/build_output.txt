@@ -1,0 +1,41 @@
+
+> behome-nextjs@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.3
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/16) ...
+   Generating static pages (4/16) 
+   Generating static pages (8/16) 
+   Generating static pages (12/16) 
+ ✓ Generating static pages (16/16)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    829 B          87.8 kB
+├ ○ /_not-found                          875 B          87.8 kB
+├ ○ /about                               167 B          87.1 kB
+├ ○ /account                             167 B          87.1 kB
+├ ○ /blog                                169 B          87.1 kB
+├ ○ /blog/post                           167 B          87.1 kB
+├ ○ /cart                                169 B          87.1 kB
+├ ○ /checkout                            169 B          87.1 kB
+├ ○ /collections                         169 B          87.1 kB
+├ ○ /contact                             168 B          87.1 kB
+├ ○ /faq                                 169 B          87.1 kB
+├ ○ /product                             169 B          87.1 kB
+├ ○ /shop                                169 B          87.1 kB
+└ ○ /wishlist                            169 B          87.1 kB
++ First Load JS shared by all            87 kB
+  ├ chunks/23-a65363d5d62554a7.js        31.5 kB
+  ├ chunks/fd9d1056-6184565b3c21c232.js  53.7 kB
+  └ other shared chunks (total)          1.83 kB
+
+
+○  (Static)  prerendered as static content
+

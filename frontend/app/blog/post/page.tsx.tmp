@@ -1,0 +1,474 @@
+{/*  start section  */}
+<section className="top-space-margin half-section pb-0">
+<div className="container">
+<div className="row">
+<div className="col-12">
+<img alt="" className="border-radius-6px" src="images/demo-decor-store-blog-single-classic-01.jpg"/>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section className="overlap-section text-center p-0 sm-pt-50px">
+<img alt="" className="rounded-circle box-shadow-medium-bottom w-150px border border-9 border-color-white" src="images/avtar-07.jpg"/>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section className="pb-0 pt-40px">
+<div className="container">
+<div className="row justify-content-center">
+<div className="col-lg-10 text-center">
+<span className="fs-18 mb-20px d-inline-block">Writer by <a className="fw-600 d-inline-block align-middle text-white" href="/blog">Charlene carberry</a> in <a className="d-inline-block align-middle text-white fw-600" href="/blog">Decor</a></span>
+<h2 className="alt-font fw-700 text-white mx-auto w-80 xl-w-100 mb-5">The best influencers to follow for
+                        sartorial inspiration.</h2>
+<i className="feather icon-feather-more-horizontal- icon-double-large text-light-gray d-inline-block mb-5 d-inline-block"></i>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section className="py-0">
+<div className="container">
+<div className="row justify-content-center">
+<div className="col-lg-10">
+<div className="dropcap-style-02 last-paragraph-no-margin">
+<p><span className="alt-font first-letter first-letter-block first-letter-round bg-dark-gray text-white">M</span>Lorem
+                            ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, sapien luctus
+                            fermentum cursus, risus arcu tristique libero, eu ultricies mauris risus at mauris. Duis sit
+                            amet tempus massa, sit amet luctus erat. Quisque pulvinar ac nibh non sodales. Fusce
+                            facilisis est. Vestibulum venenatis, mauris ut accumsan lacinia ipsum nisl volutpat leo ut
+                            dictum mauris quam eget nibhmauris ut accumsan lacinia.</p>
+<img alt="" className="mb-30px mt-6" src="images/demo-decor-store-blog-single-classic-02.jpg"/>
+<p className="pb-25px text-center alt-font text-white ls-1px fw-600 text-uppercase">We must never
+                            confuse elegance with snobbery</p>
+<div className="h-3px w-100 bg-dark-gray"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section>
+<div className="container">
+<div className="row justify-content-center">
+<div className="col-lg-10">
+<div className="row">
+<div className="col-xl-5 col-lg-6 md-mb-50px">
+<h4 className="alt-font text-white fw-700">Diversity lasts when it no longer has to be the
+                                subject of a story.</h4>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, sapien
+                                luctus fermentum cursus, risus arcu tristique libero, eu ultricies mauris risus at
+                                mauris. Duis sit amet tempus massa, sit amet luctus erat. Vestibulum venenatis accumsan
+                                lacinia ipsum nisl volutpat leo, ut dictum mauris quam eget Suspendisse fringilla sapien
+                                luctus.</p>
+<p>Suspendisse fringilla, sapien luctus and fermentum cursus, risus arcu tristique libero,
+                                eu ultricies.</p>
+<a className="btn btn-dark-gray btn-medium mt-15px" href="/blog/post#">Fashion trends</a>
+</div>
+<div className="col-lg-6 offset-xl-1"><img alt="" src="images/demo-decor-store-blog-single-classic-03.jpg"/></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section className="pt-0">
+<div className="container">
+<div className="row justify-content-center">
+<div className="col-lg-10">
+<div className="row">
+<div className="col-12 last-paragraph-no-margin">
+<div className="h-3px w-100 bg-dark-gray"></div>
+<p className="pt-25px text-center alt-font text-white ls-1px fw-600 text-uppercase">I want
+                                people to see the dress, but focus on the woman</p>
+<img alt="" className="mb-8 mt-30px" src="images/demo-decor-store-blog-single-classic-04.jpg"/>
+</div>
+<div className="col-md-6">
+<h4 className="alt-font text-white fw-700">Fashion is what you're offered four times a year by
+                                designers.</h4>
+</div>
+<div className="col-md-6 last-paragraph-no-margin">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla sapien
+                                luctus fermentum cursus, risus arcu tristique libero, eu ultricies mauris risus at
+                                mauris. Duis sit amet tempus massa. Vestibulum and venenatis, mauris ut accumsan
+                                lacinia, ipsum nisl volutpat leo, ut dictum mauris quam.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section className="half-section pt-0">
+<div className="container">
+<div className="row justify-content-center">
+<div className="col-lg-10">
+<div className="row mb-30px">
+<div className="tag-cloud col-md-9 text-center text-md-start sm-mb-15px">
+<a href="/blog">Development</a>
+<a href="/blog">Event</a>
+<a href="/blog">Multimedia </a>
+<a href="/blog">Fashion</a>
+</div>
+<div className="tag-cloud col-md-3 text-uppercase text-center text-md-end">
+<a className="likes-count fw-500 mx-0" href="/blog/post#"><i className="fa-regular fa-heart text-red me-10px"></i><span className="text-white text-white-hover">05 Likes</span></a>
+</div>
+</div>
+<div className="row">
+<div className="col-12 mb-6">
+<div className="d-block d-md-flex w-100 box-shadow-extra-large align-items-center border-radius-4px p-7 sm-p-35px">
+<div className="w-140px text-center me-50px sm-mx-auto">
+<img alt="" className="rounded-circle w-120px" src="images/avtar-07.jpg"/>
+<a className="text-white fw-600 mt-20px d-inline-block lh-20" href="/blog">Colene Landin</a>
+<span className="fs-15 lh-20 d-block sm-mb-15px">Co-founder</span>
+</div>
+<div className="w-75 sm-w-100 text-center text-md-start last-paragraph-no-margin">
+<p>Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem
+                                        ipsum has been the industry's standard dummy text ever since the 1500s when an
+                                        unknown printer took a galley of type.</p>
+<a className="btn btn-link btn-large text-white mt-15px fw-600" href="/blog">All author posts</a>
+</div>
+</div>
+</div>
+</div>
+<div className="row justify-content-center">
+<div className="col-12 text-center elements-social social-icon-style-04">
+<ul className="large-icon dark">
+<li><a className="facebook" href="https://www.facebook.com/" target="_blank"><i className="fa-brands fa-facebook-f"></i><span></span></a></li>
+<li><a className="twitter" href="https://www.twitter.com" target="_blank"><i className="fa-brands fa-twitter"></i><span></span></a></li>
+<li><a className="instagram" href="https://www.instagram.com" target="_blank"><i className="fa-brands fa-instagram"></i><span></span></a></li>
+<li><a className="linkedin" href="http://www.linkedin.com" target="_blank"><i className="fa-brands fa-linkedin-in"></i><span></span></a></li>
+<li><a className="behance" href="http://www.behance.com/" target="_blank"><i className="fa-brands fa-behance"></i><span></span></a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section className="bg-dark-gray">
+<div className="container">
+<div className="row justify-content-center mb-1">
+<div className="col-lg-7 text-center">
+<span className="text-uppercase fs-14 ls-2px fw-600 d-inline-block">You may also like</span>
+<h4 className="alt-font text-white fw-700">Related posts</h4>
+</div>
+</div>
+<div className="row g-0">
+<div className="col-12">
+<ul className="blog-classic blog-wrapper grid grid-4col xl-grid-4col lg-grid-3col md-grid-2col sm-grid-2col xs-grid-1col gutter-extra-large">
+<li className="grid-sizer"></li>
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-07.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog/post#">08
+                                            August 2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 sm-w-100" href="/blog/post">The
+                                        best influencers to follow for sartorial inspiration</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-08.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Design</a><a className="blog-date" href="/blog/post#">12
+                                            August 2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 sm-w-100" href="/blog/post">Everything
+                                        you need to know about decor's big night out</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-04.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog/post#">20
+                                            August 2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 sm-w-100" href="/blog/post">All
+                                        the best looks &amp; moments from the met gala 2023</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-03.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog/post#">26
+                                            August 2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 sm-w-100" href="/blog/post">Find
+                                        a colour palettes that reflects your passion</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+</ul>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section>
+<div className="container">
+<div className="row justify-content-center">
+<div className="col-lg-9 text-center mb-2">
+<h6 className="alt-font text-white fw-700">4 Comments</h6>
+</div>
+</div>
+<div className="row justify-content-center">
+<div className="col-lg-9">
+<ul className="blog-comment">
+<li>
+<div className="d-block d-md-flex w-100 align-items-center align-items-md-start">
+<div className="w-90px sm-w-65px sm-mb-10px">
+<img alt="" className="rounded-circle" src="images/avtar-18.jpg"/>
+</div>
+<div className="w-100 ps-30px last-paragraph-no-margin sm-ps-0">
+<a className="text-white fw-600" href="/blog/post#">Herman Miller</a>
+<a className="btn-reply text-uppercase section-link" href="/blog/post#comments">Reply</a>
+<div className="fs-14 lh-24 mb-10px">17 July 2020, 6:05 PM</div>
+<p className="w-85 sm-w-100">Lorem ipsum is simply dummy text of the printing and
+                                        typesetting industry. Lorem ipsum has been the industry's standard dummy text
+                                        ever since the make book.</p>
+</div>
+</div>
+<ul className="child-comment">
+<li>
+<div className="d-block d-md-flex w-100 align-items-center align-items-md-start">
+<div className="w-90px sm-w-65px sm-mb-10px">
+<img alt="" className="rounded-circle" src="images/avtar-19.jpg"/>
+</div>
+<div className="w-100 ps-30px last-paragraph-no-margin sm-ps-0">
+<a className="text-white fw-600" href="/blog/post#">Wilbur Haddock</a>
+<a className="btn-reply text-uppercase section-link" href="/blog/post#comments">Reply</a>
+<div className="fs-14 lh-24 mb-10px">18 July 2020, 10:19 PM</div>
+<p className="w-85 sm-w-100">Lorem ipsum is simply dummy text of the printing
+                                                and typesetting industry. Lorem ipsum has been the industry's standard
+                                                dummy text ever since.</p>
+</div>
+</div>
+</li>
+<li>
+<div className="d-block d-md-flex w-100 align-items-center align-items-md-start border-radius-5px p-50px md-p-30px sm-p-20px bg-dark-gray">
+<div className="w-90px sm-w-65px sm-mb-10px">
+<img alt="" className="rounded-circle" src="images/avtar-17.jpg"/>
+</div>
+<div className="w-100 ps-30px last-paragraph-no-margin sm-ps-0">
+<a className="text-white fw-600" href="/blog/post#">Colene Landin</a>
+<a className="btn-reply text-uppercase section-link" href="/blog/post#comments">Reply</a>
+<div className="fs-14 lh-24 mb-10px">18 July 2020, 12:39 PM</div>
+<p className="w-85 sm-w-100">Lorem ipsum is simply dummy text of the printing
+                                                and typesetting industry. Ipsum has been the industry's standard dummy
+                                                text.</p>
+</div>
+</div>
+</li>
+</ul>
+</li>
+<li>
+<div className="d-block d-md-flex w-100 align-items-center align-items-md-start">
+<div className="w-90px sm-w-65px sm-mb-10px">
+<img alt="" className="rounded-circle" src="images/avtar-18.jpg"/>
+</div>
+<div className="w-100 ps-30px last-paragraph-no-margin sm-ps-0">
+<a className="text-white fw-600" href="/blog/post#">Jennifer Freeman</a>
+<a className="btn-reply text-uppercase section-link" href="/blog/post#comments">Reply</a>
+<div className="fs-14 lh-24 mb-10px">19 July 2020, 8:25 PM</div>
+<p className="w-85 sm-w-100">Lorem ipsum is simply dummy text of the printing and
+                                        typesetting industry. Lorem ipsum has been the industry's standard dummy text
+                                        ever since the make a type specimen book.</p>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start section  */}
+<section className="pt-0" id="comments">
+<div className="container">
+<div className="row justify-content-center">
+<div className="col-lg-9 mb-3 sm-mb-6">
+<h6 className="alt-font text-white fw-700 mb-5px">Write a comment</h6>
+<div className="mb-5px">Your email address will not be published. required fields are marked *</div>
+</div>
+</div>
+<div className="row justify-content-center">
+<div className="col-lg-9">
+<form action="https://craftohtml.themezaa.com/email-templates/contact-form.php" className="row contact-form-style-02" method="post">
+<div className="col-md-6 mb-30px">
+<input className="input-name border-radius-4px form-control required" name="name" placeholder="Enter your name*" type="text"/>
+</div>
+<div className="col-md-6 mb-30px">
+<input className="border-radius-4px form-control required" name="email" placeholder="Enter your email address*" type="email"/>
+</div>
+<div className="col-md-12 mb-30px">
+<textarea className="border-radius-4px form-control" cols={40} name="comment" placeholder="Your message" rows={4}></textarea>
+</div>
+<div className="col-12">
+<input name="redirect" type="hidden" value=""/>
+<button className="btn btn-dark-gray btn-small btn-round-edge submit" type="submit">Post
+                                Comment</button>
+<div className="form-results mt-20px d-none"></div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start footer  */}
+<footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'images/new/bg/bg1.png\')' }}>
+<div className="container pt-4 pb-4 md-pt-45px md-pb-45px">
+<div className="row justify-content-center">
+{/*  start footer column  */}
+<div className="col-6 col-lg-3 last-paragraph-no-margin order-sm-1 md-mb-50px xs-mb-30px">
+<a className="footer-logo mb-30px d-inline-block" href="/">
+<img alt="Behome Logo" src="images/new/logo/Behome%20Final%20.png" style={{ maxHeight: '200px' }}/>
+</a>
+<p className="w-80 sm-w-100">Exquisite architectural decor and premium furniture for the modern luxury
+                        interior.</p>
+<div className="elements-social social-icon-style-02 mt-15px">
+<ul className="small-icon light">
+<li><a className="facebook" href="https://www.facebook.com/" target="_blank"><i className="fa-brands fa-facebook-f"></i></a></li>
+<li><a className="dribbble" href="http://www.dribbble.com" target="_blank"><i className="fa-brands fa-dribbble"></i></a></li>
+<li><a className="twitter" href="https://www.twitter.com" target="_blank"><i className="fa-brands fa-twitter"></i></a></li>
+<li><a className="instagram" href="https://www.instagram.com" target="_blank"><i className="fa-brands fa-instagram"></i></a></li>
+</ul>
+</div>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Categories</span>
+<ul>
+<li><a href="/shop">Bed room</a></li>
+<li><a href="/shop">Living room</a></li>
+<li><a href="/shop">Lightning</a></li>
+<li><a href="/shop">Fabrics sofa</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Information</span>
+<ul>
+<li><a href="/about">About us</a></li>
+<li><a href="/contact">Contact us</a></li>
+<li><a href="/faq">FAQs</a></li>
+<li><a href="/faq">Payment</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Account</span>
+<ul>
+<li><a href="/account">My account</a></li>
+<li><a href="/cart">Orders</a></li>
+<li><a href="/checkout">Checkout</a></li>
+<li><a href="/wishlist">My wishlists</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-lg-3 col-sm-6 ps-20px sm-ps-15px md-mb-50px xs-mb-0 order-sm-2 order-lg-5">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Newsletter</span>
+<div className="mb-20px">Get everything you need succeed!</div>
+<div className="d-inline-block w-100 newsletter-style-02 position-relative mb-15px">
+<form action="https://craftohtml.themezaa.com/email-templates/subscribe-newsletter.php" className="position-relative w-100" method="post">
+<input className="bg-transparent border-color-transparent-white-light w-100 form-control pe-50px ps-20px lg-ps-15px required" name="email" placeholder="Enter your email" type="email"/>
+<input name="redirect" type="hidden" value="" />
+<button aria-label="submit" className="btn pe-20px submit"><i className="icon feather icon-feather-mail icon-small text-white"></i></button>
+<div className="form-results border-radius-4px pt-5px pb-5px ps-15px pe-15px fs-14 lh-22 mt-10px w-100 text-center position-absolute d-none">
+</div>
+</form>
+</div>
+<div className="footer-card">
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-01.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-02.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-03.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-04.png"/></a>
+</div>
+</div>
+{/*  end footer column  */}
+</div>
+</div>
+<div className="border-top border-color-transparent-white-light pt-30px pb-30px">
+<div className="container">
+<div className="row align-items-center justify-content-center">
+<div className="col-xl-8 last-paragraph-no-margin text-center text-xl-start lg-mt-20px order-3 order-xl-1">
+<p className="fs-14 w-90 xl-w-100">© 2026 Behome. All rights reserved.</p>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-1 order-xl-2">
+<span className="lh-26 alt-font d-block">Need support?</span>
+<a className="fs-16 text-white fw-500" href="tel:911234567890">+91 12345 67890</a>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-2 order-xl-3">
+<span className="lh-26 alt-font d-block">Customer care</span>
+<a className="fs-16 text-white fw-500" href="mailto:info@dummy.com">info@dummy.com</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+{/*  end footer  */}
+{/*  start cookie message  */}
+<div className="cookie-message bg-dark-gray border-radius-8px" id="cookies-model">
+<div className="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing
+            experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you
+            consent to our use of cookies. </div>
+<div className="cookie-btn">
+<a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/blog/post#">
+<span>
+<span className="btn-double-text" data-text="Cookie policy">Cookie policy</span>
+</span>
+</a>
+<a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="" href="/blog/post#">
+<span>
+<span className="btn-double-text" data-text="Allow cookies">Allow cookies</span>
+</span>
+</a>
+</div>
+</div>
+{/*  end cookie message  */}
+{/*  start scroll progress  */}
+<div className="scroll-progress d-none d-xxl-block">
+<a aria-label="scroll" className="scroll-top" href="/blog/post#">
+<span className="scroll-text">Scroll</span><span className="scroll-line"><span className="scroll-point"></span></span>
+</a>
+</div>
+{/*  end scroll progress  */}
+{/*  javascript libraries  */}
+{/*  Mega Menu Alignment Fix  */}
+    {/*  Behome Premium Animation System  */}
+    
+        </main>
+    );
+}

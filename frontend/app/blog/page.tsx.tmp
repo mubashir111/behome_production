@@ -1,0 +1,332 @@
+{/*  start section  */}
+<section>
+<div className="container">
+<div className="row">
+<div className="col-12 px-0">
+<ul className="blog-classic blog-wrapper grid-loading grid grid-4col xl-grid-4col lg-grid-3col md-grid-2col sm-grid-2col xs-grid-1col gutter-double-extra-large" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay":100, "staggervalue": 150, "easing": "easeOutQuad" }'>
+<li className="grid-sizer"></li>
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-01.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">08 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">The
+                                        best influencers to follow for sartorial inspiration</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-02.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Design</a><a className="blog-date" href="/blog#">12 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Everything
+                                        you need to know about decor's big night out</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-03.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">20 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">All
+                                        the best looks &amp; moments from the met gala 2023</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-04.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">26 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Find
+                                        a colour palettes that reflects your passion</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-05.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">08 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">The
+                                        7 biggest trends of the oscars red carpet</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-06.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Design</a><a className="blog-date" href="/blog#">12 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Our
+                                        new beach house tour with before photos!</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-07.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">20 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Standing
+                                        desk for working from home in a small space</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-08.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">26 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Simple
+                                        strawberry crisp recipe with easter pie crust cutouts</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-09.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">08 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Spring
+                                        inspiration for charming yard and exterior spaces!</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-10.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Design</a><a className="blog-date" href="/blog#">12 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Our
+                                        kitchen and dining room remodeling plans</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-11.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">20 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">A
+                                        classic white kitchen with colorful patterned</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+{/*  start blog item  */}
+<li className="grid-item">
+<div className="card bg-transparent border-0 h-100">
+<div className="blog-image position-relative overflow-hidden border-radius-4px">
+<a href="/blog/post"><img alt="" src="images/demo-decor-store-blog-12.jpg"/></a>
+</div>
+<div className="card-body px-0 pt-30px pb-30px xs-pb-15px">
+<span className="fs-13 text-uppercase d-block mb-5px fw-500"><a className="text-white fw-700 categories-text" href="/blog">Decor</a><a className="blog-date" href="/blog#">26 August
+                                            2023</a></span>
+<a className="card-title fw-600 fs-17 lh-30 text-white d-inline-block w-95 xs-w-100" href="/blog/post">Three
+                                        simple updates to make your bedroom your winter</a>
+</div>
+</div>
+</li>
+{/*  end blog item  */}
+</ul>
+</div>
+<div className="col-12 mt-3 sm-mb-3 d-flex justify-content-center" data-anime='{ "translateY": [0, 0], "opacity": [0,1], "duration": 600, "delay":100, "staggervalue": 150, "easing": "easeOutQuad" }'>
+<ul className="pagination pagination-style-01 fs-13 fw-500 mb-0">
+<li className="page-item"><a className="page-link" href="/blog#"><i className="feather icon-feather-arrow-left fs-18 d-xs-none"></i></a></li>
+<li className="page-item"><a className="page-link" href="/blog#">01</a></li>
+<li className="page-item active"><a className="page-link" href="/blog#">02</a></li>
+<li className="page-item"><a className="page-link" href="/blog#">03</a></li>
+<li className="page-item"><a className="page-link" href="/blog#">04</a></li>
+<li className="page-item"><a className="page-link" href="/blog#"><i className="feather icon-feather-arrow-right fs-18 d-xs-none"></i></a></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start footer  */}
+<footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'images/new/bg/bg1.png\')' }}>
+<div className="container pt-4 pb-4 md-pt-45px md-pb-45px">
+<div className="row justify-content-center">
+{/*  start footer column  */}
+<div className="col-6 col-lg-3 last-paragraph-no-margin order-sm-1 md-mb-50px xs-mb-30px">
+<a className="footer-logo mb-30px d-inline-block" href="/">
+<img alt="Behome Logo" src="images/new/logo/Behome%20Final%20.png" style={{ maxHeight: '200px' }}/>
+</a>
+<p className="w-80 sm-w-100">Exquisite architectural decor and premium furniture for the modern luxury
+                        interior.</p>
+<div className="elements-social social-icon-style-02 mt-15px">
+<ul className="small-icon light">
+<li><a className="facebook" href="https://www.facebook.com/" target="_blank"><i className="fa-brands fa-facebook-f"></i></a></li>
+<li><a className="dribbble" href="http://www.dribbble.com" target="_blank"><i className="fa-brands fa-dribbble"></i></a></li>
+<li><a className="twitter" href="https://www.twitter.com" target="_blank"><i className="fa-brands fa-twitter"></i></a></li>
+<li><a className="instagram" href="https://www.instagram.com" target="_blank"><i className="fa-brands fa-instagram"></i></a></li>
+</ul>
+</div>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Categories</span>
+<ul>
+<li><a href="/shop">Bed room</a></li>
+<li><a href="/shop">Living room</a></li>
+<li><a href="/shop">Lightning</a></li>
+<li><a href="/shop">Fabrics sofa</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Information</span>
+<ul>
+<li><a href="/about">About us</a></li>
+<li><a href="/contact">Contact us</a></li>
+<li><a href="/faq">FAQs</a></li>
+<li><a href="/faq">Payment</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Account</span>
+<ul>
+<li><a href="/account">My account</a></li>
+<li><a href="/cart">Orders</a></li>
+<li><a href="/checkout">Checkout</a></li>
+<li><a href="/wishlist">My wishlists</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-lg-3 col-sm-6 ps-20px sm-ps-15px md-mb-50px xs-mb-0 order-sm-2 order-lg-5">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Newsletter</span>
+<div className="mb-20px">Get everything you need succeed!</div>
+<div className="d-inline-block w-100 newsletter-style-02 position-relative mb-15px">
+<form action="https://craftohtml.themezaa.com/email-templates/subscribe-newsletter.php" className="position-relative w-100" method="post">
+<input className="bg-transparent border-color-transparent-white-light w-100 form-control pe-50px ps-20px lg-ps-15px required" name="email" placeholder="Enter your email" type="email"/>
+<input name="redirect" type="hidden" value=""/>
+<button aria-label="submit" className="btn pe-20px submit"><i className="icon feather icon-feather-mail icon-small text-white"></i></button>
+<div className="form-results border-radius-4px pt-5px pb-5px ps-15px pe-15px fs-14 lh-22 mt-10px w-100 text-center position-absolute d-none">
+</div>
+</form>
+</div>
+<div className="footer-card">
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-01.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-02.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-03.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-04.png"/></a>
+</div>
+</div>
+{/*  end footer column  */}
+</div>
+</div>
+<div className="border-top border-color-transparent-white-light pt-30px pb-30px">
+<div className="container">
+<div className="row align-items-center justify-content-center">
+<div className="col-xl-8 last-paragraph-no-margin text-center text-xl-start lg-mt-20px order-3 order-xl-1">
+<p className="fs-14 w-90 xl-w-100">© 2026 Behome. All rights reserved.</p>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-1 order-xl-2">
+<span className="lh-26 alt-font d-block">Need support?</span>
+<a className="fs-16 text-white fw-500" href="tel:911234567890">+91 12345 67890</a>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-2 order-xl-3">
+<span className="lh-26 alt-font d-block">Customer care</span>
+<a className="fs-16 text-white fw-500" href="mailto:info@dummy.com">info@dummy.com</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+{/*  end footer  */}
+{/*  start cookie message  */}
+<div className="cookie-message bg-dark-gray border-radius-8px" id="cookies-model">
+<div className="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing
+            experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you
+            consent to our use of cookies. </div>
+<div className="cookie-btn">
+<a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/blog#">
+<span>
+<span className="btn-double-text" data-text="Cookie policy">Cookie policy</span>
+</span>
+</a>
+<a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="" href="/blog#">
+<span>
+<span className="btn-double-text" data-text="Allow cookies">Allow cookies</span>
+</span>
+</a>
+</div>
+</div>
+{/*  end cookie message  */}
+{/*  start scroll progress  */}
+<div className="scroll-progress d-none d-xxl-block">
+<a aria-label="scroll" className="scroll-top" href="/blog#">
+<span className="scroll-text">Scroll</span><span className="scroll-line"><span className="scroll-point"></span></span>
+</a>
+</div>
+{/*  end scroll progress  */}
+{/*  javascript libraries  */}
+{/*  Mega Menu Alignment Fix  */}
+    {/*  Behome Premium Animation System  */}
+    
+        </main>
+    );
+}

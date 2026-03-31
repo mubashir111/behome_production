@@ -1,0 +1,258 @@
+{/*  start page title  */}
+<section className="page-title-center-alignment cover-background top-space-padding bg-dark-gray" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.7)), url(\'images/new/bg/bg1.png\')', paddingTop: '200px', paddingBottom: '70px' }}>
+<div className="container">
+<div className="row">
+<div className="col-12 text-center position-relative page-title-extra-large">
+<h1 className="alt-font d-inline-block fw-700 ls-minus-05px text-white mb-10px">Collections</h1>
+</div>
+<div className="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
+<ul>
+<li><a className="text-white" href="/">Home</a></li>
+<li className="text-white opacity-7">Collections</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+{/*  end page title  */}
+{/*  start section  */}
+<section className="position-relative">
+<div className="container">
+<div className="row row-cols-1 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 justify-content-center align-items-center" data-anime='{ "el": "childs", "translateY": [50, 0], "translateX": [-50, 0], "opacity": [0,1], "duration": 600, "delay":100, "staggervalue": 150, "easing": "easeOutQuad" }'>
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center mb-50px xs-mb-35px">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-01.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                02</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Designer
+                            stool</a>
+</div>
+</div>
+{/*  end categories item  */}
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center mb-50px xs-mb-35px">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-02.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                03</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Modern
+                            chair</a>
+</div>
+</div>
+{/*  end categories item  */}
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center mb-50px xs-mb-35px">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-03.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                05</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Table
+                            clock</a>
+</div>
+</div>
+{/*  end categories item  */}
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center mb-50px xs-mb-35px">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-04.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                07</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Home
+                            decor</a>
+</div>
+</div>
+{/*  end categories item  */}
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center md-mb-50px xs-mb-35px">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-05.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                08</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Ceramic
+                            pots</a>
+</div>
+</div>
+{/*  end categories item  */}
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center md-mb-50px xs-mb-35px">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-06.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                04</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Table
+                            lamp</a>
+</div>
+</div>
+{/*  end categories item  */}
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center xs-mb-35px">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-07.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                02</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Wooden
+                            table</a>
+</div>
+</div>
+{/*  end categories item  */}
+{/*  start categories item  */}
+<div className="col categories-style-01 text-center">
+<div className="categories-box">
+<div className="icon-box position-relative mb-10px">
+<a href="/shop"><img alt="" src="images/demo-decor-store-menu-collections-08.jpg"/></a>
+<div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
+                                05</div>
+</div>
+<a className="fw-600 fs-17 text-white text-white-hover" href="/shop">Designer
+                            sofa</a>
+</div>
+</div>
+{/*  end categories item  */}
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start footer  */}
+<footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'images/new/bg/bg1.png\')' }}>
+<div className="container pt-4 pb-4 md-pt-45px md-pb-45px">
+<div className="row justify-content-center">
+{/*  start footer column  */}
+<div className="col-6 col-lg-3 last-paragraph-no-margin order-sm-1 md-mb-50px xs-mb-30px">
+<a className="footer-logo mb-30px d-inline-block" href="/">
+<img alt="Behome Logo" src="images/new/logo/Behome%20Final%20.png" style={{ maxHeight: '200px' }}/>
+</a>
+<p className="w-80 sm-w-100">Exquisite architectural decor and premium furniture for the modern luxury
+                        interior.</p>
+<div className="elements-social social-icon-style-02 mt-15px">
+<ul className="small-icon light">
+<li><a className="facebook" href="https://www.facebook.com/" target="_blank"><i className="fa-brands fa-facebook-f"></i></a></li>
+<li><a className="dribbble" href="http://www.dribbble.com" target="_blank"><i className="fa-brands fa-dribbble"></i></a></li>
+<li><a className="twitter" href="https://www.twitter.com" target="_blank"><i className="fa-brands fa-twitter"></i></a></li>
+<li><a className="instagram" href="https://www.instagram.com" target="_blank"><i className="fa-brands fa-instagram"></i></a></li>
+</ul>
+</div>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Categories</span>
+<ul>
+<li><a href="/shop">Bed room</a></li>
+<li><a href="/shop">Living room</a></li>
+<li><a href="/shop">Lightning</a></li>
+<li><a href="/shop">Fabrics sofa</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Information</span>
+<ul>
+<li><a href="/about">About us</a></li>
+<li><a href="/contact">Contact us</a></li>
+<li><a href="/faq">FAQs</a></li>
+<li><a href="/faq">Payment</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Account</span>
+<ul>
+<li><a href="/account">My account</a></li>
+<li><a href="/cart">Orders</a></li>
+<li><a href="/checkout">Checkout</a></li>
+<li><a href="/wishlist">My wishlists</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-lg-3 col-sm-6 ps-20px sm-ps-15px md-mb-50px xs-mb-0 order-sm-2 order-lg-5">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Newsletter</span>
+<div className="mb-20px">Get everything you need succeed!</div>
+<div className="d-inline-block w-100 newsletter-style-02 position-relative mb-15px">
+<form action="https://craftohtml.themezaa.com/email-templates/subscribe-newsletter.php" className="position-relative w-100" method="post">
+<input className="bg-transparent border-color-transparent-white-light w-100 form-control pe-50px ps-20px lg-ps-15px required" name="email" placeholder="Enter your email" type="email"/>
+<input name="redirect" type="hidden" value=""/>
+<button aria-label="submit" className="btn pe-20px submit"><i className="icon feather icon-feather-mail icon-small text-white"></i></button>
+<div className="form-results border-radius-4px pt-5px pb-5px ps-15px pe-15px fs-14 lh-22 mt-10px w-100 text-center position-absolute d-none">
+</div>
+</form>
+</div>
+<div className="footer-card">
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-01.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-02.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-03.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-04.png"/></a>
+</div>
+</div>
+{/*  end footer column  */}
+</div>
+</div>
+<div className="border-top border-color-transparent-white-light pt-30px pb-30px">
+<div className="container">
+<div className="row align-items-center justify-content-center">
+<div className="col-xl-8 last-paragraph-no-margin text-center text-xl-start lg-mt-20px order-3 order-xl-1">
+<p className="fs-14 w-90 xl-w-100">© 2026 Behome. All rights reserved.</p>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-1 order-xl-2">
+<span className="lh-26 alt-font d-block">Need support?</span>
+<a className="fs-16 text-white fw-500" href="tel:911234567890">+91 12345 67890</a>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-2 order-xl-3">
+<span className="lh-26 alt-font d-block">Customer care</span>
+<a className="fs-16 text-white fw-500" href="mailto:info@dummy.com">info@dummy.com</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+{/*  end footer  */}
+{/*  start cookie message  */}
+<div className="cookie-message bg-dark-gray border-radius-8px" id="cookies-model">
+<div className="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing
+            experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you
+            consent to our use of cookies. </div>
+<div className="cookie-btn">
+<a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/collections#">
+<span>
+<span className="btn-double-text" data-text="Cookie policy">Cookie policy</span>
+</span>
+</a>
+<a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="" href="/collections#">
+<span>
+<span className="btn-double-text" data-text="Allow cookies">Allow cookies</span>
+</span>
+</a>
+</div>
+</div>
+{/*  end cookie message  */}
+{/*  start scroll progress  */}
+<div className="scroll-progress d-none d-xxl-block">
+<a aria-label="scroll" className="scroll-top" href="/collections#">
+<span className="scroll-text">Scroll</span><span className="scroll-line"><span className="scroll-point"></span></span>
+</a>
+</div>
+{/*  end scroll progress  */}
+{/*  javascript libraries  */}
+{/*  Mega Menu Alignment Fix  */}
+    {/*  Behome Premium Animation System  */}
+    
+        </main>
+    );
+}

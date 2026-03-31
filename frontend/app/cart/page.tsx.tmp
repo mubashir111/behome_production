@@ -1,0 +1,551 @@
+{/*  start section  */}
+<section className="top-space-padding">
+<div className="container">
+<div className="row align-items-start">
+<div className="col-lg-8 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
+<div className="row align-items-center">
+<div className="col-12">
+<table className="table cart-products border-color-transparent-white-light !border-0">
+<thead>
+<tr>
+<th scope="col"></th>
+<th className="alt-font fw-600 text-white" scope="col">Product</th>
+<th scope="col"></th>
+<th className="alt-font fw-600 text-white" scope="col">Price</th>
+<th className="alt-font fw-600 text-white" scope="col">Quantity</th>
+<th className="alt-font fw-600 text-white" scope="col">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td className="product-remove">
+<a className="fs-20 fw-500" href="/cart#">×</a>
+</td>
+<td className="product-thumbnail"><a href="/product"><img alt="" className="cart-product-image" src="images/demo-decor-store-product-01.jpg"/></a></td>
+<td className="product-name">
+<a className="text-white fw-500 d-block lh-initial" href="/product">Table clock</a>
+<span className="fs-14">Color: Pink</span>
+</td>
+<td className="product-price" data-title="Price">$23.00</td>
+<td className="product-quantity" data-title="Quantity">
+<div className="quantity">
+<button className="qty-minus" type="button">-</button>
+<input aria-label="qty-text" className="qty-text bg-transparent text-white" id="1" type="text" value="1"/>
+<button className="qty-plus" type="button">+</button>
+</div>
+</td>
+<td className="product-subtotal" data-title="Total">$23.00</td>
+</tr>
+<tr>
+<td className="product-remove">
+<a className="fs-20 fw-500" href="/cart#">×</a>
+</td>
+<td className="product-thumbnail"><a href="/product"><img alt="" className="cart-product-image" src="images/demo-decor-store-product-09.jpg"/></a></td>
+<td className="product-name">
+<a className="text-white fw-500 d-block lh-initial" href="/product">Designer pot</a>
+<span className="fs-14">Color: Brown</span>
+</td>
+<td className="product-price" data-title="Price">$35.00</td>
+<td className="product-quantity" data-title="Quantity">
+<div className="quantity">
+<button className="qty-minus" type="button">-</button>
+<input aria-label="qty-text" className="qty-text bg-transparent text-white" id="2" type="text" value="1"/>
+<button className="qty-plus" type="button">+</button>
+</div>
+</td>
+<td className="product-subtotal" data-title="Total">$70.00</td>
+</tr>
+<tr>
+<td className="product-remove">
+<a className="fs-20 fw-500" href="/cart#">×</a>
+</td>
+<td className="product-thumbnail"><a href="/product"><img alt="" className="cart-product-image" src="images/demo-decor-store-product-03.jpg"/></a></td>
+<td className="product-name">
+<a className="text-white fw-500 d-block lh-initial" href="/product">Ceramic mug</a>
+<span className="fs-14">Color: White</span>
+</td>
+<td className="product-price" data-title="Price">$15.00</td>
+<td className="product-quantity" data-title="Quantity">
+<div className="quantity">
+<button className="qty-minus" type="button">-</button>
+<input aria-label="qty-text" className="qty-text bg-transparent text-white" id="3" type="text" value="1"/>
+<button className="qty-plus" type="button">+</button>
+</div>
+</td>
+<td className="product-subtotal" data-title="Total">$15.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div className="row mt-20px">
+<div className="col-xl-7 col-md-6">
+<div className="coupon-code-panel">
+<input className="bg-dark-gray border-radius-4px text-white border-color-transparent-white-light" placeholder="Coupon code" type="text"/>
+<a className="btn apply-coupon-btn fs-13 fw-600 text-uppercase" href="/cart#">Apply</a>
+</div>
+</div>
+<div className="col-xl-5 col-md-6 text-center text-md-end sm-mt-15px">
+<a className="btn btn-small border-1 btn-round-edge btn-transparent-white-light text-white text-transform-none me-15px" href="/cart#">Empty
+                                cart</a>
+<a className="btn btn-small border-1 btn-round-edge btn-transparent-white-light text-white text-transform-none" href="/cart#">Update
+                                cart</a>
+</div>
+</div>
+</div>
+<div className="col-lg-4">
+<div className="dark-card-bg border-radius-6px p-50px xl-p-30px lg-p-25px">
+<span className="fs-26 alt-font fw-600 text-white mb-5px d-block">Cart totals</span>
+<table className="w-100 total-price-table">
+<tbody>
+<tr>
+<th className="w-45 fw-600 text-white alt-font">Subtotal</th>
+<td className="text-white fw-600">$405.00</td>
+</tr>
+<tr className="shipping">
+<th className="fw-600 text-white alt-font">Shipping</th>
+<td data-title="Shipping">
+<ul className="p-0 m-0">
+<li className="d-flex align-items-center">
+<input defaultChecked className="d-block w-auto mb-0 me-10px p-0" id="free_shipping" name="shipping-option" type="radio"/>
+<label className="md-line-height-18px text-white" htmlFor="free_shipping">Free
+                                                    shipping</label>
+</li>
+<li className="d-flex align-items-center">
+<input className="d-block w-auto mb-0 me-10px p-0" id="flat" name="shipping-option" type="radio"/>
+<label className="md-line-height-18px text-white" htmlFor="flat">Flat:
+                                                    $12.00</label>
+</li>
+<li className="d-flex align-items-center">
+<input className="d-block w-auto mb-0 me-10px p-0" id="local_pickup" name="shipping-option" type="radio"/>
+<label className="md-line-height-18px text-white" htmlFor="local_pickup">Local
+                                                    pickup</label>
+</li>
+</ul>
+</td>
+</tr>
+<tr className="calculate-shipping">
+<th className="fw-500" colSpan={2}>
+<a aria-expanded="false" className="d-flex align-items-center calculate-shipping-title accordion-toggle" data-bs-toggle="collapse" href="/cart#shipping-accordion">
+<p className="fw-600 w-100 mb-0 text-white">Calculate shipping</p>
+<i className="feather icon-feather-chevron-down text-white icon-small align-middle"></i>
+</a>
+<div className="address-block collapse" id="shipping-accordion">
+<div className="mt-15px">
+<select className="form-select select-small mb-15px">
+<option>Select a country</option>
+<option value="Afganistan">Afghanistan</option>
+<option value="Albania">Albania</option>
+<option value="Algeria">Algeria</option>
+<option value="American Samoa">American Samoa</option>
+<option value="Andorra">Andorra</option>
+<option value="Angola">Angola</option>
+<option value="Anguilla">Anguilla</option>
+<option value="Antigua &amp; Barbuda">Antigua &amp; Barbuda</option>
+<option value="Argentina">Argentina</option>
+<option value="Armenia">Armenia</option>
+<option value="Aruba">Aruba</option>
+<option value="Australia">Australia</option>
+<option value="Austria">Austria</option>
+<option value="Azerbaijan">Azerbaijan</option>
+<option value="Bahamas">Bahamas</option>
+<option value="Bahrain">Bahrain</option>
+<option value="Bangladesh">Bangladesh</option>
+<option value="Barbados">Barbados</option>
+<option value="Belarus">Belarus</option>
+<option value="Belgium">Belgium</option>
+<option value="Belize">Belize</option>
+<option value="Benin">Benin</option>
+<option value="Bermuda">Bermuda</option>
+<option value="Bhutan">Bhutan</option>
+<option value="Bolivia">Bolivia</option>
+<option value="Bonaire">Bonaire</option>
+<option value="Bosnia &amp; Herzegovina">Bosnia &amp; Herzegovina
+                                                    </option>
+<option value="Botswana">Botswana</option>
+<option value="Brazil">Brazil</option>
+<option value="British Indian Ocean Ter">British Indian Ocean Ter
+                                                    </option>
+<option value="Brunei">Brunei</option>
+<option value="Bulgaria">Bulgaria</option>
+<option value="Burkina Faso">Burkina Faso</option>
+<option value="Burundi">Burundi</option>
+<option value="Cambodia">Cambodia</option>
+<option value="Cameroon">Cameroon</option>
+<option value="Canada">Canada</option>
+<option value="Canary Islands">Canary Islands</option>
+<option value="Cape Verde">Cape Verde</option>
+<option value="Cayman Islands">Cayman Islands</option>
+<option value="Central African Republic">Central African Republic
+                                                    </option>
+<option value="Chad">Chad</option>
+<option value="Channel Islands">Channel Islands</option>
+<option value="Chile">Chile</option>
+<option value="China">China</option>
+<option value="Christmas Island">Christmas Island</option>
+<option value="Cocos Island">Cocos Island</option>
+<option value="Colombia">Colombia</option>
+<option value="Comoros">Comoros</option>
+<option value="Congo">Congo</option>
+<option value="Cook Islands">Cook Islands</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Cote DIvoire">Cote DIvoire</option>
+<option value="Croatia">Croatia</option>
+<option value="Cuba">Cuba</option>
+<option value="Curaco">Curacao</option>
+<option value="Cyprus">Cyprus</option>
+<option value="Czech Republic">Czech Republic</option>
+<option value="Denmark">Denmark</option>
+<option value="Djibouti">Djibouti</option>
+<option value="Dominica">Dominica</option>
+<option value="Dominican Republic">Dominican Republic</option>
+<option value="East Timor">East Timor</option>
+<option value="Ecuador">Ecuador</option>
+<option value="Egypt">Egypt</option>
+<option value="El Salvador">El Salvador</option>
+<option value="Equatorial Guinea">Equatorial Guinea</option>
+<option value="Eritrea">Eritrea</option>
+<option value="Estonia">Estonia</option>
+<option value="Ethiopia">Ethiopia</option>
+<option value="Falkland Islands">Falkland Islands</option>
+<option value="Faroe Islands">Faroe Islands</option>
+<option value="Fiji">Fiji</option>
+<option value="Finland">Finland</option>
+<option value="France">France</option>
+<option value="French Guiana">French Guiana</option>
+<option value="French Polynesia">French Polynesia</option>
+<option value="French Southern Ter">French Southern Ter</option>
+<option value="Gabon">Gabon</option>
+<option value="Gambia">Gambia</option>
+<option value="Georgia">Georgia</option>
+<option value="Germany">Germany</option>
+<option value="Ghana">Ghana</option>
+<option value="Gibraltar">Gibraltar</option>
+<option value="Great Britain">Great Britain</option>
+<option value="Greece">Greece</option>
+<option value="Greenland">Greenland</option>
+<option value="Grenada">Grenada</option>
+<option value="Guadeloupe">Guadeloupe</option>
+<option value="Guam">Guam</option>
+<option value="Guatemala">Guatemala</option>
+<option value="Guinea">Guinea</option>
+<option value="Guyana">Guyana</option>
+<option value="Haiti">Haiti</option>
+<option value="Hawaii">Hawaii</option>
+<option value="Honduras">Honduras</option>
+<option value="Hong Kong">Hong Kong</option>
+<option value="Hungary">Hungary</option>
+<option value="Iceland">Iceland</option>
+<option value="Indonesia">Indonesia</option>
+<option value="India">India</option>
+<option value="Iran">Iran</option>
+<option value="Iraq">Iraq</option>
+<option value="Ireland">Ireland</option>
+<option value="Isle of Man">Isle of Man</option>
+<option value="Israel">Israel</option>
+<option value="Italy">Italy</option>
+<option value="Jamaica">Jamaica</option>
+<option value="Japan">Japan</option>
+<option value="Jordan">Jordan</option>
+<option value="Kazakhstan">Kazakhstan</option>
+<option value="Kenya">Kenya</option>
+<option value="Kiribati">Kiribati</option>
+<option value="Korea North">Korea North</option>
+<option value="Korea Sout">Korea South</option>
+<option value="Kuwait">Kuwait</option>
+<option value="Kyrgyzstan">Kyrgyzstan</option>
+<option value="Laos">Laos</option>
+<option value="Latvia">Latvia</option>
+<option value="Lebanon">Lebanon</option>
+<option value="Lesotho">Lesotho</option>
+<option value="Liberia">Liberia</option>
+<option value="Libya">Libya</option>
+<option value="Liechtenstein">Liechtenstein</option>
+<option value="Lithuania">Lithuania</option>
+<option value="Luxembourg">Luxembourg</option>
+<option value="Macau">Macau</option>
+<option value="Macedonia">Macedonia</option>
+<option value="Madagascar">Madagascar</option>
+<option value="Malaysia">Malaysia</option>
+<option value="Malawi">Malawi</option>
+<option value="Maldives">Maldives</option>
+<option value="Mali">Mali</option>
+<option value="Malta">Malta</option>
+<option value="Marshall Islands">Marshall Islands</option>
+<option value="Martinique">Martinique</option>
+<option value="Mauritania">Mauritania</option>
+<option value="Mauritius">Mauritius</option>
+<option value="Mayotte">Mayotte</option>
+<option value="Mexico">Mexico</option>
+<option value="Midway Islands">Midway Islands</option>
+<option value="Moldova">Moldova</option>
+<option value="Monaco">Monaco</option>
+<option value="Mongolia">Mongolia</option>
+<option value="Montserrat">Montserrat</option>
+<option value="Morocco">Morocco</option>
+<option value="Mozambique">Mozambique</option>
+<option value="Myanmar">Myanmar</option>
+<option value="Nambia">Nambia</option>
+<option value="Nauru">Nauru</option>
+<option value="Nepal">Nepal</option>
+<option value="Netherland Antilles">Netherland Antilles</option>
+<option value="Netherlands">Netherlands (Holland, Europe)</option>
+<option value="Nevis">Nevis</option>
+<option value="New Caledonia">New Caledonia</option>
+<option value="New Zealand">New Zealand</option>
+<option value="Nicaragua">Nicaragua</option>
+<option value="Niger">Niger</option>
+<option value="Nigeria">Nigeria</option>
+<option value="Niue">Niue</option>
+<option value="Norfolk Island">Norfolk Island</option>
+<option value="Norway">Norway</option>
+<option value="Oman">Oman</option>
+<option value="Pakistan">Pakistan</option>
+<option value="Palau Island">Palau Island</option>
+<option value="Palestine">Palestine</option>
+<option value="Panama">Panama</option>
+<option value="Papua New Guinea">Papua New Guinea</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Peru">Peru</option>
+<option value="Phillipines">Philippines</option>
+<option value="Pitcairn Island">Pitcairn Island</option>
+<option value="Poland">Poland</option>
+<option value="Portugal">Portugal</option>
+<option value="Puerto Rico">Puerto Rico</option>
+<option value="Qatar">Qatar</option>
+<option value="Republic of Montenegro">Republic of Montenegro
+                                                    </option>
+<option value="Republic of Serbia">Republic of Serbia</option>
+<option value="Reunion">Reunion</option>
+<option value="Romania">Romania</option>
+<option value="Russia">Russia</option>
+<option value="Rwanda">Rwanda</option>
+<option value="St Barthelemy">St Barthelemy</option>
+<option value="St Eustatius">St Eustatius</option>
+<option value="St Helena">St Helena</option>
+<option value="St Kitts-Nevis">St Kitts-Nevis</option>
+<option value="St Lucia">St Lucia</option>
+<option value="St Maarten">St Maarten</option>
+<option value="St Pierre &amp; Miquelon">St Pierre &amp; Miquelon
+                                                    </option>
+<option value="St Vincent &amp; Grenadines">St Vincent &amp;
+                                                        Grenadines</option>
+<option value="Saipan">Saipan</option>
+<option value="Samoa">Samoa</option>
+<option value="Samoa American">Samoa American</option>
+<option value="San Marino">San Marino</option>
+<option value="Sao Tome &amp; Principe">Sao Tome &amp; Principe
+                                                    </option>
+<option value="Saudi Arabia">Saudi Arabia</option>
+<option value="Senegal">Senegal</option>
+<option value="Seychelles">Seychelles</option>
+<option value="Sierra Leone">Sierra Leone</option>
+<option value="Singapore">Singapore</option>
+<option value="Slovakia">Slovakia</option>
+<option value="Slovenia">Slovenia</option>
+<option value="Solomon Islands">Solomon Islands</option>
+<option value="Somalia">Somalia</option>
+<option value="South Africa">South Africa</option>
+<option value="Spain">Spain</option>
+<option value="Sri Lanka">Sri Lanka</option>
+<option value="Sudan">Sudan</option>
+<option value="Suriname">Suriname</option>
+<option value="Swaziland">Swaziland</option>
+<option value="Sweden">Sweden</option>
+<option value="Switzerland">Switzerland</option>
+<option value="Syria">Syria</option>
+<option value="Tahiti">Tahiti</option>
+<option value="Taiwan">Taiwan</option>
+<option value="Tajikistan">Tajikistan</option>
+<option value="Tanzania">Tanzania</option>
+<option value="Thailand">Thailand</option>
+<option value="Togo">Togo</option>
+<option value="Tokelau">Tokelau</option>
+<option value="Tonga">Tonga</option>
+<option value="Trinidad &amp; Tobago">Trinidad &amp; Tobago</option>
+<option value="Tunisia">Tunisia</option>
+<option value="Turkey">Turkey</option>
+<option value="Turkmenistan">Turkmenistan</option>
+<option value="Turks &amp; Caicos Is">Turks &amp; Caicos Is</option>
+<option value="Tuvalu">Tuvalu</option>
+<option value="Uganda">Uganda</option>
+<option value="United Kingdom">United Kingdom</option>
+<option value="Ukraine">Ukraine</option>
+<option value="United Arab Erimates">United Arab Emirates</option>
+<option value="United States of America">United States of America
+                                                    </option>
+<option value="Uraguay">Uruguay</option>
+<option value="Uzbekistan">Uzbekistan</option>
+<option value="Vanuatu">Vanuatu</option>
+<option value="Vatican City State">Vatican City State</option>
+<option value="Venezuela">Venezuela</option>
+<option value="Vietnam">Vietnam</option>
+<option value="Virgin Islands (Brit)">Virgin Islands (Brit)</option>
+<option value="Virgin Islands (USA)">Virgin Islands (USA)</option>
+<option value="Wake Island">Wake Island</option>
+<option value="Wallis &amp; Futana Is">Wallis &amp; Futana Is
+                                                    </option>
+<option value="Yemen">Yemen</option>
+<option value="Zaire">Zaire</option>
+<option value="Zambia">Zambia</option>
+<option value="Zimbabwe">Zimbabwe</option>
+</select>
+<select className="form-select select-small mb-15px">
+<option>Select state</option>
+</select>
+<input className="input-small border-radius-4px bg-dark-gray text-white border-color-transparent-white-light mb-15px" name="city" placeholder="Town/City" type="text"/>
+<input className="input-small border-radius-4px bg-dark-gray text-white border-color-transparent-white-light mb-15px" name="zip" placeholder="ZIP" type="text"/>
+<a className="btn btn-small btn-box-shadow btn-round-edge btn-base-color w-100 text-transform-none" href="/cart#">Update</a>
+</div>
+</div>
+</th>
+</tr>
+<tr className="total-amount">
+<th className="fw-600 text-white alt-font pb-0">Total</th>
+<td className="pb-0" data-title="Total">
+<h6 className="d-block fw-700 mb-0 text-white alt-font">$405.00</h6>
+<span className="fs-14">(Includes $19.29 tax)</span>
+</td>
+</tr>
+</tbody>
+</table>
+<a className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-25px" href="/checkout">
+<span>
+<span className="btn-double-text" data-text="Proceed to checkout">Proceed to checkout</span>
+</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+{/*  end section  */}
+{/*  start footer  */}
+<footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'images/new/bg/bg1.png\')' }}>
+<div className="container pt-4 pb-4 md-pt-45px md-pb-45px">
+<div className="row justify-content-center">
+{/*  start footer column  */}
+<div className="col-6 col-lg-3 last-paragraph-no-margin order-sm-1 md-mb-50px xs-mb-30px">
+<a className="footer-logo mb-30px d-inline-block" href="/">
+<img alt="Behome Logo" src="images/new/logo/Behome%20Final%20.png" style={{ maxHeight: '200px' }}/>
+</a>
+<p className="w-80 sm-w-100">Exquisite architectural decor and premium furniture for the modern luxury
+                        interior.</p>
+<div className="elements-social social-icon-style-02 mt-15px">
+<ul className="small-icon light">
+<li><a className="facebook" href="https://www.facebook.com/" target="_blank"><i className="fa-brands fa-facebook-f"></i></a></li>
+<li><a className="dribbble" href="http://www.dribbble.com" target="_blank"><i className="fa-brands fa-dribbble"></i></a></li>
+<li><a className="twitter" href="https://www.twitter.com" target="_blank"><i className="fa-brands fa-twitter"></i></a></li>
+<li><a className="instagram" href="https://www.instagram.com" target="_blank"><i className="fa-brands fa-instagram"></i></a></li>
+</ul>
+</div>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Categories</span>
+<ul>
+<li><a href="/shop">Bed room</a></li>
+<li><a href="/shop">Living room</a></li>
+<li><a href="/shop">Lightning</a></li>
+<li><a href="/shop">Fabrics sofa</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Information</span>
+<ul>
+<li><a href="/about">About us</a></li>
+<li><a href="/contact">Contact us</a></li>
+<li><a href="/faq">FAQs</a></li>
+<li><a href="/faq">Payment</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Account</span>
+<ul>
+<li><a href="/account">My account</a></li>
+<li><a href="/cart">Orders</a></li>
+<li><a href="/checkout">Checkout</a></li>
+<li><a href="/wishlist">My wishlists</a></li>
+</ul>
+</div>
+{/*  end footer column  */}
+{/*  start footer column  */}
+<div className="col-lg-3 col-sm-6 ps-20px sm-ps-15px md-mb-50px xs-mb-0 order-sm-2 order-lg-5">
+<span className="fs-16 fw-500 d-block text-white mb-5px">Newsletter</span>
+<div className="mb-20px">Get everything you need succeed!</div>
+<div className="d-inline-block w-100 newsletter-style-02 position-relative mb-15px">
+<form action="https://craftohtml.themezaa.com/email-templates/subscribe-newsletter.php" className="position-relative w-100" method="post">
+<input className="bg-transparent border-color-transparent-white-light w-100 form-control pe-50px ps-20px lg-ps-15px required" name="email" placeholder="Enter your email" type="email"/>
+<input name="redirect" type="hidden" value="" />
+<button aria-label="submit" className="btn pe-20px submit"><i className="icon feather icon-feather-mail icon-small text-white"></i></button>
+<div className="form-results border-radius-4px pt-5px pb-5px ps-15px pe-15px fs-14 lh-22 mt-10px w-100 text-center position-absolute d-none">
+</div>
+</form>
+</div>
+<div className="footer-card">
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-01.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-02.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-03.png"/></a>
+<a className="d-inline-block me-5px align-middle" href="/shop"><img alt="" src="images/demo-decor-store-payment-icon-04.png"/></a>
+</div>
+</div>
+{/*  end footer column  */}
+</div>
+</div>
+<div className="border-top border-color-transparent-white-light pt-30px pb-30px">
+<div className="container">
+<div className="row align-items-center justify-content-center">
+<div className="col-xl-8 last-paragraph-no-margin text-center text-xl-start lg-mt-20px order-3 order-xl-1">
+<p className="fs-14 w-90 xl-w-100">© 2026 Behome. All rights reserved.</p>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-1 order-xl-2">
+<span className="lh-26 alt-font d-block">Need support?</span>
+<a className="fs-16 text-white fw-500" href="tel:911234567890">+91 12345 67890</a>
+</div>
+<div className="col-6 col-xl-2 col-md-3 col-sm-5 text-center text-xl-start order-2 order-xl-3">
+<span className="lh-26 alt-font d-block">Customer care</span>
+<a className="fs-16 text-white fw-500" href="mailto:info@dummy.com">info@dummy.com</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+{/*  end footer  */}
+{/*  start cookie message  */}
+<div className="cookie-message bg-dark-gray border-radius-8px" id="cookies-model">
+<div className="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing
+            experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you
+            consent to our use of cookies. </div>
+<div className="cookie-btn">
+<a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/cart#">
+<span>
+<span className="btn-double-text" data-text="Cookie policy">Cookie policy</span>
+</span>
+</a>
+<a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="" href="/cart#">
+<span>
+<span className="btn-double-text" data-text="Allow cookies">Allow cookies</span>
+</span>
+</a>
+</div>
+</div>
+{/*  end cookie message  */}
+{/*  start scroll progress  */}
+<div className="scroll-progress d-none d-xxl-block">
+<a aria-label="scroll" className="scroll-top" href="/cart#">
+<span className="scroll-text">Scroll</span><span className="scroll-line"><span className="scroll-point"></span></span>
+</a>
+</div>
+{/*  end scroll progress  */}
+{/*  javascript libraries  */}
+{/*  Mega Menu Alignment Fix  */}
+    {/*  Behome Premium Animation System  */}
+    
+        </main>
+    );
+}
