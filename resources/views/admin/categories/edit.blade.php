@@ -117,7 +117,7 @@
 
 <!-- Image Cropping Modal (FULL SCREEN) -->
 <div id="crop-modal" class="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" style="display: none; z-index: 10000 !important;">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col" style="max-height:90vh;">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <div>
                 <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Crop Category Image</h3>
@@ -142,7 +142,7 @@
         </div>
 
         <!-- Cropping Viewport -->
-        <div class="flex-1 bg-[#121216] flex items-center justify-center overflow-hidden p-8 relative">
+        <div class="flex-1 min-h-0 bg-[#121216] flex items-center justify-center overflow-hidden p-8 relative">
             <div class="w-full h-full flex items-center justify-center">
                 <img id="crop-image-element" src="" class="max-h-full max-w-full drop-shadow-2xl">
             </div>

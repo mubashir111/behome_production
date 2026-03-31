@@ -104,16 +104,10 @@ export default async function Header() {
                                                             <div className="col" key={category.id}>
                                                                 <ul>
                                                                     <li className="sub-title">{category.name}</li>
-                                                                    {/* If the category has children/subcategories, map them here. 
-                                                                        Assuming the API returns children or we just link to the main category for now. */}
                                                                     <li><a href={`/shop?category=${category.slug}`}>View All</a></li>
-                                                                    {/* Adding a few placeholder sub-items for aesthetic if children don't exist yet */}
-                                                                    {!category.children && (
-                                                                        <>
-                                                                            <li><a href={`/shop?category=${category.slug}`}>New Arrivals</a></li>
-                                                                            <li><a href={`/shop?category=${category.slug}`}>Best Sellers</a></li>
-                                                                        </>
-                                                                    )}
+                                                                    {category.children?.map((child: any) => (
+                                                                        <li key={child.id}><a href={`/shop?category=${child.slug}`}>{child.name}</a></li>
+                                                                    ))}
                                                                 </ul>
                                                             </div>
                                                         ))}
@@ -257,10 +251,9 @@ export default async function Header() {
                                     <div className="mobile-nav-section">
                                         <span className="mobile-nav-section-label">Shop by Category</span>
                                         <div className="mobile-nav-quick-links">
-                                            <a href="/shop?category=living-room" className="mobile-nav-quick-chip">Living Room</a>
-                                            <a href="/shop?category=bedroom" className="mobile-nav-quick-chip">Bedroom</a>
-                                            <a href="/shop?category=lighting" className="mobile-nav-quick-chip">Lighting</a>
-                                            <a href="/shop?category=decor" className="mobile-nav-quick-chip">Decor</a>
+                                            {categories.slice(0, 4).map((cat: any) => (
+                                                <a key={cat.id} href={`/shop?category=${cat.slug}`} className="mobile-nav-quick-chip">{cat.name}</a>
+                                            ))}
                                             <a href="/shop" className="mobile-nav-quick-chip mobile-nav-quick-chip--gold">View All →</a>
                                         </div>
                                     </div>

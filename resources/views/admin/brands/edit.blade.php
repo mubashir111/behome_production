@@ -25,13 +25,6 @@
         @csrf @method('PUT')
 
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Current Logo</label>
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 inline-flex items-center">
-                <img src="{{ $brand->thumb }}" alt="{{ $brand->name }}" class="max-h-12 max-w-[150px] object-contain">
-            </div>
-        </div>
-
-        <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Brand Name <span class="text-rose-500">*</span></label>
             <input type="text" name="name" value="{{ old('name', $brand->name) }}" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required>
         </div>
@@ -51,7 +44,14 @@
 
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Replace Logo <span class="text-slate-400 font-normal">(optional)</span></label>
-            <input type="file" name="logo" accept="image/*" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+            @include('admin.partials.image_uploader', [
+                'inputName'      => 'logo',
+                'label'          => 'Brand Logo',
+                'aspectRatio'    => null,
+                'currentImageUrl'=> $brand->thumb,
+                'outputWidth'    => 300,
+                'outputHeight'   => 150,
+            ])
         </div>
 
         <div class="flex gap-3 pt-2">

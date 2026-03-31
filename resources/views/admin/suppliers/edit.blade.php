@@ -109,23 +109,15 @@
                 Supplier Profile Image
             </h2>
             
-            <div class="flex flex-col md:flex-row gap-8 items-start">
-                <div class="w-full md:w-1/3">
-                    <div class="relative group aspect-square rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden transition-all hover:border-pink-300">
-                        <img id="preview_image" src="{{ $supplier->image }}" 
-                             class="w-full h-full object-cover transition-transform group-hover:scale-105">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span class="text-white text-xs font-bold px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm">Click to Change</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-1 space-y-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Update Profile Image</label>
-                    <input type="file" name="image" onchange="previewFile(this)"
-                           class="w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100">
-                    <p class="text-xs text-slate-400">Keep empty to maintain current image. Dimensions: 800x800px recommended.</p>
-                </div>
-            </div>
+            @include('admin.partials.image_uploader', [
+                'inputName'      => 'image',
+                'label'          => 'Profile Image',
+                'aspectRatio'    => 1,
+                'currentImageUrl'=> $supplier->image,
+                'outputWidth'    => 800,
+                'outputHeight'   => 800,
+                'hint'           => 'Keep empty to maintain current image. 800×800px recommended.',
+            ])
         </div>
 
         <div class="admin-form-actions">
@@ -135,15 +127,4 @@
     </form>
 </div>
 
-<script>
-    function previewFile(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('preview_image').src = e.target.result;
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-</script>
 @endsection

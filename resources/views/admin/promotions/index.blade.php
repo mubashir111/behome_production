@@ -39,6 +39,7 @@
     <span class="px-3 py-1.5 text-xs font-semibold bg-purple-100 text-purple-700 rounded-xl" title="Type 10">Homepage Left Banner (Tall)</span>
     <span class="px-3 py-1.5 text-xs font-semibold bg-sky-100 text-sky-700 rounded-xl" title="Type 5">Homepage Right Banners (Stacked)</span>
     <span class="px-3 py-1.5 text-xs font-semibold bg-amber-100 text-amber-700 rounded-xl" title="Type 1">Hero Slider Card (Editorial)</span>
+    <span class="px-3 py-1.5 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-xl" title="Type 15">Feature Section Banner</span>
 </div>
 <div id="promotions-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     @forelse($promotions as $promotion)
@@ -52,8 +53,8 @@
                     <span class="px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-100/90 backdrop-blur rounded-lg">Inactive</span>
                 @endif
                 @php
-                    $typeColors = [1 => 'bg-amber-300/90 text-amber-900', 5 => 'bg-sky-300/90 text-sky-900', 10 => 'bg-purple-300/90 text-purple-900'];
-                    $typeLabels = [1 => 'Hero Slider Card', 5 => 'Right Banner', 10 => 'Left Banner'];
+                    $typeColors = [1 => 'bg-amber-300/90 text-amber-900', 5 => 'bg-sky-300/90 text-sky-900', 10 => 'bg-purple-300/90 text-purple-900', 15 => 'bg-emerald-300/90 text-emerald-900'];
+                    $typeLabels = [1 => 'Hero Slider Card', 5 => 'Right Banner', 10 => 'Left Banner', 15 => 'Feature Banner'];
                 @endphp
                 <span class="px-2.5 py-1 text-xs font-bold backdrop-blur rounded-lg {{ $typeColors[$promotion->type] ?? 'bg-slate-300/90 text-slate-900' }}">
                     {{ $typeLabels[$promotion->type] ?? 'Type '.$promotion->type }}

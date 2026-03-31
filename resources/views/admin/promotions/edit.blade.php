@@ -24,12 +24,6 @@
     <form action="{{ route('admin.promotions.update', $promotion) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf @method('PUT')
 
-        {{-- Current image --}}
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Current Image</label>
-            <img src="{{ $promotion->cover }}" alt="{{ $promotion->name }}" class="h-32 w-full object-cover rounded-xl border border-slate-200">
-        </div>
-
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Name <span class="text-rose-500">*</span></label>
             <input type="text" name="name" value="{{ old('name', $promotion->name) }}" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required>
@@ -51,6 +45,7 @@
                 <option value="10" {{ old('type', $promotion->type) == 10 ? 'selected' : '' }}>Homepage Left Banner (Tall, 660px)</option>
                 <option value="5"  {{ old('type', $promotion->type) == 5  ? 'selected' : '' }}>Homepage Right Banner (Stacked, up to 2)</option>
                 <option value="1"  {{ old('type', $promotion->type) == 1  ? 'selected' : '' }}>Hero Slider Card (Editorial feature)</option>
+                <option value="15" {{ old('type', $promotion->type) == 15 ? 'selected' : '' }}>Feature Section Banner (Split screen with products)</option>
             </select>
         </div>
 
@@ -64,7 +59,14 @@
 
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Replace Image <span class="text-slate-400 font-normal">(optional)</span></label>
-            <input type="file" name="image" accept="image/*" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+            @include('admin.partials.image_uploader', [
+                'inputName'      => 'image',
+                'label'          => 'Banner Image',
+                'aspectRatio'    => null,
+                'currentImageUrl'=> $promotion->cover,
+                'outputWidth'    => 1200,
+                'outputHeight'   => 660,
+            ])
         </div>
 
         <div class="flex gap-3 pt-2">

@@ -23,18 +23,18 @@ class ProductBrand extends Model implements HasMedia
 
     public function getThumbAttribute(): string
     {
-        if (!empty($this->getFirstMediaUrl('product-brand'))) {
-            $brand = $this->getMedia('product-brand')->last();
-            return $brand->getUrl('thumb');
+        $media = $this->getMedia('product-brand')->last();
+        if ($media) {
+            return $media->hasGeneratedConversion('thumb') ? $media->getUrl('thumb') : $media->getUrl();
         }
         return asset('images/default/brand/thumb.png');
     }
 
     public function getCoverAttribute(): string
     {
-        if (!empty($this->getFirstMediaUrl('product-brand'))) {
-            $brand = $this->getMedia('product-brand')->last();
-            return $brand->getUrl('cover');
+        $media = $this->getMedia('product-brand')->last();
+        if ($media) {
+            return $media->hasGeneratedConversion('cover') ? $media->getUrl('cover') : $media->getUrl();
         }
         return asset('images/default/brand/cover.png');
     }

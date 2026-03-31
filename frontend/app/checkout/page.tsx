@@ -174,7 +174,7 @@ export default function Checkout() {
 
             if (cartResponse.status) {
                 setCartItems(cartResponse.data);
-                const total = cartResponse.data.reduce((acc: number, item: any) => acc + parseFloat(item.total), 0);
+                const total = cartResponse.data.reduce((acc: number, item: any) => acc + parseFloat(item.subtotal), 0);
                 setSubtotal(total);
                 const totalTax = cartResponse.data.reduce((acc: number, item: any) => acc + parseFloat(item.tax || 0), 0);
                 setTax(totalTax);
@@ -288,7 +288,7 @@ export default function Checkout() {
     const placeOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         setPlacingOrder(true);
-        
+
         try {
             let addressId = selectedAddressId;
             const selectedAddress = addresses.find((address: any) => address.id === selectedAddressId) || null;
@@ -464,7 +464,7 @@ export default function Checkout() {
             </main>
         );
     }
-    
+
     return (
         <main className="no-layout-pad" style={{ paddingTop: '100px' }}>
             <section className="page-shell page-shell-tight">

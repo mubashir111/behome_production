@@ -46,6 +46,7 @@
                 <option value="10" {{ old('type') == 10 ? 'selected' : '' }}>Homepage Left Banner (Tall, 660px)</option>
                 <option value="5"  {{ old('type') == 5  ? 'selected' : '' }}>Homepage Right Banner (Stacked, up to 2)</option>
                 <option value="1"  {{ old('type') == 1  ? 'selected' : '' }}>Hero Slider Card (Editorial feature)</option>
+                <option value="15" {{ old('type') == 15 ? 'selected' : '' }}>Feature Section Banner (Split screen with products)</option>
             </select>
         </div>
 
@@ -59,8 +60,15 @@
 
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Banner Image <span class="text-rose-500">*</span></label>
-            <input type="file" name="image" accept="image/*" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700" required>
-            <p class="text-xs text-slate-400 mt-1.5">Recommended: 1200×400px for feature banner, 600×660px for big banner, 600×310px for small banner. Max 6MB.</p>
+            @include('admin.partials.image_uploader', [
+                'inputName'    => 'image',
+                'label'        => 'Banner Image',
+                'aspectRatio'  => null,
+                'required'     => true,
+                'outputWidth'  => 1200,
+                'outputHeight' => 660,
+                'hint'         => 'Recommended: 1200×400px for feature banner, 600×660px for big banner, 600×310px for small banner. Max 6MB.',
+            ])
         </div>
 
         <div class="flex gap-3 pt-2">

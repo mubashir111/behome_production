@@ -65,6 +65,34 @@ class ProductVariationController extends AdminController
         }
     }
 
+    public function updateSimple(\Illuminate\Http\Request $request, Product $product, ProductVariation $productVariation): \Illuminate\Http\Response | \Illuminate\Contracts\Foundation\Application | \Illuminate\Contracts\Routing\ResponseFactory
+    {
+        try {
+            $request->validate([
+                'price'         => ['nullable', 'numeric', 'min:0'],
+                'sku'           => ['nullable', 'string'],
+                'variant_image' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:2048'],
+            ]);
+
+            if ($request->filled('price')) {
+                $productVariation->price = $request->price;
+            }
+            if ($request->filled('sku')) {
+                $productVariation->sku = $request->sku;
+            }
+            $productVariation->save();
+
+            if ($request->hasFile('variant_image')) {
+                $productVariation->clearMediaCollection('variant');
+                $productVariation->addMediaFromRequest('variant_image')->toMediaCollection('variant');
+            }
+
+            return response(new ProductVariationResource($productVariation->fresh(['media', 'productAttribute', 'productAttributeOption'])), 200);
+        } catch (Exception $exception) {
+            return response(['status' => false, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
     public function destroy(Product $product, ProductVariation $productVariation): \Illuminate\Http\Response | \Illuminate\Contracts\Foundation\Application | \Illuminate\Contracts\Routing\ResponseFactory
     {
         try {

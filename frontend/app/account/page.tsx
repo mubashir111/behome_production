@@ -202,16 +202,12 @@ function AccountContent() {
             return;
         }
         try {
-            const response = await apiFetch('/profile/change-password', {
+            await apiFetch('/profile/change-password', {
                 method: 'PUT',
                 body: JSON.stringify(passwordData),
             });
-            if (response.status) {
-                showToast('Password changed successfully.', 'success');
-                setPasswordData({ old_password: '', new_password: '', confirm_password: '' });
-            } else {
-                showToast(response.message || 'Password change failed', 'error');
-            }
+            showToast('Password changed successfully.', 'success');
+            setPasswordData({ old_password: '', new_password: '', confirm_password: '' });
         } catch (err: any) {
             showToast(err.message || 'Password change failed', 'error');
         } finally {

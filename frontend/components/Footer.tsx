@@ -1,6 +1,6 @@
 
 import Image from 'next/image';
-import NewsletterForm from './NewsletterForm';
+
 
 export default function Footer() {
     return (
@@ -64,19 +64,7 @@ export default function Footer() {
                         </ul>
                     </div>
                     {/*  end footer column  */}
-                    {/*  start footer column  */}
-                    <div className="col-lg-3 col-sm-6 ps-20px sm-ps-15px md-mb-50px xs-mb-0 order-sm-2 order-lg-5">
-                        <span className="fs-16 fw-500 d-block text-white mb-5px">Newsletter</span>
-                        <div className="mb-20px">Get everything you need succeed!</div>
-                        <NewsletterForm />
-                        <div className="footer-card">
-                            <a className="d-inline-block me-5px align-middle" href="/shop"><Image alt="" src="/images/demo-decor-store-payment-icon-01.png" width={38} height={24} /></a>
-                            <a className="d-inline-block me-5px align-middle" href="/shop"><Image alt="" src="/images/demo-decor-store-payment-icon-02.png" width={38} height={24} /></a>
-                            <a className="d-inline-block me-5px align-middle" href="/shop"><Image alt="" src="/images/demo-decor-store-payment-icon-03.png" width={38} height={24} /></a>
-                            <a className="d-inline-block me-5px align-middle" href="/shop"><Image alt="" src="/images/demo-decor-store-payment-icon-04.png" width={38} height={24} /></a>
-                        </div>
-                    </div>
-                    {/*  end footer column  */}
+
                 </div>
             </div>
             <div className="border-top border-color-transparent-white-light pt-30px pb-30px">

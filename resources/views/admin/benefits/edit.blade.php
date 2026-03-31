@@ -25,11 +25,6 @@
         @csrf @method('PUT')
 
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Current Icon</label>
-            <img src="{{ $benefit->thumb }}" alt="{{ $benefit->title }}" class="w-16 h-16 object-cover rounded-xl border border-slate-200">
-        </div>
-
-        <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Title <span class="text-rose-500">*</span></label>
             <input type="text" name="title" value="{{ old('title', $benefit->title) }}" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required>
         </div>
@@ -54,7 +49,14 @@
 
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Replace Icon <span class="text-slate-400 font-normal">(optional)</span></label>
-            <input type="file" name="image" accept="image/*" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+            @include('admin.partials.image_uploader', [
+                'inputName'      => 'image',
+                'label'          => 'Ticker Icon',
+                'aspectRatio'    => 1,
+                'currentImageUrl'=> $benefit->thumb,
+                'outputWidth'    => 64,
+                'outputHeight'   => 64,
+            ])
         </div>
 
         <div class="flex gap-3 pt-2">

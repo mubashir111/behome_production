@@ -28,18 +28,18 @@ class Promotion extends Model implements HasMedia
 
     public function getCoverAttribute(): string
     {
-        if (!empty($this->getFirstMediaUrl('promotion'))) {
-            $promotion = $this->getMedia('promotion')->last();
-            return $promotion->getUrl('cover');
+        $media = $this->getMedia('promotion')->last();
+        if ($media) {
+            return $media->hasGeneratedConversion('cover') ? $media->getUrl('cover') : $media->getUrl();
         }
         return asset('images/default/promotion/cover.png');
     }
 
     public function getPreviewAttribute(): string
     {
-        if (!empty($this->getFirstMediaUrl('promotion'))) {
-            $product = $this->getMedia('promotion')->last();
-            return $product->getUrl('preview');
+        $media = $this->getMedia('promotion')->last();
+        if ($media) {
+            return $media->hasGeneratedConversion('preview') ? $media->getUrl('preview') : $media->getUrl();
         }
         return asset('images/default/promotion/preview.png');
     }

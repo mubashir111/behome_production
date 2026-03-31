@@ -61,7 +61,8 @@ export default function Cart() {
     }, [clearCouponState, currencySymbol]);
 
     const calculateTotal = useCallback((items: any[]) => {
-        const total = items.reduce((acc, item) => acc + parseFloat(item.total), 0);
+        // Subtotal = sum of pre-tax line totals (price × quantity)
+        const total = items.reduce((acc, item) => acc + parseFloat(item.subtotal || (item.price * item.quantity)), 0);
         setSubtotal(total);
         return total;
     }, []);
@@ -124,8 +125,9 @@ export default function Cart() {
                 body: JSON.stringify({ quantity: newQty }),
             });
             if (response.status) {
-                const updatedItems = cartItems.map(item => 
-                    item.id === id ? response.data : item
+                const updatedItem = response.data;
+                const updatedItems = cartItems.map(item =>
+                    item.id === id ? { ...item, ...updatedItem } : item
                 );
                 setCartItems(updatedItems);
                 const nextSubtotal = calculateTotal(updatedItems);
@@ -250,7 +252,7 @@ export default function Cart() {
                                                 </thead>
                                                 <tbody>
                                                     {cartItems.map((item) => (
-                                                        <tr key={item.id} className={updatingItems.has(item.id) ? 'opacity-50' : ''}>
+                                                        <tr key={item.id}>
                                                             <td className="product-remove">
                                                                 <a className="fs-20 fw-500 cursor-pointer" onClick={() => removeItem(item.id)}>×</a>
                                                             </td>
@@ -265,13 +267,13 @@ export default function Cart() {
                                                             </td>
                                                             <td className="product-price" data-title="Price">{formatAmount(parseFloat(item.price))}</td>
                                                             <td className="product-quantity" data-title="Quantity">
-                                                                <div className="quantity">
+                                                                <div className="quantity" style={{ opacity: updatingItems.has(item.id) ? 0.4 : 1, transition: 'opacity 0.2s ease' }}>
                                                                     <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
                                                                     <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} />
                                                                     <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)}>+</button>
                                                                 </div>
                                                             </td>
-                                                            <td className="product-subtotal" data-title="Total">{formatAmount(parseFloat(item.total))}</td>
+                                                            <td className="product-subtotal" data-title="Total">{formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -289,7 +291,7 @@ export default function Cart() {
                                                     onChange={(e) => setCouponCode(e.target.value)}
                                                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), applyCoupon())}
                                                 />
-                                                <button type="button" className="btn apply-coupon-btn fs-13 fw-600 text-uppercase" onClick={applyCoupon}>Apply</button>
+                                                <button type="button" className="btn apply-coupon-btn fs-13 fw-600 text-uppercase text-white" onClick={applyCoupon}>Apply</button>
                                             </div>
                                             {couponMessage && <p className={`fs-13 mt-10px mb-0 ${couponDiscount > 0 ? 'text-base-color' : 'text-red'}`}>{couponMessage}</p>}
                                         </div>
@@ -307,6 +309,15 @@ export default function Cart() {
                                                     <th className="w-45 fw-600 text-white alt-font">Subtotal</th>
                                                     <td className="text-white fw-600">{formatAmount(subtotal)}</td>
                                                 </tr>
+                                                {(() => {
+                                                    const totalTax = cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0);
+                                                    return totalTax > 0 ? (
+                                                        <tr>
+                                                            <th className="w-45 fw-600 text-white alt-font">Tax</th>
+                                                            <td className="text-white fw-600">{formatAmount(totalTax)}</td>
+                                                        </tr>
+                                                    ) : null;
+                                                })()}
                                                 {couponDiscount > 0 && (
                                                     <tr>
                                                         <th className="w-45 fw-600 text-white alt-font">Discount</th>
@@ -320,7 +331,14 @@ export default function Cart() {
                                                 <tr className="total-amount">
                                                     <th className="fw-600 text-white alt-font pb-0">Total</th>
                                                     <td className="pb-0" data-title="Total">
-                                                        <h6 className="d-block fw-700 mb-0 text-white alt-font">{formatAmount(Math.max(subtotal - couponDiscount, 0))}</h6>
+                                                        <h6 className="d-block fw-700 mb-0 text-white alt-font">
+                                                            {formatAmount(Math.max(
+                                                                subtotal
+                                                                + cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0)
+                                                                - couponDiscount,
+                                                                0
+                                                            ))}
+                                                        </h6>
                                                     </td>
                                                 </tr>
                                             </tbody>

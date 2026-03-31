@@ -50,8 +50,14 @@
 
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Icon / Image <span class="text-slate-400 font-normal">(optional)</span></label>
-            <input type="file" name="image" accept="image/*" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700">
-            <p class="text-xs text-slate-400 mt-1.5">Small icon shown alongside the ticker text. Recommended: 24×24px. Max 2MB.</p>
+            @include('admin.partials.image_uploader', [
+                'inputName'    => 'image',
+                'label'        => 'Ticker Icon',
+                'aspectRatio'  => 1,
+                'outputWidth'  => 64,
+                'outputHeight' => 64,
+                'hint'         => 'Small icon shown alongside the ticker text. Recommended: 64×64px. Max 2MB.',
+            ])
         </div>
 
         <div class="flex gap-3 pt-2">

@@ -18,7 +18,33 @@ class CartController extends Controller
     public function index()
     {
         try {
-            $cartItems = Cart::where('user_id', Auth::id())->with(['product', 'variation'])->get();
+            $cartItems = Cart::where('user_id', Auth::id())
+                ->with(['product.taxes.tax', 'variation'])
+                ->get();
+
+            // Recalculate tax from current product tax rates
+            foreach ($cartItems as $item) {
+                $taxRate = 0;
+                if ($item->product) {
+                    foreach ($item->product->taxes as $productTax) {
+                        if ($productTax->tax) {
+                            $taxRate += (float) $productTax->tax->tax_rate;
+                        }
+                    }
+                }
+                $taxPerUnit = round(($item->price * $taxRate) / 100, (int) env('CURRENCY_DECIMAL_POINT', 2));
+                $subtotal   = $item->price * $item->quantity;
+                $tax        = $taxPerUnit * $item->quantity;
+                $total      = $subtotal + $tax;
+
+                if ($item->tax != $taxPerUnit || $item->subtotal != $subtotal || $item->total != $total) {
+                    $item->tax      = $taxPerUnit;
+                    $item->subtotal = $subtotal;
+                    $item->total    = $total;
+                    $item->save();
+                }
+            }
+
             return $this->successResponse($cartItems, 'Cart retrieved successfully');
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage());
@@ -103,6 +129,7 @@ class CartController extends Controller
             $cartItem->subtotal = $cartItem->price * $request->quantity;
             $cartItem->total    = $cartItem->subtotal + ($cartItem->tax * $request->quantity);
             $cartItem->save();
+            $cartItem->load(['product', 'variation']);
 
             return $this->successResponse($cartItem, 'Cart updated successfully');
         } catch (Exception $e) {

@@ -27,44 +27,23 @@ interface FeaturedPromotion {
     currency_price?: string | null;
 }
 
-// ─── Decorative SVG: abstract chair line-art ─────────────────────────────────
-function ChairIllustration() {
-    return (
-        <svg viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg"
-            style={{ width: '100%', maxWidth: '160px', opacity: 0.55 }}>
-            <path d="M30 90 Q80 80 130 90" stroke="var(--base-color,#c9a96e)" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M45 90 L40 40 Q80 30 120 40 L115 90" stroke="var(--base-color,#c9a96e)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M40 40 Q80 26 120 40" stroke="var(--base-color,#c9a96e)" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="45" y1="90" x2="38" y2="155" stroke="var(--base-color,#c9a96e)" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="115" y1="90" x2="122" y2="155" stroke="var(--base-color,#c9a96e)" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="40" y1="40" x2="35" y2="155" stroke="rgba(201,169,110,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 3"/>
-            <line x1="120" y1="40" x2="125" y2="155" stroke="rgba(201,169,110,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 3"/>
-            <path d="M38 130 Q80 124 122 130" stroke="var(--base-color,#c9a96e)" strokeWidth="1.5" strokeLinecap="round" opacity="0.6"/>
-            <line x1="60" y1="42" x2="57" y2="88" stroke="rgba(201,169,110,0.3)" strokeWidth="1" strokeLinecap="round"/>
-            <line x1="80" y1="38" x2="80" y2="88" stroke="rgba(201,169,110,0.3)" strokeWidth="1" strokeLinecap="round"/>
-            <line x1="100" y1="42" x2="103" y2="88" stroke="rgba(201,169,110,0.3)" strokeWidth="1" strokeLinecap="round"/>
-        </svg>
-    );
-}
-
-const palette = [
-    { hex: '#C9A96E', name: 'Sand Gold' },
-    { hex: '#8B7355', name: 'Walnut' },
-    { hex: '#D4C5B2', name: 'Linen' },
-    { hex: '#4A5240', name: 'Forest' },
-    { hex: '#1C1C1C', name: 'Onyx' },
-];
-
 interface Props {
     slides: Slide[];
-    featuredPromotion?: FeaturedPromotion | null;
+    featuredPromotions?: FeaturedPromotion[];
 }
 
-export default function HeroSliderAlt({ slides, featuredPromotion }: Props) {
+export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props) {
     const activeSlides = slides.filter(s => s.status === 5);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [cardHovered, setCardHovered] = useState(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Pick the active promotion card in sync with the slide, cycling around
+    const activePromo: FeaturedPromotion | null =
+        featuredPromotions.length > 0
+            ? featuredPromotions[currentIndex % featuredPromotions.length]
+            : null;
 
     const goToSlide = useCallback((index: number) => {
         if (isAnimating) return;
@@ -86,6 +65,14 @@ export default function HeroSliderAlt({ slides, featuredPromotion }: Props) {
         intervalRef.current = setInterval(goToNext, 7000);
         return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     }, [activeSlides.length, currentIndex, goToNext]);
+
+    // Derive a clean eyebrow label from the active promotion
+    const eyebrowLabel = activePromo?.badge_text
+        || activePromo?.subtitle
+        || null;
+
+    // Show the card only when there is at least one real promotion
+    const showPromoCard = !!activePromo;
 
     if (activeSlides.length === 0) {
         return (
@@ -143,7 +130,7 @@ export default function HeroSliderAlt({ slides, featuredPromotion }: Props) {
                         style={{
                             position: 'absolute', inset: 0, zIndex: 2,
                             display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
+                            gridTemplateColumns: showPromoCard ? '1fr 1fr' : '1fr',
                             alignItems: 'center',
                             padding: 'clamp(80px,8vw,120px) clamp(24px,6vw,80px)',
                             gap: '40px',
@@ -243,113 +230,279 @@ export default function HeroSliderAlt({ slides, featuredPromotion }: Props) {
                 </div>
             ))}
 
-            {/* ── Persistent Overlay: Right-side Editorial card ── */}
-            <div
-                style={{
-                    position: 'absolute', inset: 0, zIndex: 5,
-                    pointerEvents: 'none',
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    alignItems: 'center',
-                    padding: 'clamp(80px,8vw,120px) clamp(24px,6vw,80px)',
-                    gap: '40px',
-                }}
-            >
-                <div /> {/* Empty Left half to match slider grid */}
-                
+            {/* ── Persistent Overlay: Right-side Editorial Promotion Card ── */}
+            {showPromoCard && (
                 <div
-                    className="hero-slider-right-panel"
                     style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        pointerEvents: 'auto',
-                        transition: 'all 1.2s cubic-bezier(0.4,0,0.2,1)',
+                        position: 'absolute', inset: 0, zIndex: 5,
+                        pointerEvents: 'none',
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        alignItems: 'center',
+                        padding: 'clamp(80px,8vw,120px) clamp(24px,6vw,80px)',
+                        gap: '40px',
                     }}
                 >
-                    <div style={{
-                        width: '100%',
-                        maxWidth: '340px',
-                        background: 'rgba(13,11,9,0.55)',
-                        backdropFilter: 'blur(24px)',
-                        WebkitBackdropFilter: 'blur(24px)',
-                        border: '1px solid rgba(201,169,110,0.18)',
-                        borderRadius: '16px',
-                        overflow: 'hidden',
-                        boxShadow: '0 32px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)',
-                    }}>
-                        {/* Top area */}
-                        <div style={{ padding: '32px 32px 8px', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            {featuredPromotion?.discounted_price && featuredPromotion?.discount_pct ? (
+                    <div /> {/* Empty left half */}
+
+                    <div
+                        className="hero-slider-right-panel"
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            pointerEvents: 'auto',
+                        }}
+                    >
+                        {/* ── Luxury Promo Card ── */}
+                        <div
+                            onMouseEnter={() => setCardHovered(true)}
+                            onMouseLeave={() => setCardHovered(false)}
+                            style={{
+                                width: '100%',
+                                maxWidth: '340px',
+                                background: 'rgba(10,9,7,0.62)',
+                                backdropFilter: 'blur(28px)',
+                                WebkitBackdropFilter: 'blur(28px)',
+                                border: `1px solid ${cardHovered ? 'rgba(201,169,110,0.45)' : 'rgba(201,169,110,0.18)'}`,
+                                borderRadius: '16px',
+                                overflow: 'hidden',
+                                boxShadow: cardHovered
+                                    ? '0 0 80px rgba(201,169,110,0.14), 0 32px 80px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.07)'
+                                    : '0 0 60px rgba(201,169,110,0.07), 0 24px 60px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05)',
+                                transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
+                            }}
+                        >
+                            {/* ── Image Area ── */}
+                            <div style={{ position: 'relative', width: '100%', height: '190px', overflow: 'hidden' }}>
+                                {activePromo?.image ? (
+                                    <Image
+                                        src={activePromo!.image!}
+                                        alt={activePromo!.name}
+                                        fill
+                                        unoptimized
+                                        style={{ objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.6s ease' }}
+                                    />
+                                ) : (
+                                    /* Elegant gradient placeholder — no dummy SVG */
+                                    <div style={{
+                                        position: 'absolute', inset: 0,
+                                        background: 'linear-gradient(135deg, #1a1208 0%, #2c1f0a 40%, #1a1208 100%)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}>
+                                        <span style={{
+                                            fontFamily: 'var(--primary-font,serif)',
+                                            fontSize: '72px',
+                                            fontWeight: '800',
+                                            color: 'rgba(201,169,110,0.18)',
+                                            lineHeight: '1',
+                                            userSelect: 'none',
+                                            letterSpacing: '-3px',
+                                        }}>
+                                            {activePromo?.name?.charAt(0) ?? 'B'}
+                                        </span>
+                                        {/* Subtle pattern lines */}
+                                        <div style={{
+                                            position: 'absolute', inset: 0,
+                                            backgroundImage: 'repeating-linear-gradient(45deg, rgba(201,169,110,0.03) 0px, rgba(201,169,110,0.03) 1px, transparent 1px, transparent 12px)',
+                                        }} />
+                                    </div>
+                                )}
+
+                                {/* Gradient fade bottom of image into card body */}
                                 <div style={{
-                                    position: 'absolute', top: '16px', right: '16px',
-                                    background: 'var(--base-color,#c9a96e)', color: '#0d0d0d',
-                                    fontWeight: '800', fontSize: '11px', letterSpacing: '1px',
-                                    padding: '5px 10px', borderRadius: '20px', zIndex: 2
+                                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                                    height: '60px',
+                                    background: 'linear-gradient(to top, rgba(10,9,7,0.75) 0%, transparent 100%)',
+                                }} />
+
+                                {/* Discount badge — top-right corner of image */}
+                                {activePromo?.discount_pct ? (
+                                    <div style={{
+                                        position: 'absolute', top: '14px', right: '14px',
+                                        background: 'var(--base-color,#c9a96e)',
+                                        color: '#0d0d0d',
+                                        fontWeight: '800',
+                                        fontSize: '10px',
+                                        letterSpacing: '0.5px',
+                                        padding: '5px 11px',
+                                        borderRadius: '20px',
+                                        zIndex: 2,
+                                        boxShadow: '0 2px 12px rgba(0,0,0,0.4)',
+                                    }}>
+                                        {activePromo.discount_pct}% OFF
+                                    </div>
+                                ) : (activePromo?.subtitle && !activePromo?.discount_pct) ? (
+                                    <div style={{
+                                        position: 'absolute', top: '14px', right: '14px',
+                                        background: 'rgba(13,11,9,0.72)',
+                                        backdropFilter: 'blur(8px)',
+                                        WebkitBackdropFilter: 'blur(8px)',
+                                        border: '1px solid rgba(201,169,110,0.28)',
+                                        color: 'var(--base-color,#c9a96e)',
+                                        fontWeight: '700',
+                                        fontSize: '9px',
+                                        letterSpacing: '2px',
+                                        textTransform: 'uppercase',
+                                        padding: '5px 11px',
+                                        borderRadius: '20px',
+                                        zIndex: 2,
+                                        maxWidth: '120px',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}>
+                                        {activePromo.subtitle}
+                                    </div>
+                                ) : null}
+
+                            </div>
+
+                            {/* ── Card Body ── */}
+                            <div style={{ padding: '20px 24px 0' }}>
+
+                                {/* Eyebrow label — from DB only */}
+                                {eyebrowLabel && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                                        <span style={{
+                                            display: 'block', width: '18px', height: '1px',
+                                            background: 'var(--base-color,#c9a96e)',
+                                            flexShrink: 0,
+                                        }} />
+                                        <span style={{
+                                            color: 'var(--base-color,#c9a96e)',
+                                            fontSize: '9px',
+                                            fontWeight: '700',
+                                            letterSpacing: '2.5px',
+                                            textTransform: 'uppercase',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {eyebrowLabel}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Promotion name */}
+                                <div style={{
+                                    fontFamily: 'var(--primary-font,serif)',
+                                    color: '#ffffff',
+                                    fontSize: 'clamp(17px,1.5vw,21px)',
+                                    fontWeight: '700',
+                                    letterSpacing: '-0.3px',
+                                    lineHeight: '1.25',
+                                    marginBottom: '8px',
+                                    transition: 'opacity 0.4s ease',
                                 }}>
-                                    {featuredPromotion.discount_pct}% OFF
+                                    {activePromo.name}
                                 </div>
-                            ) : null}
 
-                            <div style={{ position: 'absolute', top: '10px', right: '24px', fontFamily: 'var(--primary-font,serif)', fontSize: '80px', fontWeight: '800', color: 'rgba(201,169,110,0.07)', lineHeight: '1', userSelect: 'none', pointerEvents: 'none' }}>26</div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', alignSelf: 'flex-start' }}>
-                                <span style={{ width: '20px', height: '1px', background: 'var(--base-color,#c9a96e)', display: 'block' }} />
-                                <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: '10px', fontWeight: '700', letterSpacing: '3px', textTransform: 'uppercase' }}>
-                                    {featuredPromotion?.badge_text || featuredPromotion?.subtitle || 'Spring 2026'}
-                                </span>
+                                {/* Price row — only when real price data exists */}
+                                {activePromo.discounted_price ? (
+                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '18px' }}>
+                                        <span style={{
+                                            color: 'var(--base-color,#c9a96e)',
+                                            fontSize: '19px',
+                                            fontWeight: '800',
+                                            letterSpacing: '-0.5px',
+                                        }}>
+                                            {activePromo.discounted_price}
+                                        </span>
+                                        {activePromo.currency_price && (
+                                            <span style={{
+                                                color: 'rgba(255,255,255,0.30)',
+                                                fontSize: '13px',
+                                                textDecoration: 'line-through',
+                                            }}>
+                                                {activePromo.currency_price}
+                                            </span>
+                                        )}
+                                    </div>
+                                ) : (
+                                    /* Description — only shown when no price */
+                                    activePromo.description && (
+                                        <div style={{
+                                            color: 'rgba(255,255,255,0.42)',
+                                            fontSize: '12px',
+                                            lineHeight: '1.6',
+                                            marginBottom: '18px',
+                                        }}>
+                                            {activePromo.description}
+                                        </div>
+                                    )
+                                )}
                             </div>
 
-                            {featuredPromotion?.image ? (
-                                <div style={{ width: '100%', height: '150px', position: 'relative', borderRadius: '10px', overflow: 'hidden', marginBottom: '4px' }}>
-                                    <Image src={featuredPromotion.image} alt={featuredPromotion.name} fill unoptimized style={{ objectFit: 'cover' }} />
-                                </div>
-                            ) : <ChairIllustration />}
+                            {/* ── Divider ── */}
+                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0 24px' }} />
 
-                            <div style={{ fontFamily: 'var(--primary-font,serif)', color: '#ffffff', fontSize: 'clamp(18px,1.6vw,22px)', fontWeight: '700', letterSpacing: '-0.3px', textAlign: 'center', marginTop: '12px', marginBottom: '4px' }}>
-                                {featuredPromotion?.name || 'The New Collection'}
-                            </div>
-
-                            {featuredPromotion?.discounted_price ? (
-                                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                                    <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: '20px', fontWeight: '800', letterSpacing: '-0.5px' }}>{featuredPromotion.discounted_price}</span>
-                                    {featuredPromotion.currency_price && <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', textDecoration: 'line-through', marginLeft: '8px' }}>{featuredPromotion.currency_price}</span>}
-                                </div>
-                            ) : (
-                                <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px', textAlign: 'center', marginBottom: '24px' }}>
-                                    {featuredPromotion?.description || 'Crafted for the modern home'}
-                                </div>
-                            )}
-                        </div>
-
-                        <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0 24px' }} />
-
-                        {!featuredPromotion?.discounted_price && (
-                            <>
-                                <div style={{ padding: '20px 28px 0' }}>
-                                    <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '9px', fontWeight: '700', letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '12px' }}>Season Palette</div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        {palette.map((c) => (
-                                            <div key={c.hex} title={c.name} style={{ width: '26px', height: '26px', borderRadius: '50%', background: c.hex, border: '2px solid rgba(255,255,255,0.12)' }} />
+                            {/* ── CTA Row ── */}
+                            <div style={{ padding: '16px 24px 22px' }}>
+                                {/* Promotion dot indicators */}
+                                {featuredPromotions.length > 1 && (
+                                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center', marginBottom: '12px' }}>
+                                        {featuredPromotions.map((_, i) => (
+                                            <div
+                                                key={i}
+                                                style={{
+                                                    width: i === (currentIndex % featuredPromotions.length) ? '20px' : '5px',
+                                                    height: '5px',
+                                                    borderRadius: '3px',
+                                                    background: i === (currentIndex % featuredPromotions.length)
+                                                        ? 'var(--base-color,#c9a96e)'
+                                                        : 'rgba(255,255,255,0.20)',
+                                                    transition: 'all 0.4s ease',
+                                                }}
+                                            />
                                         ))}
                                     </div>
-                                </div>
-                                <div style={{ padding: '16px 28px 0', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                    {['Minimalist', 'Japandi', 'Artisan'].map(tag => (
-                                        <span key={tag} style={{ padding: '4px 12px', borderRadius: '20px', background: 'rgba(201,169,110,0.10)', border: '1px solid rgba(201,169,110,0.22)', color: 'rgba(201,169,110,0.85)', fontSize: '10px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase' }}>{tag}</span>
-                                    ))}
-                                </div>
-                            </>
-                        )}
+                                )}
 
-                        <div style={{ padding: '20px 28px 24px' }}>
-                            <Link href={featuredPromotion?.link || '/collections'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(201,169,110,0.10)', border: '1px solid rgba(201,169,110,0.25)', borderRadius: '8px', padding: '13px 18px', textDecoration: 'none' }}>
-                                <span style={{ color: '#ffffff', fontSize: '12px', fontWeight: '600' }}>Discover the Collection</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--base-color,#c9a96e)" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                            </Link>
+                                <Link
+                                    href={activePromo?.link || '/shop'}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        background: 'rgba(201,169,110,0.09)',
+                                        border: '1px solid rgba(201,169,110,0.22)',
+                                        borderRadius: '8px',
+                                        padding: '12px 16px',
+                                        textDecoration: 'none',
+                                        transition: 'background 0.3s ease, border-color 0.3s ease',
+                                    }}
+                                    onMouseEnter={e => {
+                                        const el = e.currentTarget as HTMLAnchorElement;
+                                        el.style.background = 'rgba(201,169,110,0.18)';
+                                        el.style.borderColor = 'rgba(201,169,110,0.40)';
+                                    }}
+                                    onMouseLeave={e => {
+                                        const el = e.currentTarget as HTMLAnchorElement;
+                                        el.style.background = 'rgba(201,169,110,0.09)';
+                                        el.style.borderColor = 'rgba(201,169,110,0.22)';
+                                    }}
+                                >
+                                    <span style={{
+                                        color: '#ffffff',
+                                        fontSize: '11px',
+                                        fontWeight: '600',
+                                        letterSpacing: '0.5px',
+                                    }}>
+                                        Shop the Look
+                                    </span>
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                        stroke="var(--base-color,#c9a96e)" strokeWidth="2"
+                                        strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* ── Bottom Bar: Left (arrows + dots) | Center (scroll) | Right (counter) ── */}
             <div style={{
@@ -393,7 +546,7 @@ export default function HeroSliderAlt({ slides, featuredPromotion }: Props) {
                                 </svg>
                             </button>
 
-                            {/* Dots — next to arrows */}
+                            {/* Dots */}
                             <div style={{ display: 'flex', gap: '7px', alignItems: 'center', marginLeft: '4px' }}>
                                 {activeSlides.map((_, i) => (
                                     <button key={i} onClick={() => goToSlide(i)} aria-label={`Go to slide ${i + 1}`}

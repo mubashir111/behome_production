@@ -86,9 +86,14 @@
         {{-- Cover Image --}}
         <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 space-y-4">
             <h3 class="font-semibold text-slate-800">Cover Image</h3>
-            <input type="file" name="cover_image" accept="image/*"
-                class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all border border-slate-200 rounded-xl p-2">
-            <p class="text-xs text-slate-400">Recommended: 1200×630px. Max 4MB.</p>
+            @include('admin.partials.image_uploader', [
+                'inputName'    => 'cover_image',
+                'label'        => 'Cover Image',
+                'aspectRatio'  => 1.905,
+                'outputWidth'  => 1200,
+                'outputHeight' => 630,
+                'hint'         => 'Recommended: 1200×630px (16:9). Max 4MB.',
+            ])
         </div>
 
         {{-- Metadata --}}

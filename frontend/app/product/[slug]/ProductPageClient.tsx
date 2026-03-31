@@ -103,7 +103,9 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const [attrOptions, setAttrOptions] = useState<Record<string, string[]>>({});
     const [selected, setSelected] = useState<Record<string, string>>({});
     const [activeVariation, setActiveVariation] = useState<Variation | null>(null);
-    const [colorVariantMap, setColorVariantMap] = useState<Record<string, Variation>>({});
+    // key: "AttrName###OptionName" → variation node (for any attribute that has media)
+    const [variantMediaMap, setVariantMediaMap] = useState<Record<string, Variation>>({});
+    const [hoveredSwatch, setHoveredSwatch] = useState<string | null>(null); // key of hovered swatch
 
     // Wishlist
     const [inWishlist, setInWishlist] = useState(false);
@@ -138,18 +140,18 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                         const opts = collectOptions(vars);
                         setAttrOptions(opts);
                         
-                        // Build color variant map for fast image lookup
-                        const colorMap: Record<string, Variation> = {};
-                        const buildColorMap = (variations: Variation[]) => {
+                        // Build variant media map: key = "AttrName###OptionName" for any attribute that has images
+                        const mediaMap: Record<string, Variation> = {};
+                        const buildMediaMap = (variations: Variation[]) => {
                             for (const v of variations) {
-                                if (v.product_attribute_name === 'Color' && v.product_attribute_option_name) {
-                                    colorMap[v.product_attribute_option_name] = v;
+                                if (v.product_attribute_name && v.product_attribute_option_name) {
+                                    mediaMap[`${v.product_attribute_name}###${v.product_attribute_option_name}`] = v;
                                 }
-                                if (v.children?.length) buildColorMap(v.children);
+                                if (v.children?.length) buildMediaMap(v.children);
                             }
                         };
-                        buildColorMap(vars);
-                        setColorVariantMap(colorMap);
+                        buildMediaMap(vars);
+                        setVariantMediaMap(mediaMap);
                         
                         const defaults: Record<string, string> = {};
                         const firstLeaf = flattenVariationLeaves(vars)[0];
@@ -207,6 +209,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
             attrNames.every((attrName) => leaf.optionMap[attrName] === selected[attrName])
         );
         setActiveVariation(match || null);
+        setActiveImageIndex(0); // switch gallery to variant image when selection changes
     }, [selected, allVariations, attrOptions]);
 
     // ── Displayed price ──────────────────────────────────────────────────────
@@ -220,9 +223,44 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const displayStock = activeVariation != null ? activeVariation.stock : (product?.stock ?? null);
     const canPurchase = product?.can_purchasable === 5;
     const stockOk = canPurchase && (displayStock === null || displayStock > 0);
-    const galleryImages: string[] = product?.images?.length
+    // Prefer the selected variant's images in the gallery; fall back to product images
+    const productImages: string[] = product?.images?.length
         ? product.images
         : [product?.image || product?.cover || '/images/demo-decor-store-product-01.jpg'];
+
+    const variantGalleryImages: string[] = (() => {
+        // Priority 1: active (leaf) variation has its own uploaded images
+        // Show variant image first, then product gallery images (so product photos remain visible)
+        if (activeVariation?.media?.length) {
+            const variantImgs = activeVariation.media.map((m: any) => m.original_url);
+            return [...variantImgs, ...productImages.filter((img: string) => !variantImgs.includes(img))];
+        }
+        // Priority 2: any selected option node has uploaded images
+        for (const [attrName, optName] of Object.entries(selected)) {
+            const v = variantMediaMap[`${attrName}###${optName}`];
+            if (v?.media?.length) {
+                const variantImgs = v.media.map((m: any) => m.original_url);
+                return [...variantImgs, ...productImages.filter((img: string) => !variantImgs.includes(img))];
+            }
+        }
+        // Priority 3: no variant images uploaded yet — cycle through product images
+        // by variant index so each color shows a different image from the gallery
+        if (product?.images?.length > 1) {
+            const firstAttr = Object.keys(attrOptions)[0];
+            if (firstAttr && selected[firstAttr]) {
+                const optIndex = attrOptions[firstAttr].indexOf(selected[firstAttr]);
+                if (optIndex >= 0) {
+                    // Rotate the gallery so the variant's image leads, others follow
+                    const idx = optIndex % productImages.length;
+                    return [...productImages.slice(idx), ...productImages.slice(0, idx)];
+                }
+            }
+        }
+        return [];
+    })();
+    const galleryImages: string[] = variantGalleryImages.length > 0
+        ? variantGalleryImages
+        : productImages;
     const plainDescription = (product?.description || '')
         .replace(/<[^>]*>/g, ' ')
         .replace(/\s+/g, ' ')
@@ -601,23 +639,6 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                     )}
                                 </div>
 
-                                <p className="fs-13 mb-20px" style={{ color: 'rgba(255,255,255,0.58)' }}>
-                                    EMI and promotional offers can be attached here once those fields exist in admin.
-                                </p>
-
-                                <div
-                                    className="mb-20px"
-                                    style={{
-                                        border: '1px solid rgba(255,122,26,0.35)',
-                                        background: 'rgba(255,122,26,0.08)',
-                                        borderRadius: '12px',
-                                        padding: '14px 16px',
-                                    }}
-                                >
-                                    <span className="d-block fs-12 fw-700 text-uppercase mb-5px" style={{ color: '#ff7a1a' }}>Offer</span>
-                                    <span className="d-block text-white fw-600">Apply coupon or campaign messaging in this area when promo data is available.</span>
-                                </div>
-
                                 {shortDescription && (
                                     <p className="mb-20px fs-14 lh-26" style={{ color: 'rgba(255,255,255,0.74)' }}>
                                         {shortDescription}
@@ -658,43 +679,119 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                 <div className="d-flex flex-wrap gap-2">
                                                     {attrOptions[attrName].map(opt => {
                                                         const isActive = selected[attrName] === opt;
-                                                        const colorVariant = colorVariantMap[opt];
-                                                        const hasImage = colorVariant?.media && colorVariant.media.length > 0;
-                                                        const imageUrl = hasImage ? colorVariant.media?.[0].original_url : null;
+                                                        const swatchKey = `${attrName}###${opt}`;
+                                                        const variantNode = variantMediaMap[swatchKey];
+                                                        const hasImage = (variantNode?.media?.length ?? 0) > 0;
+                                                        const imageUrl = hasImage ? variantNode!.media![0].original_url : null;
+                                                        const isHovered = hoveredSwatch === swatchKey;
 
-                                                        // Render image swatch for Color attribute, text button for others
-                                                        if (attrName === 'Color' && hasImage) {
+                                                        if (hasImage) {
+                                                            // Image swatch — works for any attribute (Color, Material, Style, etc.)
                                                             return (
-                                                                <button
+                                                                <div
                                                                     key={opt}
-                                                                    type="button"
-                                                                    onClick={() => setSelected(prev => ({ ...prev, [attrName]: opt }))}
-                                                                    style={{
-                                                                        width: '70px',
-                                                                        height: '70px',
-                                                                        padding: '2px',
-                                                                        borderRadius: '10px',
-                                                                        border: isActive ? '3px solid #ff7a1a' : '1px solid rgba(255,255,255,0.14)',
-                                                                        background: 'transparent',
-                                                                        overflow: 'hidden',
-                                                                    }}
-                                                                    title={opt}
+                                                                    style={{ position: 'relative', display: 'inline-block' }}
+                                                                    onMouseEnter={() => setHoveredSwatch(swatchKey)}
+                                                                    onMouseLeave={() => setHoveredSwatch(null)}
                                                                 >
-                                                                    <img
-                                                                        src={imageUrl!}
-                                                                        alt={opt}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setSelected(prev => ({ ...prev, [attrName]: opt }))}
                                                                         style={{
-                                                                            width: '100%',
-                                                                            height: '100%',
-                                                                            objectFit: 'cover',
-                                                                            borderRadius: '8px',
+                                                                            width: '72px',
+                                                                            height: '72px',
+                                                                            padding: '3px',
+                                                                            borderRadius: '10px',
+                                                                            border: isActive ? '3px solid #ff7a1a' : '2px solid rgba(255,255,255,0.12)',
+                                                                            background: 'transparent',
+                                                                            overflow: 'hidden',
+                                                                            cursor: 'pointer',
+                                                                            transition: 'border-color 0.15s',
+                                                                            display: 'block',
                                                                         }}
-                                                                    />
-                                                                </button>
+                                                                    >
+                                                                        <img
+                                                                            src={imageUrl!}
+                                                                            alt={opt}
+                                                                            style={{
+                                                                                width: '100%',
+                                                                                height: '100%',
+                                                                                objectFit: 'cover',
+                                                                                borderRadius: '7px',
+                                                                                display: 'block',
+                                                                            }}
+                                                                        />
+                                                                    </button>
+
+                                                                    {/* Option name label below swatch */}
+                                                                    <span style={{
+                                                                        display: 'block',
+                                                                        textAlign: 'center',
+                                                                        fontSize: '10px',
+                                                                        color: isActive ? '#ff7a1a' : 'rgba(255,255,255,0.55)',
+                                                                        marginTop: '4px',
+                                                                        maxWidth: '72px',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap',
+                                                                        fontWeight: isActive ? 700 : 400,
+                                                                    }}>
+                                                                        {opt}
+                                                                    </span>
+
+                                                                    {/* Hover popup — larger preview */}
+                                                                    {isHovered && (
+                                                                        <div style={{
+                                                                            position: 'absolute',
+                                                                            bottom: 'calc(100% + 10px)',
+                                                                            left: '50%',
+                                                                            transform: 'translateX(-50%)',
+                                                                            zIndex: 50,
+                                                                            background: '#1a1a1a',
+                                                                            border: '1px solid rgba(255,255,255,0.15)',
+                                                                            borderRadius: '12px',
+                                                                            padding: '8px',
+                                                                            boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
+                                                                            pointerEvents: 'none',
+                                                                            minWidth: '160px',
+                                                                        }}>
+                                                                            <img
+                                                                                src={imageUrl!}
+                                                                                alt={opt}
+                                                                                style={{
+                                                                                    width: '144px',
+                                                                                    height: '144px',
+                                                                                    objectFit: 'cover',
+                                                                                    borderRadius: '8px',
+                                                                                    display: 'block',
+                                                                                }}
+                                                                            />
+                                                                            <p style={{
+                                                                                margin: '6px 0 0',
+                                                                                textAlign: 'center',
+                                                                                fontSize: '12px',
+                                                                                fontWeight: 600,
+                                                                                color: '#fff',
+                                                                            }}>{opt}</p>
+                                                                            {/* Arrow pointing down */}
+                                                                            <div style={{
+                                                                                position: 'absolute',
+                                                                                bottom: '-6px',
+                                                                                left: '50%',
+                                                                                transform: 'translateX(-50%)',
+                                                                                width: 0,
+                                                                                height: 0,
+                                                                                borderLeft: '6px solid transparent',
+                                                                                borderRight: '6px solid transparent',
+                                                                                borderTop: '6px solid rgba(255,255,255,0.15)',
+                                                                            }} />
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             );
                                                         }
 
-                                                        // Text button for other attributes or colors without images
+                                                        // Text pill — for options without images
                                                         return (
                                                             <button
                                                                 key={opt}
@@ -709,6 +806,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                                     color: '#fff',
                                                                     fontSize: '13px',
                                                                     fontWeight: 600,
+                                                                    cursor: 'pointer',
                                                                 }}
                                                             >
                                                                 {opt}

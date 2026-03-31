@@ -64,6 +64,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('products/{product}/variations')->name('products.variations.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\ProductVariationController::class, 'index'])->name('index');
             Route::post('/store', [\App\Http\Controllers\Admin\ProductVariationController::class, 'store'])->name('store');
+            Route::post('/update-simple/{productVariation}', [\App\Http\Controllers\Admin\ProductVariationController::class, 'updateSimple'])->name('update-simple');
             Route::delete('/destroy/{productVariation}', [\App\Http\Controllers\Admin\ProductVariationController::class, 'destroy'])->name('destroy');
         });
         Route::put('orders/{order}/payment-status', [\App\Http\Controllers\Admin\Web\OrderController::class, 'updatePaymentStatus'])->name('orders.payment-status.update');

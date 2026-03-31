@@ -7,8 +7,8 @@
 <style>
     #crop-image-element { max-width: 100%; display: block; }
     .crop-area-wrapper {
-        min-height: 400px;
-        max-height: 70vh;
+        min-height: 300px;
+        max-height: calc(90vh - 200px);
         width: 100%;
         overflow: hidden;
         background-color: #f8fafc;
@@ -134,7 +134,7 @@
         $p_tags = old('tags_string', implode(', ', $product->tags->pluck('name')->toArray()));
     }
     
-    $p_taxes = old('tax_id', $product->taxes->pluck('id')->toArray());
+    $p_taxes = old('tax_id', $product->taxes->pluck('tax_id')->toArray());
 @endphp
 
 <div class="max-w-[1240px] mx-auto pb-28 px-4 sm:px-6 lg:px-8">
@@ -242,7 +242,7 @@
                             @forelse($product->getMedia('product') as $image)
                                 <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                                     <div class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white">
-                                        <img src="{{ $image->getUrl('thumb') }}" class="w-full h-full object-contain" alt="{{ $product->name }}">
+                                        <img src="{{ $image->hasGeneratedConversion('thumb') ? $image->getUrl('thumb') : $image->getUrl() }}" class="w-full h-full object-contain" alt="{{ $product->name }}">
                                         <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <span class="px-2 py-0.5 bg-white rounded text-[10px] font-bold text-slate-900">{{ $loop->first ? 'Main' : 'Gallery' }}</span>
                                         </div>
@@ -400,8 +400,8 @@
 
             <!-- Image Cropping Modal -->
             <div id="crop-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200" style="max-height:90vh;">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 flex-shrink-0">
                         <div>
                             <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Crop Block Image</h3>
                             <p class="text-[10px] text-slate-500 font-medium">Ensures professional quality (800x600 recommended)</p>
@@ -410,7 +410,7 @@
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
                         </button>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 flex-1 min-h-0 overflow-y-auto">
                         <div class="crop-area-wrapper flex items-center justify-center">
                             <img id="crop-image-element" src="" alt="To crop">
                         </div>
@@ -449,7 +449,18 @@
                         </div>
                     </div>
                     <div class="p-5 space-y-3">
-                        <label class="status-toggle-card">
+
+                        {{-- TOGGLE MACRO: uses JS to drive visual state; no Tailwind peer-checked needed --}}
+                        @php
+                        function renderToggle(string $id, string $name, bool $checked, string $label, string $sublabel, string $iconBg, string $iconColor, string $iconPath): string {
+                            $track   = $checked ? 'background:#6366f1;' : 'background:#e2e8f0;';
+                            $knob    = $checked ? 'transform:translateX(20px);' : '';
+                            return ''; // rendered inline below
+                        }
+                        @endphp
+
+                        {{-- Active --}}
+                        <div class="status-toggle-card" onclick="toggleSwitch('status_toggle')">
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <div style="width:34px;height:34px;border-radius:10px;background:#eef2ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <svg class="w-4 h-4" style="color:#6366f1;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-width="2"/></svg>
@@ -459,15 +470,17 @@
                                     <div style="font-size:11px;color:#94a3b8;">Show product in the store</div>
                                 </div>
                             </div>
-                            <div style="position:relative;">
+                            <div style="position:relative;pointer-events:none;">
                                 <input type="hidden" name="status" value="10">
-                                <input type="checkbox" name="status" value="5" {{ $p_status == 5 ? 'checked' : '' }} class="sr-only peer" id="status_toggle">
-                                <label for="status_toggle" style="display:block;width:44px;height:24px;background:#e2e8f0;border-radius:12px;cursor:pointer;position:relative;transition:background 0.2s;" class="peer-checked:!bg-indigo-600">
-                                    <span style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);" class="peer-checked:translate-x-5"></span>
-                                </label>
+                                <input type="checkbox" name="status" value="5" {{ $p_status == 5 ? 'checked' : '' }} class="sr-only" id="status_toggle">
+                                <div id="status_toggle_track" style="display:block;width:44px;height:24px;{{ $p_status == 5 ? 'background:#6366f1;' : 'background:#e2e8f0;' }}border-radius:12px;position:relative;transition:background 0.2s;">
+                                    <span id="status_toggle_knob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);{{ $p_status == 5 ? 'transform:translateX(20px);' : '' }}"></span>
+                                </div>
                             </div>
-                        </label>
-                        <label class="status-toggle-card">
+                        </div>
+
+                        {{-- Purchasable --}}
+                        <div class="status-toggle-card" onclick="toggleSwitch('purchasable_toggle')">
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <div style="width:34px;height:34px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <svg class="w-4 h-4" style="color:#22c55e;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
@@ -477,15 +490,17 @@
                                     <div style="font-size:11px;color:#94a3b8;">Allow customers to buy it</div>
                                 </div>
                             </div>
-                            <div style="position:relative;">
+                            <div style="position:relative;pointer-events:none;">
                                 <input type="hidden" name="can_purchasable" value="10">
-                                <input type="checkbox" name="can_purchasable" value="5" {{ $p_purchasable == 5 ? 'checked' : '' }} class="sr-only peer" id="purchasable_toggle">
-                                <label for="purchasable_toggle" style="display:block;width:44px;height:24px;background:#e2e8f0;border-radius:12px;cursor:pointer;position:relative;transition:background 0.2s;" class="peer-checked:!bg-indigo-600">
-                                    <span style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);" class="peer-checked:translate-x-5"></span>
-                                </label>
+                                <input type="checkbox" name="can_purchasable" value="5" {{ $p_purchasable == 5 ? 'checked' : '' }} class="sr-only" id="purchasable_toggle">
+                                <div id="purchasable_toggle_track" style="display:block;width:44px;height:24px;{{ $p_purchasable == 5 ? 'background:#6366f1;' : 'background:#e2e8f0;' }}border-radius:12px;position:relative;transition:background 0.2s;">
+                                    <span id="purchasable_toggle_knob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);{{ $p_purchasable == 5 ? 'transform:translateX(20px);' : '' }}"></span>
+                                </div>
                             </div>
-                        </label>
-                        <label class="status-toggle-card">
+                        </div>
+
+                        {{-- Show When Out-of-Stock --}}
+                        <div class="status-toggle-card" onclick="toggleSwitch('stock_out_toggle')">
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <div style="width:34px;height:34px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <svg class="w-4 h-4" style="color:#f97316;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
@@ -495,14 +510,15 @@
                                     <div style="font-size:11px;color:#94a3b8;">Display even if no stock</div>
                                 </div>
                             </div>
-                            <div style="position:relative;">
+                            <div style="position:relative;pointer-events:none;">
                                 <input type="hidden" name="show_stock_out" value="10">
-                                <input type="checkbox" name="show_stock_out" value="5" {{ $p_stock_out == 5 ? 'checked' : '' }} class="sr-only peer" id="stock_out_toggle">
-                                <label for="stock_out_toggle" style="display:block;width:44px;height:24px;background:#e2e8f0;border-radius:12px;cursor:pointer;position:relative;transition:background 0.2s;" class="peer-checked:!bg-indigo-600">
-                                    <span style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);" class="peer-checked:translate-x-5"></span>
-                                </label>
+                                <input type="checkbox" name="show_stock_out" value="5" {{ $p_stock_out == 5 ? 'checked' : '' }} class="sr-only" id="stock_out_toggle">
+                                <div id="stock_out_toggle_track" style="display:block;width:44px;height:24px;{{ $p_stock_out == 5 ? 'background:#6366f1;' : 'background:#e2e8f0;' }}border-radius:12px;position:relative;transition:background 0.2s;">
+                                    <span id="stock_out_toggle_knob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);{{ $p_stock_out == 5 ? 'transform:translateX(20px);' : '' }}"></span>
+                                </div>
                             </div>
-                        </label>
+                        </div>
+
                     </div>
                 </div>
 
@@ -611,36 +627,37 @@
                     </div>
                 </div>
 
-                <!-- Product Variants Section -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="pe-section-header" style="justify-content:space-between;">
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <div class="pe-section-icon" style="background:#ecfdf5;">
-                                <svg class="w-4 h-4" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-                            </div>
-                            <div>
-                                <div class="pe-section-title">Product Variants</div>
-                                <div class="pe-section-subtitle">Colors, sizes and other options</div>
-                            </div>
-                        </div>
-                        <button type="button" id="add-variant-btn" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold hover:from-indigo-500 hover:to-violet-500 transition-all shadow-md flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-                            Add Variant
-                        </button>
+            </div>
+        </div>
+
+        <!-- Product Variants Section (full width below main grid) -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-8">
+            <div class="pe-section-header" style="justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="pe-section-icon" style="background:#ecfdf5;">
+                        <svg class="w-4 h-4" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
                     </div>
-                    <div class="p-6 min-h-[300px]">
-                        <div id="variants-list" class="space-y-3">
-                            <!-- Variants will be loaded here via AJAX -->
-                            <div class="text-center py-16">
-                                <svg class="w-12 h-12 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h5m-12 4h12a2 2 0 002-2V9a2 2 0 00-2-2h-2.343" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-                                <p class="text-sm font-medium text-slate-600 mb-2">No variants yet</p>
-                                <p class="text-xs text-slate-500 mb-4">Add your first product variant (color, size, etc.)</p>
-                                <button type="button" onclick="openAddVariantModal()" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 text-sm font-semibold transition-all inline-flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-                                    Create First Variant
-                                </button>
-                            </div>
-                        </div>
+                    <div>
+                        <div class="pe-section-title">Product Variants</div>
+                        <div class="pe-section-subtitle">Colors, sizes and other options</div>
+                    </div>
+                </div>
+                <button type="button" id="add-variant-btn" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold hover:from-indigo-500 hover:to-violet-500 transition-all shadow-md flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                    Add Variant
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="variants-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Variants will be loaded here via AJAX -->
+                    <div class="col-span-full text-center py-16">
+                        <svg class="w-12 h-12 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h5m-12 4h12a2 2 0 002-2V9a2 2 0 00-2-2h-2.343" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                        <p class="text-sm font-medium text-slate-600 mb-2">No variants yet</p>
+                        <p class="text-xs text-slate-500 mb-4">Add your first product variant (color, size, etc.)</p>
+                        <button type="button" onclick="openAddVariantModal()" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 text-sm font-semibold transition-all inline-flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            Create First Variant
+                        </button>
                     </div>
                 </div>
             </div>
@@ -704,15 +721,16 @@
                 <div class="space-y-3">
                     <div id="color-image-preview" class="hidden">
                         <div class="relative inline-block">
-                            <img id="color-image-preview-img" src="" alt="Color preview" class="w-20 h-20 rounded-lg object-cover border-2 border-indigo-300">
-                            <button type="button" onclick="clearColorImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">✕</button>
+                            <img id="color-image-preview-img" src="" alt="Color preview" class="w-full h-40 rounded-lg object-cover border-2 border-indigo-300">
+                            <button type="button" onclick="clearColorImage()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 shadow">✕</button>
                         </div>
                     </div>
-                    <input type="file" id="color-image-input" accept="image/jpeg,image/png,image/webp" class="hidden">
-                    <button type="button" id="color-image-btn" onclick="document.getElementById('color-image-input').click()" class="w-full px-4 py-3 rounded-lg border-2 border-dashed border-indigo-300 text-indigo-700 font-semibold hover:bg-indigo-100 transition-all text-sm">
-                        📁 Choose Image
-                    </button>
-                    <p class="text-xs text-slate-600">Upload an image showing this color. JPG/PNG, max 2MB</p>
+                    <label id="color-image-btn" class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border-2 border-dashed border-indigo-300 text-indigo-700 font-semibold hover:bg-indigo-100 transition-all text-sm cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                        <span id="color-image-btn-text">📁 Choose & Crop Image</span>
+                        <input type="file" id="color-image-input" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="startCropping('variant_color', null, this)">
+                    </label>
+                    <p class="text-xs text-slate-500">Image will be cropped before uploading. JPG/PNG/WebP, max 2MB</p>
                 </div>
             </div>
 
@@ -744,11 +762,28 @@
 </div>
 
 <script>
+    function toggleSwitch(id) {
+        const cb = document.getElementById(id);
+        cb.checked = !cb.checked;
+        const track = document.getElementById(id + '_track');
+        const knob  = document.getElementById(id + '_knob');
+        if (cb.checked) {
+            track.style.background = '#6366f1';
+            knob.style.transform   = 'translateX(20px)';
+        } else {
+            track.style.background = '#e2e8f0';
+            knob.style.transform   = '';
+        }
+    }
+
     const productId = {{ $product->id }};
+    let currentVariants = [];
 
     // Close modal
     function closeVariantModal() {
         document.getElementById('variant-modal').classList.add('hidden');
+        document.getElementById('variant-attribute').disabled = false;
+        document.getElementById('variant-value').disabled = false;
     }
 
     // Load variants
@@ -776,10 +811,11 @@
 
     // Display variants
     function displayVariants(variants) {
+        currentVariants = variants || [];
         const container = document.getElementById('variants-list');
         if (!variants || variants.length === 0) {
             container.innerHTML = `
-                <div class="text-center py-12 text-slate-500">
+                <div class="col-span-full text-center py-12 text-slate-500">
                     <p class="text-sm mb-4">No variants yet</p>
                     <button type="button" onclick="openAddVariantModal()" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 text-sm font-semibold transition-all">
                         Create First Variant
@@ -803,31 +839,29 @@
             const imageUrl = hasImage ? variant.media[0].original_url : null;
             
             return `
-            <div class="flex items-center gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md transition-all group">
-                <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden flex items-center justify-center border-2 border-slate-200 ${variant.product_attribute_name === 'Color' ? 'bg-slate-100' : 'bg-gradient-to-br from-indigo-50 to-blue-50'}">
-                    ${hasImage && variant.product_attribute_name === 'Color' 
+            <div class="flex flex-col rounded-xl border-2 border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md transition-all overflow-hidden">
+                <div class="w-full aspect-square overflow-hidden flex items-center justify-center border-b border-slate-100 ${variant.product_attribute_name === 'Color' ? 'bg-slate-100' : 'bg-gradient-to-br from-indigo-50 to-blue-50'}">
+                    ${hasImage && variant.product_attribute_name === 'Color'
                         ? `<img src="${imageUrl}" alt="${escapeHtml(variant.product_attribute_option_name)}" class="w-full h-full object-cover">`
-                        : `<span class="text-2xl">${icon}</span>`
+                        : `<span class="text-5xl">${icon}</span>`
                     }
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="font-semibold text-slate-900 text-sm">
-                        ${escapeHtml(variant.product_attribute_name)}
-                    </p>
-                    <p class="text-slate-600 text-sm font-medium">
-                        ${escapeHtml(variant.product_attribute_option_name)}
-                    </p>
-                    <div class="flex gap-3 mt-2 flex-wrap">
-                        <span class="text-xs font-semibold px-3 py-1 rounded bg-slate-100 text-slate-700">💵 \$${(variant.price || 0).toFixed(2)}</span>
-                        <span class="text-xs font-semibold px-3 py-1 rounded ${stockColor}">
-                            ${variant.stock > 0 ? `📦 ${variant.stock} in stock` : '❌ Out of Stock'}
+                <div class="p-3 flex-1 flex flex-col gap-1">
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">${escapeHtml(variant.product_attribute_name)}</p>
+                    <p class="font-semibold text-slate-800 text-sm leading-tight">${escapeHtml(variant.product_attribute_option_name)}</p>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">💵 ${parseFloat(variant.price) > 0 ? parseFloat(variant.price).toFixed(2) : (variant.price || 0)}</span>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${stockColor}">
+                            ${variant.stock > 0 ? `${variant.stock} in stock` : 'Out of Stock'}
                         </span>
-                        ${variant.sku ? `<span class="text-xs font-mono px-3 py-1 rounded bg-slate-100 text-slate-600">${escapeHtml(variant.sku)}</span>` : ''}
-                        ${hasImage ? '<span class="text-xs px-3 py-1 rounded bg-green-50 text-green-700 font-semibold">✓ Image</span>' : ''}
                     </div>
+                    ${variant.sku ? `<p class="text-[10px] font-mono text-slate-400 mt-0.5">${escapeHtml(variant.sku)}</p>` : ''}
                 </div>
-                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                    <button type="button" onclick="deleteVariant(${variant.id})" class="px-3 py-2 text-xs font-semibold bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-all">
+                <div class="flex border-t border-slate-100">
+                    <button type="button" onclick="openEditVariantModal(${variant.id})" class="flex-1 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition-all border-r border-slate-100">
+                        ✎ Edit
+                    </button>
+                    <button type="button" onclick="deleteVariant(${variant.id})" class="flex-1 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition-all">
                         ✕ Remove
                     </button>
                 </div>
@@ -840,7 +874,52 @@
     function openAddVariantModal() {
         document.getElementById('modal-title').textContent = 'Add Variant';
         document.getElementById('variant-form').reset();
-        document.getElementById('variant-form').dataset.mode = 'create';
+        const form = document.getElementById('variant-form');
+        form.dataset.mode = 'create';
+        delete form.dataset.variantId;
+        document.getElementById('variant-attribute').disabled = false;
+        document.getElementById('variant-value').disabled = false;
+        document.getElementById('color-image-section').classList.add('hidden');
+        clearColorImage();
+        document.getElementById('variant-modal').classList.remove('hidden');
+    }
+
+    // Open edit modal
+    function openEditVariantModal(variantId) {
+        const variant = currentVariants.find(v => v.id == variantId);
+        if (!variant) return;
+
+        document.getElementById('modal-title').textContent = 'Edit Variant';
+        document.getElementById('variant-form').reset();
+
+        const form = document.getElementById('variant-form');
+        form.dataset.mode = 'edit';
+        form.dataset.variantId = variantId;
+
+        const attrSelect = document.getElementById('variant-attribute');
+        attrSelect.value = variant.product_attribute_name || '';
+        attrSelect.disabled = true;
+
+        const valInput = document.getElementById('variant-value');
+        valInput.value = variant.product_attribute_option_name || '';
+        valInput.disabled = true;
+
+        document.getElementById('variant-price').value = parseFloat(variant.price) || '';
+        document.getElementById('variant-sku').value = variant.sku || '';
+
+        const colorSection = document.getElementById('color-image-section');
+        if (variant.product_attribute_name === 'Color') {
+            colorSection.classList.remove('hidden');
+            // Show existing image preview if available
+            if (variant.media && variant.media.length > 0) {
+                document.getElementById('color-image-preview').classList.remove('hidden');
+                document.getElementById('color-image-preview-img').src = variant.media[0].original_url;
+                document.getElementById('color-image-btn').textContent = '🔄 Replace Image';
+            }
+        } else {
+            colorSection.classList.add('hidden');
+        }
+
         document.getElementById('variant-modal').classList.remove('hidden');
     }
 
@@ -901,54 +980,79 @@
         document.getElementById('color-image-btn').textContent = '📁 Choose Image';
     }
 
-    // Save variant
+    // Save variant (create or edit)
     document.getElementById('variant-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const form = e.target;
+        const isEdit = form.dataset.mode === 'edit';
+        const variantId = form.dataset.variantId;
+
         const attribute = document.getElementById('variant-attribute').value;
         const value = document.getElementById('variant-value').value;
         const price = parseFloat(document.getElementById('variant-price').value) || 0;
-        const stock = 0; // Stock must be added via Purchase Order legally
         const sku = document.getElementById('variant-sku').value;
         const colorImage = document.getElementById('color-image-input').files[0];
 
-        // Validate color image if Color attribute
-        if (attribute === 'Color' && !colorImage) {
+        // For new Color variants, image is required; for edits with existing image, optional
+        if (!isEdit && attribute === 'Color' && !colorImage) {
             showToast('Please upload a color image', 'error');
             return;
         }
 
         try {
             const formData = new FormData();
-            formData.append('product_attribute_name', attribute);
-            formData.append('product_attribute_option_name', value);
-            formData.append('price', price);
-            formData.append('sku', sku);
-            formData.append('stock', stock);
-            
-            // Add color image if provided
-            if (colorImage) {
-                formData.append('variant_image', colorImage);
-            }
 
-            const response = await fetch(`/admin/products/${productId}/variations/store`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${window.localStorage.getItem('auth_token') || ''}`,
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                credentials: 'include',
-                body: formData
-            });
+            if (isEdit) {
+                formData.append('price', price);
+                formData.append('sku', sku);
+                if (colorImage) formData.append('variant_image', colorImage);
 
-            const data = await response.json();
-            
-            if (response.ok) {
-                showToast('Variant created successfully! ✓', 'success');
-                closeVariantModal();
-                loadVariants();
+                const response = await fetch(`/admin/products/${productId}/variations/update-simple/${variantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${window.localStorage.getItem('auth_token') || ''}`,
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    credentials: 'include',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('Variant updated successfully! ✓', 'success');
+                    closeVariantModal();
+                    loadVariants();
+                } else {
+                    showToast(data.message || data.error || 'Error updating variant', 'error');
+                }
             } else {
-                showToast(data.message || data.error || 'Error creating variant', 'error');
+                formData.append('product_attribute_name', attribute);
+                formData.append('product_attribute_option_name', value);
+                formData.append('price', price);
+                formData.append('sku', sku);
+                formData.append('stock', 0);
+                if (colorImage) formData.append('variant_image', colorImage);
+
+                const response = await fetch(`/admin/products/${productId}/variations/store`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${window.localStorage.getItem('auth_token') || ''}`,
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    credentials: 'include',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('Variant created successfully! ✓', 'success');
+                    closeVariantModal();
+                    loadVariants();
+                } else {
+                    showToast(data.message || data.error || 'Error creating variant', 'error');
+                }
             }
         } catch (error) {
             console.error('Error saving variant:', error);
@@ -1080,17 +1184,15 @@
                             const item = (block.items || [])[i] || {title:'', text:'', image:''};
                             return `
                             <div class="p-3 bg-slate-50 border border-slate-100 rounded-lg space-y-2">
+                                ${item.image ? `<img src="${escapeHtml(item.image)}" alt="" class="w-full h-16 object-cover rounded mb-1">` : ''}
                                 <div class="flex items-center gap-1">
-                                    <input type="text" id="img_${index}_${i}" value="${escapeHtml(item.image || '')}" placeholder="Icon path" 
-                                           onchange="updateBlockGridItem(${index}, ${i}, 'image', this.value)" 
-                                           class="flex-1 px-2 py-1 bg-white border border-slate-200 rounded text-[10px] font-mono">
-                                    <label class="p-1 px-2 bg-white border border-slate-200 text-indigo-600 rounded text-[10px] font-bold cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <label class="flex-1 p-1.5 px-3 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded text-[10px] font-bold cursor-pointer hover:bg-indigo-100 transition-colors text-center">
                                         <input type="file" class="hidden" accept="image/*" onchange="startCropping(${index}, 'image', this, ${i})">
-                                        +
+                                        ${item.image ? 'Replace Icon' : '+ Upload Icon'}
                                     </label>
                                 </div>
-                                <input type="text" value="${escapeHtml(item.title || '')}" placeholder="Title" onchange="updateBlockGridItem(${index}, ${i}, 'title', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-bold">
-                                <textarea placeholder="Text" onchange="updateBlockGridItem(${index}, ${i}, 'text', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-[10px]" rows="2">${escapeHtml(item.text || '')}</textarea>
+                                <input type="text" value="${escapeHtml(item.title || '')}" placeholder="Title" oninput="updateBlockGridItem(${index}, ${i}, 'title', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-bold">
+                                <textarea placeholder="Text" oninput="updateBlockGridItem(${index}, ${i}, 'text', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-[10px]" rows="2">${escapeHtml(item.text || '')}</textarea>
                             </div>
                             `;
                         }).join('')}

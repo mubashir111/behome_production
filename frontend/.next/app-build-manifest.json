@@ -5,10 +5,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/global-error.js"
     ],
-    "/page": [
+    "/collections/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/collections/page.js"
+    ],
+    "/collections/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/collections/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -30,6 +35,31 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
+    ],
+    "/account/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/account/page.js"
+    ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/cart/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/cart/page.js"
+    ],
+    "/checkout/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/checkout/page.js"
+    ],
+    "/account/order/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/account/order/[id]/page.js"
     ],
     "/shop/page": [
       "static/chunks/webpack.js",

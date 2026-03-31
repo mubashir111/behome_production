@@ -52,14 +52,14 @@ export default async function Home() {
         ...p,
         image: p.preview || p.cover || '',
     }));
-    const featurePromo = promotions.find((p: any) => p.type === 1);
+    const featurePromo = promotions.find((p: any) => p.type === 15);
 
     // Map Dynamic Promotions Grid (declared first so featuredOffer can reference it)
     const bigPromotion = promotions.find((p: any) => p.type === 10);
 
     // Best active-offer product for the hero card
     const topOfferProduct = (offerData.data?.data || [])[0] as any | undefined;
-    const featuredOffer = topOfferProduct ? {
+    const topOfferCard = topOfferProduct ? {
         name: topOfferProduct.name,
         subtitle: topOfferProduct.discounted_price
             ? `Was ${topOfferProduct.currency_price}`
@@ -73,7 +73,23 @@ export default async function Home() {
             : null,
         discounted_price: topOfferProduct.discounted_price || null,
         currency_price: topOfferProduct.currency_price || null,
-    } : (featurePromo ?? bigPromotion ?? promotions[0] ?? null);
+    } : null;
+
+    // Build ordered promotion cards array: sale product first, then type=1 (Hero Slider Card) promotions only
+    const promotionCards = [
+        ...(topOfferCard ? [topOfferCard] : []),
+        ...promotions.filter((p: any) => p.type === 1).map((p: any) => ({
+            name: p.name,
+            subtitle: p.subtitle || null,
+            badge_text: null,
+            description: null,
+            link: p.link || '/shop',
+            image: p.image || null,
+            discount_pct: null,
+            discounted_price: null,
+            currency_price: null,
+        })),
+    ];
 
     const smallPromotions = promotions.filter((p: any) => p.type === 5).slice(0, 2);
 
@@ -91,7 +107,7 @@ export default async function Home() {
         <main className="no-layout-pad">
 
         {/* ── Hero Slider ─────────────────────────────────────────── */}
-        <HeroSlider slides={sliders} featuredPromotion={featuredOffer} />
+        <HeroSlider slides={sliders} featuredPromotions={promotionCards} />
 
         {/* ── Featured Categories + Promotions ────────────────────── */}
         <section className="position-relative overflow-hidden bg-dark-texture pb-5">
@@ -241,7 +257,7 @@ export default async function Home() {
                         style={{ backgroundImage: featurePromo?.image ? `url('${featurePromo.image}')` : "url('images/demo-decor-store-banner-04.jpg')" }}>
                         <div className="pt-13 pb-13 pe-5 w-40 xl-w-45 lg-w-55 md-w-65 sm-w-75 float-end" style={{ maxWidth: '100%' }}>
                             <span className="fs-15 fw-700 text-dark-gray text-uppercase mb-20px xs-mb-15px d-inline-block text-decoration-line-bottom-medium">
-                                {featurePromo?.subtitle || 'Save up to 50% off'}
+                                {featurePromo?.subtitle || 'New Collection 2025'}
                             </span>
                             <h1 className="alt-font fw-400 text-dark-gray mb-40px lg-mb-35px xs-mb-25px ls-minus-1px">
                                 {featurePromo?.name

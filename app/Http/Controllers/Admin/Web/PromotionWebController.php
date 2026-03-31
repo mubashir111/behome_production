@@ -26,7 +26,7 @@ class PromotionWebController extends Controller
             'name'     => ['required', 'string', 'max:190'],
             'subtitle' => ['nullable', 'string', 'max:255'],
             'link'     => ['nullable', 'string', 'max:500'],
-            'type'     => ['required', 'integer', 'in:1,5,10'],
+            'type'     => ['required', 'integer', 'in:1,5,10,15'],
             'status'   => ['required', 'numeric'],
             'image'    => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
         ]);
@@ -58,7 +58,7 @@ class PromotionWebController extends Controller
             'name'     => ['required', 'string', 'max:190'],
             'subtitle' => ['nullable', 'string', 'max:255'],
             'link'     => ['nullable', 'string', 'max:500'],
-            'type'     => ['required', 'integer', 'in:1,5,10'],
+            'type'     => ['required', 'integer', 'in:1,5,10,15'],
             'status'   => ['required', 'numeric'],
             'image'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
         ]);

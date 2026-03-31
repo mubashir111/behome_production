@@ -31,13 +31,14 @@
                 <div class="grid grid-cols-1 gap-4">
                     @if($product->getMedia('product')->count() > 0)
                         <div class="aspect-video rounded-lg overflow-hidden border border-slate-200">
-                            <img src="{{ $product->getFirstMediaUrl('product') }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                            @php $firstMedia = $product->getMedia('product')->first(); @endphp
+                            <img src="{{ $firstMedia ? ($firstMedia->hasGeneratedConversion('cover') ? $firstMedia->getUrl('cover') : $firstMedia->getUrl()) : '' }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                         </div>
                         @if($product->getMedia('product')->count() > 1)
                         <div class="grid grid-cols-4 gap-3">
                             @foreach($product->getMedia('product')->slice(1) as $media)
                                 <div class="aspect-square rounded-lg overflow-hidden border border-slate-200 hover:border-indigo-300 transition-colors cursor-pointer">
-                                    <img src="{{ $media->getUrl('thumb') }}" alt="" class="w-full h-full object-cover">
+                                    <img src="{{ $media->hasGeneratedConversion('thumb') ? $media->getUrl('thumb') : $media->getUrl() }}" alt="" class="w-full h-full object-cover">
                                 </div>
                             @endforeach
                         </div>

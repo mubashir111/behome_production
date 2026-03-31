@@ -26,7 +26,7 @@ class BrandWebController extends Controller
             'name'        => ['required', 'string', 'max:190'],
             'description' => ['nullable', 'string', 'max:500'],
             'status'      => ['required', 'numeric'],
-            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $brand = ProductBrand::create([
@@ -54,7 +54,7 @@ class BrandWebController extends Controller
             'name'        => ['required', 'string', 'max:190'],
             'description' => ['nullable', 'string', 'max:500'],
             'status'      => ['required', 'numeric'],
-            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $brand->update([
