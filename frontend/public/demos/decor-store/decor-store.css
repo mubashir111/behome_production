@@ -2797,3 +2797,219 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
     /* Prevent text-nowrap from causing overflow on small screens */
     [class*="text-white-space-nowrap"] { white-space: normal !important; }
 }
+
+/* ============================================================
+   HOME PAGE — MOBILE OPTIMISATIONS  (max 767px)
+   Desktop breakpoints are untouched.
+   ============================================================ */
+@media (max-width: 767px) {
+
+    /* ── 1. Hero Slider ──────────────────────────────────────── */
+    /* Reduce container padding so content doesn't crowd edges */
+    .hero-slider-grid {
+        padding: 90px 22px 80px !important;
+        align-items: flex-end !important;
+    }
+
+    /* Tighten the heading */
+    .hero-slider-text-block h1 {
+        font-size: clamp(32px, 9vw, 46px) !important;
+        margin-bottom: 14px !important;
+        max-width: 100% !important;
+    }
+
+    /* Shorten description */
+    .hero-slider-text-block p {
+        font-size: 14px !important;
+        margin-bottom: 28px !important;
+        max-width: 100% !important;
+    }
+
+    /* Stack CTA buttons vertically */
+    .hero-slider-text-block > div:last-child {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 14px !important;
+    }
+
+    /* Hero bottom bar: hide the scroll indicator and counter on xs, keep arrows */
+    .hero-bottom-bar-scroll  { display: none !important; }
+    .hero-bottom-bar-counter { display: none !important; }
+
+    /* ── 2. Category circles ─────────────────────────────────── */
+    /* 3-up grid instead of 2-up so images aren't giant */
+    .categories-style-01.col {
+        flex: 0 0 33.333% !important;
+        max-width: 33.333% !important;
+    }
+    /* Shrink the circle image itself */
+    .categories-style-01 .icon-box img {
+        width: 72px !important;
+        height: 72px !important;
+    }
+    /* Smaller category label */
+    .categories-style-01 .fw-600 {
+        font-size: 12px !important;
+    }
+
+    /* ── 3. Promotions grid ─────────────────────────────────── */
+    /* Big promo: make it a sensible 60vw-tall card, not 660px */
+    .big-promo-banner,
+    .row.g-4 > .col-12.col-lg-6:first-child > .position-relative {
+        height: 52vw !important;
+        min-height: 220px !important;
+        max-height: 320px !important;
+    }
+    /* Small promos: reduce stacked height */
+    .row.g-4 > .col-12.col-lg-6:last-child > div > .position-relative {
+        height: 44vw !important;
+        min-height: 170px !important;
+        max-height: 250px !important;
+    }
+
+    /* ── 4. Marquee ticker ──────────────────────────────────── */
+    .marquee-ticker-text {
+        font-size: 28px !important;
+    }
+
+    /* ── 5. Feature Split Banner ────────────────────────────── */
+    /* Make the text block full-width and properly padded */
+    .col-md-8.cover-background {
+        min-height: 300px;
+        background-size: cover;
+        background-position: center top;
+    }
+    .col-md-8.cover-background .float-end {
+        float: none !important;
+        width: 100% !important;
+        padding: 40px 24px !important;
+    }
+    .col-md-8.cover-background h1 {
+        font-size: clamp(30px, 8vw, 44px) !important;
+    }
+
+    /* ── 6. Editorial "Fresh from collection" grid ──────────── */
+    /* 2-col grid on mobile instead of 1 */
+    .row-cols-1.row-cols-md-2.row-cols-lg-4 > .col {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+    .row-cols-1.row-cols-md-2.row-cols-lg-4 .blog-image img,
+    .row-cols-1.row-cols-md-2.row-cols-lg-4 .blog-image [style*="height: 240"] {
+        height: 160px !important;
+    }
+    /* Tighten card body text */
+    .row-cols-1.row-cols-md-2.row-cols-lg-4 .card-body {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+    }
+    .row-cols-1.row-cols-md-2.row-cols-lg-4 .card-title {
+        font-size: 13px !important;
+        margin-bottom: 6px !important;
+    }
+    .row-cols-1.row-cols-md-2.row-cols-lg-4 .categories-text {
+        font-size: 11px !important;
+    }
+
+    /* ── 7. Benefits / Why-choose-us strip ──────────────────── */
+    /* 2-col on mobile — already handled by Bootstrap xs-border fixes,
+       just tighten the padding */
+    .icon-with-text-style-08 {
+        padding-top: 28px !important;
+        padding-bottom: 28px !important;
+    }
+    .icon-with-text-style-08 .feature-box-content .fw-600 {
+        font-size: 14px !important;
+    }
+
+    /* ── 8. Section vertical rhythm ────────────────────────── */
+    .bg-dark-texture { padding-bottom: 20px !important; }
+    .half-section     { padding-top: 24px !important; padding-bottom: 24px !important; }
+
+    /* ── 9. "View all products" button row ─────────────────── */
+    .text-center.mt-50px { margin-top: 28px !important; }
+}
+
+/* ============================================================
+   SHOP PAGE — MOBILE OPTIMISATIONS  (max 767px)
+   ============================================================ */
+@media (max-width: 767px) {
+
+    /* ── Page wrapper: tighter padding ── */
+    .top-space-padding.page-shell { padding-top: 80px !important; }
+    .top-space-padding.page-shell .container-fluid { padding-left: 12px !important; padding-right: 12px !important; }
+
+    /* ── Sidebar: hidden by default, shown via drawer ── */
+    .shop-sidebar { display: none !important; }
+
+    /* ── Product grid column: full width (padding reset for 2-col) ── */
+    .col-xxl-10.col-lg-9.ps-5 { padding-left: 0 !important; }
+
+    /* ── Product cards: compact on mobile ── */
+    .shop-box { padding-bottom: 16px !important; }
+    .shop-footer { padding-top: 10px !important; }
+    .shop-footer a.text-white { font-size: 13px !important; margin-bottom: 2px !important; }
+    .shop-footer .fw-500 { font-size: 13px !important; }
+
+    /* ── Product image: keep aspect ratio, limit max height ── */
+    .shop-image img { max-height: 220px; object-fit: cover; }
+
+    /* ── Grid row: tighter gutter ── */
+    .row-cols-2 { --bs-gutter-x: 10px !important; }
+    .row-cols-2 .col.mb-45px { margin-bottom: 20px !important; }
+
+    /* ── Filter pills ── */
+    .filter-chip { font-size: 12px !important; padding: 5px 10px !important; }
+
+    /* ── Pagination: bigger tap targets ── */
+    .pagination .page-link { min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
+}
+
+/* ============================================================
+   ACCOUNT PAGE — MOBILE OPTIMISATIONS  (max 767px)
+   ============================================================ */
+@media (max-width: 767px) {
+
+    /* ── Page top padding ── */
+    .account-page-shell { padding-top: 80px !important; }
+
+    /* ── Section titles: tighter ── */
+    .ui-section-title { font-size: 18px !important; }
+
+    /* ── Content panels: narrower padding on mobile ── */
+    .ui-panel { padding: 18px !important; }
+    .ui-panel.ui-panel-lg { padding: 20px !important; }
+    .ui-panel.ui-panel-sm { padding: 14px !important; }
+
+    /* ── Profile / Security form: full-width inputs ── */
+    .ui-stack-md .row > [class*="col-md-6"],
+    .ui-stack-md .row > [class*="col-md-3"] {
+        width: 100% !important;
+    }
+
+    /* ── Orders table: enable horizontal scroll so columns don't crush ── */
+    .orders-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .orders-table-wrap table { min-width: 520px; }
+
+    /* ── Order rows: compact padding on mobile ── */
+    .orders-table-wrap td,
+    .orders-table-wrap th { padding: 11px 12px !important; }
+
+    /* ── Address grid: single column on mobile ── */
+    .addresses-grid > [class*="col-md-6"] { width: 100% !important; }
+
+    /* ── Wishlist grid: 2-col ── */
+    .wishlist-grid > [class*="col-md-6"],
+    .wishlist-grid > [class*="col-lg-4"] { width: 50% !important; }
+    .wishlist-grid img { height: 120px !important; }
+
+    /* ── Wallet balance card: stack vertically ── */
+    .wallet-balance-card { flex-direction: column !important; align-items: flex-start !important; gap: 14px !important; padding: 18px !important; }
+    .wallet-balance-card .text-end { text-align: left !important; }
+
+    /* ── Tab content vertical rhythm ── */
+    .ui-stack-md { gap: 18px !important; }
+
+    /* ── Security form max-width override ── */
+    .security-form-wrap { max-width: 100% !important; }
+}

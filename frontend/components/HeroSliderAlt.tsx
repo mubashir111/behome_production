@@ -565,6 +565,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
 
                 {/* Center: scroll indicator */}
                 <div
+                    className="hero-bottom-bar-scroll"
                     style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', paddingBottom: '4px' }}
                     onClick={() => {
                         const next = document.querySelector('.hero-slider-section + *') as HTMLElement | null;
@@ -588,7 +589,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                 </div>
 
                 {/* Right: counter */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div className="hero-bottom-bar-counter" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     {activeSlides.length > 1 && (
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontFamily: 'var(--primary-font,serif)' }}>
                             <span style={{ color: '#ffffff', fontSize: 'clamp(18px,2vw,26px)', fontWeight: '700', letterSpacing: '-0.5px' }}>
@@ -608,9 +609,27 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                     0%, 100% { transform: translateY(0); opacity: 1; }
                     60% { transform: translateY(8px); opacity: 0.3; }
                 }
-                @media (max-width: 768px) {
-                    .hero-slider-grid { grid-template-columns: 1fr !important; }
+                @media (max-width: 767px) {
+                    .hero-slider-grid {
+                        grid-template-columns: 1fr !important;
+                        padding: 100px 22px 100px !important;
+                        align-items: flex-end !important;
+                    }
                     .hero-slider-right-panel { display: none !important; }
+                    .hero-slider-text-block h1 {
+                        font-size: clamp(30px, 9vw, 44px) !important;
+                        margin-bottom: 12px !important;
+                    }
+                    .hero-slider-text-block p {
+                        font-size: 14px !important;
+                        margin-bottom: 24px !important;
+                        -webkit-line-clamp: 2;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                    }
+                    .hero-bottom-bar-scroll  { display: none !important; }
+                    .hero-bottom-bar-counter { display: none !important; }
                 }
             `}</style>
         </section>

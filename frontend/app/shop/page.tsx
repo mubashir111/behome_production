@@ -41,6 +41,7 @@ function ShopContent() {
     const [searchInput, setSearchInput] = useState(searchQuery);
     const [naIndex, setNaIndex] = useState(0);
     const lastFetchedUrl = useRef<string | null>(null);
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     const { updateCart } = useCart();
 
@@ -180,13 +181,14 @@ function ShopContent() {
     const currentArrival = latestProducts[naIndex] || null;
 
     /* ── Grid class helper ───────────────────────────────── */
+    // Always 2-col on mobile (row-cols-2), desktop follows user selection
     const gridClass = viewMode === '2'
-        ? 'row-cols-1 row-cols-md-2 row-cols-xl-2'
+        ? 'row-cols-2 row-cols-md-2 row-cols-xl-2'
         : viewMode === '3'
-            ? 'row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3'
+            ? 'row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-3'
             : viewMode === 'list'
                 ? 'row-cols-1'
-                : /* 4 */ 'row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4';
+                : /* 4 */ 'row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4';
 
     return (
         <main>
@@ -200,10 +202,48 @@ function ShopContent() {
 
 
 
-                            {/* Toolbar: search + grid icons + sort */}
-                            <div className="toolbar-wrapper border-bottom border-color-extra-medium-gray d-flex flex-wrap align-items-center gap-2 w-100 mb-40px md-mb-30px pb-15px">
+                            {/* ── Mobile search bar (xs only, full width, above toolbar) ── */}
+                            <form className="d-flex d-md-none gap-2 mb-15px w-100" onSubmit={submitSearch} role="search">
+                                <input
+                                    type="search" name="search" autoComplete="off" spellCheck={false}
+                                    className="form-control form-control-sm flex-grow-1"
+                                    placeholder="Search products…"
+                                    value={searchInput}
+                                    onChange={e => setSearchInput(e.target.value)}
+                                    style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.14)' }}
+                                />
+                                <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap' }}>Search</button>
+                            </form>
+
+                            {/* ── Mobile filter + sort bar (xs only) ── */}
+                            <div className="d-flex d-md-none align-items-center gap-2 mb-20px">
+                                <button
+                                    type="button"
+                                    className="shop-mobile-filter-btn"
+                                    onClick={() => setShowMobileFilters(true)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: 7, flex: 1, justifyContent: 'center', padding: '9px 14px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, color: '#fff', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+                                >
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+                                    Filters {(categorySlug || brandSlugParam || priceRange) ? <span style={{ background: 'var(--base-color)', color: '#000', borderRadius: '50%', width: 18, height: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800 }}>{[categorySlug, brandSlugParam, priceRange].filter(Boolean).length}</span> : null}
+                                </button>
+                                <select
+                                    className="form-select form-select-sm border-0"
+                                    value={sortBy}
+                                    onChange={e => setSortBy(e.target.value)}
+                                    style={{ flex: 1, background: 'rgba(255,255,255,0.06)', color: '#fff', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', padding: '9px 12px', fontSize: 13, fontWeight: 600 }}
+                                >
+                                    <option value="default">Default</option>
+                                    <option value="1">Popular</option>
+                                    <option value="3">Latest</option>
+                                    <option value="4">Price ↑</option>
+                                    <option value="5">Price ↓</option>
+                                </select>
+                            </div>
+
+                            {/* ── Desktop toolbar (md+) ── */}
+                            <div className="toolbar-wrapper border-bottom border-color-extra-medium-gray d-none d-md-flex flex-wrap align-items-center gap-2 w-100 mb-40px pb-15px">
                                 {/* Grid/list toggle icons */}
-                                <div className="d-none d-md-flex align-items-center gap-1 me-5px" role="group" aria-label="Product grid layout">
+                                <div className="d-flex align-items-center gap-1 me-5px" role="group" aria-label="Product grid layout">
                                     {([['2', '/images/shop-two-column.svg', '2 columns'], ['3', '/images/shop-three-column.svg', '3 columns'], ['4', '/images/shop-four-column.svg', '4 columns'], ['list', '/images/shop-list.svg', 'List view']] as const).map(([mode, src, label]) => (
                                         <button
                                             key={mode}
@@ -533,6 +573,115 @@ function ShopContent() {
                     </div>
                 </div>
             </section>
+
+            {/* ── Mobile Filter Drawer ── */}
+            {showMobileFilters && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+                    {/* Backdrop */}
+                    <div
+                        onClick={() => setShowMobileFilters(false)}
+                        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+                    />
+                    {/* Drawer panel */}
+                    <div style={{
+                        position: 'absolute', bottom: 0, left: 0, right: 0,
+                        background: '#141414',
+                        borderRadius: '20px 20px 0 0',
+                        maxHeight: '85vh',
+                        overflowY: 'auto',
+                        padding: '0 0 40px',
+                        boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
+                    }}>
+                        {/* Handle + header */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', position: 'sticky', top: 0, background: '#141414', zIndex: 1 }}>
+                            <span style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>Filters</span>
+                            <button onClick={() => setShowMobileFilters(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 24, cursor: 'pointer', lineHeight: 1 }}>×</button>
+                        </div>
+
+                        <div style={{ padding: '20px' }}>
+                            {/* Active filter pills */}
+                            {(categorySlug || brandSlugParam || priceRange) && (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                                    {categorySlug && (
+                                        <button className="filter-chip ui-filter-chip text-white border-0" onClick={() => { applyShopParams({ category: null, page: null }, { scroll: false }); setShowMobileFilters(false); }}>
+                                            {categorySlug} ×
+                                        </button>
+                                    )}
+                                    {brandSlugParam && (
+                                        <button className="filter-chip ui-filter-chip text-white border-0" onClick={() => { applyShopParams({ brand: null, page: null }, { scroll: false }); setShowMobileFilters(false); }}>
+                                            {brandSlugParam} ×
+                                        </button>
+                                    )}
+                                    {priceRange && (
+                                        <button className="filter-chip ui-filter-chip text-white border-0" onClick={() => { setPriceRange(null); setShowMobileFilters(false); }}>
+                                            {priceRange.label} ×
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Categories */}
+                            <div style={{ marginBottom: 24 }}>
+                                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Categories</p>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                    <button
+                                        onClick={() => { applyShopParams({ category: null, page: null }, { scroll: false }); setShowMobileFilters(false); }}
+                                        style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid', borderColor: !categorySlug ? 'var(--base-color)' : 'rgba(255,255,255,0.15)', background: !categorySlug ? 'rgba(197,160,89,0.12)' : 'transparent', color: !categorySlug ? 'var(--base-color)' : '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+                                    >All</button>
+                                    {categories.map((cat: any) => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => { applyShopParams({ category: cat.slug, page: null }, { scroll: false }); setShowMobileFilters(false); }}
+                                            style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid', borderColor: categorySlug === cat.slug ? 'var(--base-color)' : 'rgba(255,255,255,0.15)', background: categorySlug === cat.slug ? 'rgba(197,160,89,0.12)' : 'transparent', color: categorySlug === cat.slug ? 'var(--base-color)' : '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+                                        >{cat.name}</button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Brands */}
+                            {brands.length > 0 && (
+                                <div style={{ marginBottom: 24 }}>
+                                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Brands</p>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                        {brands.map((b: any) => (
+                                            <button
+                                                key={b.id}
+                                                onClick={() => { applyShopParams({ brand: b.slug, page: null }, { scroll: false }); setShowMobileFilters(false); }}
+                                                style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid', borderColor: brandSlugParam === b.slug ? 'var(--base-color)' : 'rgba(255,255,255,0.15)', background: brandSlugParam === b.slug ? 'rgba(197,160,89,0.12)' : 'transparent', color: brandSlugParam === b.slug ? 'var(--base-color)' : '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+                                            >{b.name}</button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Price */}
+                            <div style={{ marginBottom: 24 }}>
+                                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Price Range</p>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                    {PRICE_RANGES.map(range => {
+                                        const active = priceRange?.min === range.min && priceRange?.max === range.max;
+                                        return (
+                                            <button
+                                                key={range.label}
+                                                onClick={() => { setPriceRange(active ? null : range); setShowMobileFilters(false); }}
+                                                style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid', borderColor: active ? 'var(--base-color)' : 'rgba(255,255,255,0.15)', background: active ? 'rgba(197,160,89,0.12)' : 'transparent', color: active ? 'var(--base-color)' : '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+                                            >{range.label}</button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Close CTA */}
+                            <button
+                                onClick={() => setShowMobileFilters(false)}
+                                style={{ width: '100%', padding: '14px', background: 'var(--base-color)', color: '#0a0a0a', fontWeight: 700, fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer', marginTop: 8 }}
+                            >
+                                Show Results
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="cookie-message bg-dark-gray border-radius-8px" id="cookies-model">
                 <div className="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you consent to our use of cookies.</div>

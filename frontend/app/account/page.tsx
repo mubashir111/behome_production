@@ -277,9 +277,60 @@ function AccountContent() {
             <main>
                 <section className="top-space-padding page-shell page-shell-tight">
                     <div className="container">
+
+                        {/* ── Mobile: compact user card + horizontal pill nav ── */}
+                        <div className="d-lg-none mb-24px" style={{ marginBottom: 24 }}>
+                            {/* User card */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 0 20px' }}>
+                                <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'var(--base-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                    <i className="feather icon-feather-user text-white" style={{ fontSize: 20 }}></i>
+                                </div>
+                                <div style={{ minWidth: 0 }}>
+                                    <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</p>
+                                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</p>
+                                </div>
+                            </div>
+                            {/* Horizontal scrollable pill nav */}
+                            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+                                {[
+                                    { tab: 'profile',   icon: 'icon-feather-user',        label: 'Profile'    },
+                                    { tab: 'orders',    icon: 'icon-feather-package',      label: 'Orders'     },
+                                    { tab: 'addresses', icon: 'icon-feather-map-pin',      label: 'Addresses'  },
+                                    { tab: 'security',  icon: 'icon-feather-lock',         label: 'Security'   },
+                                    { tab: 'wishlist',  icon: 'icon-feather-heart',        label: 'Wishlist'   },
+                                    { tab: 'wallet',    icon: 'icon-feather-dollar-sign',  label: 'Wallet'     },
+                                ].map(({ tab, icon, label }) => (
+                                    <Link key={tab} href={`/account?tab=${tab}`}
+                                        style={{
+                                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                                            padding: '8px 16px', borderRadius: 24, whiteSpace: 'nowrap',
+                                            fontSize: 13, fontWeight: 600, textDecoration: 'none',
+                                            flexShrink: 0,
+                                            background: activeTab === tab ? 'var(--base-color)' : 'rgba(255,255,255,0.07)',
+                                            color: activeTab === tab ? '#0a0a0a' : 'rgba(255,255,255,0.75)',
+                                            border: activeTab === tab ? '1px solid var(--base-color)' : '1px solid rgba(255,255,255,0.1)',
+                                        }}>
+                                        <i className={`feather ${icon}`} style={{ fontSize: 13 }}></i>
+                                        {label}
+                                    </Link>
+                                ))}
+                                <button onClick={handleLogout}
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                                        padding: '8px 16px', borderRadius: 24, whiteSpace: 'nowrap',
+                                        fontSize: 13, fontWeight: 600, flexShrink: 0,
+                                        background: 'rgba(239,68,68,0.08)', color: 'rgba(239,68,68,0.8)',
+                                        border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer',
+                                    }}>
+                                    <i className="feather icon-feather-log-out" style={{ fontSize: 13 }}></i>
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="row">
-                            {/* Sidebar */}
-                            <div className="col-lg-3 col-md-4 md-mb-40px">
+                            {/* Sidebar — desktop only */}
+                            <div className="col-lg-3 col-md-4 d-none d-lg-block md-mb-40px">
                                 <div className="bg-dark-gray border-radius-6px box-shadow-extra-large border border-color-extra-medium-gray ui-panel ui-panel-lg">
                                     <div className="text-center ui-panel-header">
                                         <div className="d-inline-flex align-items-center justify-content-center bg-base-color rounded-circle mb-10px" style={{ width: 60, height: 60, fontSize: 24 }}>
@@ -315,7 +366,7 @@ function AccountContent() {
                             </div>
 
                             {/* Content */}
-                            <div className="col-lg-9 col-md-8 ui-content-offset">
+                            <div className="col-lg-9 col-md-8 col-12 ui-content-offset">
 
                                 {/* Profile Tab */}
                                 {activeTab === 'profile' && (
@@ -407,8 +458,8 @@ function AccountContent() {
                                                 <Link href="/shop" className="btn btn-small btn-round-edge btn-base-color mt-20px">Start Shopping</Link>
                                             </div>
                                         ) : (
-                                            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
-                                                <div style={{ overflowX: 'auto' }}>
+                                            <div className="orders-table-wrap" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                                                <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' as any }}>
                                                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                                                         <thead>
                                                             <tr style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
@@ -540,7 +591,7 @@ function AccountContent() {
                                             </div>
                                         )}
 
-                                        <div className="row g-4">
+                                        <div className="row g-4 addresses-grid">
                                             {addresses.length === 0 && !showAddressForm ? (
                                                 <div className="col-12">
                                                     <div className="bg-dark-gray text-center border-radius-6px border border-dashed border-color-extra-medium-gray ui-panel">
@@ -589,7 +640,7 @@ function AccountContent() {
                                 {activeTab === 'security' && (
                                     <div className="ui-stack-md">
                                         <h4 className="ui-section-title">Change Password</h4>
-                                        <div className="bg-dark-gray border-radius-6px box-shadow-extra-large border border-color-extra-medium-gray ui-panel ui-panel-lg" style={{ maxWidth: 500 }}>
+                                        <div className="bg-dark-gray border-radius-6px box-shadow-extra-large border border-color-extra-medium-gray ui-panel ui-panel-lg security-form-wrap" style={{ maxWidth: 500 }}>
                                             <form onSubmit={handlePasswordChange}>
                                                 <div className="mb-20px">
                                                     <label className="text-white mb-10px fw-500 fs-14">Current Password <span className="text-red">*</span></label>
@@ -637,7 +688,7 @@ function AccountContent() {
                                         <h4 className="ui-section-title mb-0">Wallet</h4>
 
                                         {/* Balance Card */}
-                                        <div className="d-flex align-items-center justify-content-between p-25px border-radius-6px" style={{ background: 'rgba(251,153,28,0.08)', border: '1px solid rgba(251,153,28,0.25)' }}>
+                                        <div className="wallet-balance-card d-flex align-items-center justify-content-between p-25px border-radius-6px" style={{ background: 'rgba(251,153,28,0.08)', border: '1px solid rgba(251,153,28,0.25)' }}>
                                             <div className="d-flex align-items-center gap-15px">
                                                 <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'rgba(251,153,28,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                                     <i className="feather icon-feather-dollar-sign fs-22" style={{ color: '#FB991C' }}></i>
@@ -713,7 +764,7 @@ function AccountContent() {
                                                 <Link href="/shop" className="btn btn-small btn-round-edge btn-base-color">Browse Products</Link>
                                             </div>
                                         ) : (
-                                            <div className="row g-3">
+                                            <div className="row g-3 wishlist-grid">
                                                 {wishlistItems.map((item: any) => {
                                                     const product = item.product ?? item;
                                                     return (
