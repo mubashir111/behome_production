@@ -21,7 +21,7 @@ class CustomerService
     public object $user;
     public array $phoneFilter = ['phone'];
     public array $roleFilter = ['role_id'];
-    public array $userFilter = ['name', 'email', 'username','status', 'phone'];
+    public array $userFilter = ['name', 'email', 'username', 'status', 'phone'];
     public array $blockRoles = [EnumRole::ADMIN];
 
 
@@ -31,11 +31,11 @@ class CustomerService
     public function list(PaginateRequest $request)
     {
         try {
-            $requests    = $request->all();
-            $method      = $request->get('paginate', 0) == 1 ? 'paginate' : 'get';
+            $requests = $request->all();
+            $method = $request->get('paginate', 0) == 1 ? 'paginate' : 'get';
             $methodValue = $request->get('paginate', 0) == 1 ? $request->get('per_page', 10) : '*';
             $orderColumn = $request->get('order_column') ?? 'id';
-            $orderType   = $request->get('order_type') ?? 'desc';
+            $orderType = $request->get('order_type') ?? 'desc';
 
             return User::with('media', 'addresses')->role(EnumRole::CUSTOMER)->where(function ($query) use ($requests) {
                 foreach ($requests as $key => $request) {
@@ -44,8 +44,8 @@ class CustomerService
                     }
                 }
             })->orderBy($orderColumn, $orderType)->$method(
-                $methodValue
-            );
+                    $methodValue
+                );
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
@@ -60,15 +60,15 @@ class CustomerService
         try {
             DB::transaction(function () use ($request) {
                 $this->user = User::create([
-                    'name'              => $request->name,
-                    'email'             => $request->email,
-                    'phone'             => $request->phone,
-                    'username'          => $this->username($request->email),
-                    'password'          => bcrypt($request->password),
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'username' => $this->username($request->email),
+                    'password' => bcrypt($request->password),
                     'email_verified_at' => now(),
-                    'status'            => $request->status,
-                    'country_code'      => $request->country_code,
-                    'is_guest'          => Ask::NO,
+                    'status' => $request->status,
+                    'country_code' => $request->country_code,
+                    'is_guest' => Ask::NO,
                 ]);
                 $this->user->assignRole(EnumRole::CUSTOMER);
             });
@@ -88,11 +88,11 @@ class CustomerService
         try {
             if (!in_array(EnumRole::CUSTOMER, $this->blockRoles)) {
                 DB::transaction(function () use ($customer, $request) {
-                    $this->user               = $customer;
-                    $this->user->name         = $request->name;
-                    $this->user->email        = $request->email;
-                    $this->user->phone        = $request->phone;
-                    $this->user->status       = $request->status;
+                    $this->user = $customer;
+                    $this->user->name = $request->name;
+                    $this->user->email = $request->email;
+                    $this->user->phone = $request->phone;
+                    $this->user->status = $request->status;
                     $this->user->country_code = $request->country_code;
                     if ($request->password) {
                         $this->user->password = Hash::make($request->password);

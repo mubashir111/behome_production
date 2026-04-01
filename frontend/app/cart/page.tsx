@@ -237,51 +237,113 @@ export default function Cart() {
                         {cartItems.length > 0 ? (
                             <div className="row align-items-start">
                                 <div className="col-lg-8 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
-                                    <div className="row align-items-center">
-                                        <div className="col-12">
-                                            <table className="table cart-products border-color-transparent-white-light !border-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col"></th>
-                                                        <th className="alt-font fw-600 text-white" scope="col">Product</th>
-                                                        <th scope="col"></th>
-                                                        <th className="alt-font fw-600 text-white" scope="col">Price</th>
-                                                        <th className="alt-font fw-600 text-white" scope="col">Quantity</th>
-                                                        <th className="alt-font fw-600 text-white" scope="col">Total</th>
+
+                                    {/* ── Desktop table (md and up) ── */}
+                                    <div className="d-none d-md-block">
+                                        <table className="table cart-products border-color-transparent-white-light !border-0">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col"></th>
+                                                    <th className="alt-font fw-600 text-white" scope="col">Product</th>
+                                                    <th scope="col"></th>
+                                                    <th className="alt-font fw-600 text-white" scope="col">Price</th>
+                                                    <th className="alt-font fw-600 text-white" scope="col">Quantity</th>
+                                                    <th className="alt-font fw-600 text-white" scope="col">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {cartItems.map((item) => (
+                                                    <tr key={item.id}>
+                                                        <td className="product-remove">
+                                                            <a className="fs-20 fw-500 cursor-pointer" onClick={() => removeItem(item.id)}>×</a>
+                                                        </td>
+                                                        <td className="product-thumbnail">
+                                                            <a href={`/product/${item.product?.slug}`}>
+                                                                <Image alt={item.product?.name} className="cart-product-image" src={item.product?.cover || "/images/demo-decor-store-product-01.jpg"} width={140} height={140} unoptimized />
+                                                            </a>
+                                                        </td>
+                                                        <td className="product-name">
+                                                            <a className="text-white fw-500 d-block lh-initial" href={`/product/${item.product?.slug}`}>{item.product?.name}</a>
+                                                            {item.variation_names && <span className="fs-14">{item.variation_names}</span>}
+                                                        </td>
+                                                        <td className="product-price" data-title="Price">{formatAmount(parseFloat(item.price))}</td>
+                                                        <td className="product-quantity" data-title="Quantity">
+                                                            <div className="quantity" style={{ opacity: updatingItems.has(item.id) ? 0.4 : 1, transition: 'opacity 0.2s ease' }}>
+                                                                <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
+                                                                <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} />
+                                                                <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)}>+</button>
+                                                            </div>
+                                                        </td>
+                                                        <td className="product-subtotal" data-title="Total">{formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}</td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {cartItems.map((item) => (
-                                                        <tr key={item.id}>
-                                                            <td className="product-remove">
-                                                                <a className="fs-20 fw-500 cursor-pointer" onClick={() => removeItem(item.id)}>×</a>
-                                                            </td>
-                                                            <td className="product-thumbnail">
-                                                                <a href={`/product/${item.product?.slug}`}>
-                                                                    <Image alt={item.product?.name} className="cart-product-image" src={item.product?.cover || "/images/demo-decor-store-product-01.jpg"} width={140} height={140} unoptimized />
-                                                                </a>
-                                                            </td>
-                                                            <td className="product-name">
-                                                                <a className="text-white fw-500 d-block lh-initial" href={`/product/${item.product?.slug}`}>{item.product?.name}</a>
-                                                                {item.variation_names && <span className="fs-14">{item.variation_names}</span>}
-                                                            </td>
-                                                            <td className="product-price" data-title="Price">{formatAmount(parseFloat(item.price))}</td>
-                                                            <td className="product-quantity" data-title="Quantity">
-                                                                <div className="quantity" style={{ opacity: updatingItems.has(item.id) ? 0.4 : 1, transition: 'opacity 0.2s ease' }}>
-                                                                    <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
-                                                                    <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} />
-                                                                    <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)}>+</button>
-                                                                </div>
-                                                            </td>
-                                                            <td className="product-subtotal" data-title="Total">{formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
+
+                                    {/* ── Mobile card list (xs and sm only) ── */}
+                                    <div className="d-md-none" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                        {cartItems.map((item) => (
+                                            <div key={item.id} style={{
+                                                display: 'flex',
+                                                gap: '14px',
+                                                padding: '16px 0',
+                                                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                                opacity: updatingItems.has(item.id) ? 0.5 : 1,
+                                                transition: 'opacity 0.2s ease',
+                                            }}>
+                                                {/* Product image */}
+                                                <a href={`/product/${item.product?.slug}`} style={{ flexShrink: 0 }}>
+                                                    <Image
+                                                        alt={item.product?.name}
+                                                        src={item.product?.cover || '/images/demo-decor-store-product-01.jpg'}
+                                                        width={80} height={80} unoptimized
+                                                        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, display: 'block' }}
+                                                    />
+                                                </a>
+
+                                                {/* Details */}
+                                                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                                    {/* Name + remove */}
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                                                        <a href={`/product/${item.product?.slug}`} style={{ color: '#fff', fontWeight: 600, fontSize: 14, lineHeight: 1.3, textDecoration: 'none' }}>
+                                                            {item.product?.name}
+                                                        </a>
+                                                        <button onClick={() => removeItem(item.id)} disabled={updatingItems.has(item.id)}
+                                                            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 22, lineHeight: 1, cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}>
+                                                            ×
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Variant */}
+                                                    {item.variation_names && (
+                                                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{item.variation_names}</span>
+                                                    )}
+
+                                                    {/* Unit price */}
+                                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+                                                        {formatAmount(parseFloat(item.price))} each
+                                                    </span>
+
+                                                    {/* Qty controls + line total */}
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+                                                        <div className="quantity" style={{ transform: 'scale(0.88)', transformOrigin: 'left center' }}>
+                                                            <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
+                                                            <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} />
+                                                            <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)}>+</button>
+                                                        </div>
+                                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>
+                                                            {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* ── Coupon + Continue Shopping ── */}
                                     <div className="row mt-20px">
-                                        <div className="col-xl-7 col-md-6">
+                                        <div className="col-12 col-md-7 col-xl-7">
                                             <div className="coupon-code-panel">
                                                 <input
                                                     className="bg-dark-gray border-radius-4px text-white border-color-transparent-white-light"
@@ -295,13 +357,13 @@ export default function Cart() {
                                             </div>
                                             {couponMessage && <p className={`fs-13 mt-10px mb-0 ${couponDiscount > 0 ? 'text-base-color' : 'text-red'}`}>{couponMessage}</p>}
                                         </div>
-                                        <div className="col-xl-5 col-md-6 text-center text-md-end sm-mt-15px">
+                                        <div className="col-12 col-md-5 col-xl-5 text-start text-md-end mt-15px mt-md-0">
                                             <a className="btn btn-small border-1 btn-round-edge btn-transparent-white-light text-white text-transform-none" href="/shop">Continue Shopping</a>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-lg-4">
-                                    <div className="dark-card-bg border-radius-6px p-50px xl-p-30px lg-p-25px ui-panel ui-panel-lg">
+                                    <div className="dark-card-bg border-radius-6px p-50px xl-p-30px lg-p-25px xs-p-20px ui-panel ui-panel-lg">
                                         <span className="fs-26 alt-font fw-600 text-white mb-5px d-block">Cart totals</span>
                                         <table className="w-100 total-price-table">
                                             <tbody>

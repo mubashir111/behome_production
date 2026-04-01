@@ -20,11 +20,11 @@ class ProfileService
     public function update(ProfileRequest $request): ?\Illuminate\Contracts\Auth\Authenticatable
     {
         try {
-            $user               = User::find(auth()->user()->id);
+            $user = User::find(auth()->user()->id);
             if (!blank($user)) {
-                $user->name         = $request->name;
-                $user->phone        = $request->get('phone');
-                $user->email        = $request->get('email');
+                $user->name = $request->name;
+                $user->phone = $request->get('phone');
+                $user->email = $request->get('email');
                 $user->country_code = $request->get('country_code');
                 $user->save();
             }
@@ -49,7 +49,7 @@ class ProfileService
     public function changePassword(ChangePasswordRequest $request): ?\Illuminate\Contracts\Auth\Authenticatable
     {
         try {
-            $user           = User::find(auth()->user()->id);
+            $user = User::find(auth()->user()->id);
             $user->password = bcrypt($request->get('new_password'));
             $user->save();
             return $user;

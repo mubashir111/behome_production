@@ -1024,3 +1024,8 @@ textarea.form-control {
   transform: translateX(-3px);
   transition: transform 0.2s ease;
 }
+
+.icon-hover-push-left:hover i {
+  transform: translateX(-3px);
+  transition: transform 0.2s ease;
+}

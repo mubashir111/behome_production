@@ -106,7 +106,7 @@ function ShopContent() {
     useEffect(() => {
         const pageFromUrl = Number.parseInt(searchParams.get('page') || '1', 10);
         const searchFromUrl = searchParams.get('search') || '';
-        
+
         let url = `/products?per_page=24&page=${pageFromUrl}`;
         if (categorySlug) url += `&category_slug=${categorySlug}`;
         if (brandSlugParam) url += `&brand_slug=${brandSlugParam}`;
@@ -350,7 +350,7 @@ function ShopContent() {
                                                                 {product.is_offer && <span className="lable hot">Offer</span>}
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
-                                                            <div className="shop-hover d-flex justify-content-start">
+                                                            <div className="shop-hover d-flex justify-content-center">
                                                                 <WishlistButton
                                                                     productId={product.id}
                                                                     initialInWishlist={Boolean(product.wishlist)}
@@ -371,7 +371,7 @@ function ShopContent() {
                                                                 </a>
                                                             </div>
                                                         </div>
-                                                        <div className="shop-footer pt-20px">
+                                                        <div className="shop-footer pt-20px text-center">
                                                             <a className="text-white fs-17 fw-600 d-block mb-5px" href={`/product/${product.slug}`}>{product.name}</a>
                                                             <div className="fw-500 fs-15 lh-normal">
                                                                 {product.is_offer ? (

@@ -31,32 +31,32 @@ class EmployeeService
     public function list(PaginateRequest $request)
     {
         try {
-            $requests    = $request->all();
-            $method      = $request->get('paginate', 0) == 1 ? 'paginate' : 'get';
+            $requests = $request->all();
+            $method = $request->get('paginate', 0) == 1 ? 'paginate' : 'get';
             $methodValue = $request->get('paginate', 0) == 1 ? $request->get('per_page', 10) : '*';
             $orderColumn = $request->get('order_column') ?? 'id';
-            $orderType   = $request->get('order_type') ?? 'desc';
+            $orderType = $request->get('order_type') ?? 'desc';
 
             return User::with('media', 'addresses', 'roles')->where(
-                function ($query) use ($requests) {
-                    $query->whereHas('roles', function ($query) {
-                        $query->where('id', '!=', EnumRole::ADMIN);
-                        $query->where('id', '!=', EnumRole::CUSTOMER);
-                    });
-                    foreach ($requests as $key => $request) {
-                        if (in_array($key, $this->roleFilter)) {
-                            $query->whereHas('roles', function ($query) use ($request, $key) {
-                                $query->where('id', '=', $request);
+                        function ($query) use ($requests) {
+                            $query->whereHas('roles', function ($query) {
+                                $query->where('id', '!=', EnumRole::ADMIN);
+                                $query->where('id', '!=', EnumRole::CUSTOMER);
                             });
+                            foreach ($requests as $key => $request) {
+                                if (in_array($key, $this->roleFilter)) {
+                                    $query->whereHas('roles', function ($query) use ($request, $key) {
+                                        $query->where('id', '=', $request);
+                                    });
+                                }
+                                if (in_array($key, $this->userFilter)) {
+                                    $query->where($key, 'like', '%' . $request . '%');
+                                }
+                            }
                         }
-                        if (in_array($key, $this->userFilter)) {
-                            $query->where($key, 'like', '%' . $request . '%');
-                        }
-                    }
-                }
-            )->orderBy($orderColumn, $orderType)->$method(
-                $methodValue
-            );
+                    )->orderBy($orderColumn, $orderType)->$method(
+                    $methodValue
+                );
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
@@ -69,15 +69,15 @@ class EmployeeService
             if (!in_array($request->role_id, $this->blockRoles)) {
                 DB::transaction(function () use ($request) {
                     $this->user = User::create([
-                        'name'              => $request->name,
-                        'email'             => $request->email,
-                        'phone'             => $request->phone,
-                        'username'          => $this->username($request->email),
-                        'password'          => bcrypt($request->password),
-                        'status'            => $request->status,
+                        'name' => $request->name,
+                        'email' => $request->email,
+                        'phone' => $request->phone,
+                        'username' => $this->username($request->email),
+                        'password' => bcrypt($request->password),
+                        'status' => $request->status,
                         'email_verified_at' => now(),
-                        'country_code'      => $request->country_code,
-                        'is_guest'          => Ask::NO,
+                        'country_code' => $request->country_code,
+                        'is_guest' => Ask::NO,
                     ]);
 
                     $this->user->assignRole($request->role_id);
@@ -99,16 +99,18 @@ class EmployeeService
     public function update(EmployeeRequest $request, User $employee)
     {
         try {
-            if (!in_array($request->role_id, $this->blockRoles) && !in_array(
-                optional($employee->roles[0])->id,
-                $this->blockRoles
-            )) {
+            if (
+                !in_array($request->role_id, $this->blockRoles) && !in_array(
+                    optional($employee->roles[0])->id,
+                    $this->blockRoles
+                )
+            ) {
                 DB::transaction(function () use ($employee, $request) {
-                    $this->user               = $employee;
-                    $this->user->name         = $request->name;
-                    $this->user->email        = $request->email;
-                    $this->user->phone        = $request->phone;
-                    $this->user->status       = $request->status;
+                    $this->user = $employee;
+                    $this->user->name = $request->name;
+                    $this->user->email = $request->email;
+                    $this->user->phone = $request->phone;
+                    $this->user->status = $request->status;
                     $this->user->country_code = $request->country_code;
                     if ($request->password) {
                         $this->user->password = Hash::make($request->password);

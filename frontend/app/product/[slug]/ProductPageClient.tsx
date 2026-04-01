@@ -139,7 +139,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                         setAllVariations(vars);
                         const opts = collectOptions(vars);
                         setAttrOptions(opts);
-                        
+
                         // Build variant media map: key = "AttrName###OptionName" for any attribute that has images
                         const mediaMap: Record<string, Variation> = {};
                         const buildMediaMap = (variations: Variation[]) => {
@@ -152,7 +152,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                         };
                         buildMediaMap(vars);
                         setVariantMediaMap(mediaMap);
-                        
+
                         const defaults: Record<string, string> = {};
                         const firstLeaf = flattenVariationLeaves(vars)[0];
 
@@ -832,19 +832,19 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                         <div className="d-flex align-items-center gap-2">
                                             {/* Quantity Selector */}
                                             <div className="d-flex align-items-center" style={{ height: '50px', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', background: '#0a0a0a' }}>
-                                                <button 
-                                                    className="bg-transparent border-0 text-white" 
+                                                <button
+                                                    className="bg-transparent border-0 text-white"
                                                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
                                                     style={{ width: '45px', height: '100%', fontSize: '20px', cursor: 'pointer' }}
                                                 >-</button>
-                                                <span 
-                                                    className="d-flex align-items-center justify-content-center fw-700 text-white mx-1" 
+                                                <span
+                                                    className="d-flex align-items-center justify-content-center fw-700 text-white mx-1"
                                                     style={{ width: '40px', height: '100%', fontSize: '18px', cursor: 'default' }}
                                                 >
                                                     {quantity}
                                                 </span>
-                                                <button 
-                                                    className="bg-transparent border-0 text-white" 
+                                                <button
+                                                    className="bg-transparent border-0 text-white"
                                                     onClick={() => setQuantity(q => q + 1)}
                                                     style={{ width: '45px', height: '100%', fontSize: '18px', cursor: 'pointer' }}
                                                 >+</button>
