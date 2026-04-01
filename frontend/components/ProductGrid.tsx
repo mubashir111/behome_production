@@ -22,7 +22,7 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products, showCategory = false, onAddToCart }: ProductGridProps) {
     return (
-        <div className="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 justify-content-center">
+        <div className="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-md-2">
             {products.map((product) => (
                 <div key={product.id} className="col mb-45px">
                     <ProductCard

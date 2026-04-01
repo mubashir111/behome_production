@@ -129,9 +129,9 @@ export default async function Home() {
                             <h6 className="mb-0 fw-700 alt-font text-white">Featured categories</h6>
                         </div>
                         <div className="col-xl-10 col-lg-9">
-                            <div className="row row-cols-2 row-cols-md-6 row-cols-sm-3 justify-content-center align-items-center">
+                            <div className="row row-cols-2 row-cols-md-6 row-cols-sm-3 align-items-center">
                                 {categories.map((cat: any) => (
-                                    <div key={cat.id} className="col categories-style-01 text-center sm-mb-30px">
+                                    <div key={cat.id} className="col categories-style-01 sm-mb-30px">
                                         <div className="categories-box">
                                             <div className="icon-box position-relative mb-20px">
                                                 <a href={`/shop?category=${cat.slug}`} className="d-block">
@@ -141,7 +141,7 @@ export default async function Home() {
                                                         width={130}
                                                         height={130}
                                                         unoptimized
-                                                        style={{ borderRadius: '50%', width: 130, height: 130, objectFit: 'cover', margin: '0 auto', boxShadow: '0 10px 30px rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)' }}
+                                                        style={{ borderRadius: '50%', width: 130, height: 130, objectFit: 'cover', boxShadow: '0 10px 30px rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)' }}
                                                     />
                                                 </a>
                                             </div>

@@ -307,7 +307,7 @@ function ShopContent() {
                                 <div className="ui-panel ui-empty-state text-white opacity-6 fs-17">No products found.</div>
                             ) : (
                                 <>
-                                    <div className={`row ${gridClass} justify-content-center`}>
+                                    <div className={`row ${gridClass}`}>
                                         {products.map(product => (
                                             <div key={product.id} className="col mb-45px">
                                                 {viewMode === 'list' ? (
@@ -350,7 +350,7 @@ function ShopContent() {
                                                                 {product.is_offer && <span className="lable hot">Offer</span>}
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
-                                                            <div className="shop-hover d-flex justify-content-center">
+                                                            <div className="shop-hover d-flex justify-content-start">
                                                                 <WishlistButton
                                                                     productId={product.id}
                                                                     initialInWishlist={Boolean(product.wishlist)}
@@ -371,7 +371,7 @@ function ShopContent() {
                                                                 </a>
                                                             </div>
                                                         </div>
-                                                        <div className="shop-footer text-center pt-20px">
+                                                        <div className="shop-footer pt-20px">
                                                             <a className="text-white fs-17 fw-600 d-block mb-5px" href={`/product/${product.slug}`}>{product.name}</a>
                                                             <div className="fw-500 fs-15 lh-normal">
                                                                 {product.is_offer ? (

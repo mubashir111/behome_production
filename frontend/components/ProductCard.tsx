@@ -69,7 +69,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                     {product.is_offer && <span className="lable hot">Offer</span>}
                     <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                 </a>
-                <div className="shop-hover d-flex justify-content-center">
+                <div className="shop-hover d-flex justify-content-start">
                     <WishlistButton
                         productId={product.id}
                         initialInWishlist={Boolean(product.wishlist)}
@@ -88,7 +88,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                     </a>
                 </div>
             </div>
-            <div className="shop-footer text-center pt-20px">
+            <div className="shop-footer pt-20px">
                 {showCategory && product.category && (
                     <span className="fw-500 text-white d-block mb-5px">{product.category.name}</span>
                 )}

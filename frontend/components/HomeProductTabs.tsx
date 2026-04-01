@@ -24,7 +24,7 @@ export default function HomeProductTabs({
                 <div className="row mb-4">
                     <div className="col-12">
                         <div
-                            className="d-flex justify-content-center flex-wrap gap-4 mb-50px sm-mb-20px"
+                            className="d-flex justify-content-start flex-wrap gap-4 mb-50px sm-mb-20px"
                             data-anime='{"el":"childs","translateY":[50,0],"opacity":[0,1],"duration":600,"delay":100,"staggervalue":150,"easing":"easeOutQuad"}'
                         >
                             <button
