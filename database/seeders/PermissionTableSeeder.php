@@ -577,6 +577,10 @@ class PermissionTableSeeder extends Seeder
         ];
 
         $permissions = AppLibrary::associativeToNumericArrayBuilder($permissions);
-        Permission::insert($permissions);
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(
+                ['name' => $permission['name'], 'guard_name' => $permission['guard_name']]
+            );
+        }
     }
 }
