@@ -112,7 +112,7 @@ class RealProductSeeder extends Seeder
                 'brand' => 'Ink Home',
                 'price' => 4500.00,
                 'desc' => 'A modular black sofa set designed for free DIY combinations. Features integrated small side tables and memory foam comfort.',
-                'image' => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/ink_shadow_modular_sofa_v5_1774928925715.png',
+                'image' => base_path('database/seeders/images/ink_shadow_modular_sofa_v5_1774928925715.png'),
                 'variations' => ['Ink Black', 'Smoke Grey']
             ],
             [
@@ -121,7 +121,7 @@ class RealProductSeeder extends Seeder
                 'brand' => 'Secret Realm',
                 'price' => 6200.00,
                 'desc' => 'A luxury curved sofa set finished in full frosted emerald green leather. Unique visual symbol with curved armrests.',
-                'image' => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/secret_realm_curved_sofa_v5_1774928953422.png',
+                'image' => base_path('database/seeders/images/secret_realm_curved_sofa_v5_1774928953422.png'),
                 'variations' => ['Emerald Green', 'Royal Velvet']
             ],
             [
@@ -130,7 +130,7 @@ class RealProductSeeder extends Seeder
                 'brand' => 'Howvin',
                 'price' => 3800.00,
                 'desc' => 'Coastal architectural furniture featuring a teak wood base and navy woven back chairs with grey cushions.',
-                'image' => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/howvin_outdoor_set_v5_1774928970239.png'
+                'image' => base_path('database/seeders/images/howvin_outdoor_set_v5_1774928970239.png')
             ],
             [
                 'name' => 'Yalong Signature Gold Rim Tableware',
@@ -138,7 +138,7 @@ class RealProductSeeder extends Seeder
                 'brand' => 'Yalong',
                 'price' => 850.00,
                 'desc' => 'Boutique fine bone china with elegant 24k gold-rimmed detailing and minimalist patterns.',
-                'image' => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/yalong_signature_tableware_v5_1774928996290.png'
+                'image' => base_path('database/seeders/images/yalong_signature_tableware_v5_1774928996290.png')
             ],
             [
                 'name' => 'Firenze Elegant Sofa (SF2115)',
@@ -146,7 +146,7 @@ class RealProductSeeder extends Seeder
                 'brand' => 'Secret Realm',
                 'price' => 5400.00,
                 'desc' => 'Modern round contours with high-density sponge. Dimension: 310 x 116 x 76 cm.',
-                'image' => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/secret_realm_curved_sofa_v5_1774928953422.png'
+                'image' => base_path('database/seeders/images/secret_realm_curved_sofa_v5_1774928953422.png')
             ]
         ];
 
