@@ -20,18 +20,22 @@ class UserTableSeeder extends Seeder
     public function run(): void
     {
 
-        $admin      = User::create([
-            'name'              => 'John Doe',
-            'email'             => 'admin@example.com',
-            'phone'             => '1254875855',
-            'username'          => 'admin',
-            'email_verified_at' => now(),
-            'password'          => bcrypt('123456'),
-            'status'            => Status::ACTIVE,
-            'country_code'      => '+880',
-            'is_guest'          => Ask::NO
-        ]);
-        $admin->assignRole(EnumRole::ADMIN);
+        $admin = User::firstOrCreate(
+            ['username' => 'admin'],
+            [
+                'name'              => 'John Doe',
+                'email'             => 'admin@example.com',
+                'phone'             => '1254875855',
+                'email_verified_at' => now(),
+                'password'          => bcrypt('123456'),
+                'status'            => Status::ACTIVE,
+                'country_code'      => '+880',
+                'is_guest'          => Ask::NO,
+            ]
+        );
+        if (!$admin->hasRole(EnumRole::ADMIN)) {
+            $admin->assignRole(EnumRole::ADMIN);
+        }
         if (env('DEMO', false)) {
             Address::create([
                 'full_name'    => $admin->name,
@@ -59,18 +63,22 @@ class UserTableSeeder extends Seeder
             ]);
         }
 
-        $customer = User::create([
-            'name'              => 'Walking Customer',
-            'email'             => 'walkingcustomer@example.com',
-            'phone'             => '125444455',
-            'username'          => 'default-customer',
-            'email_verified_at' => now(),
-            'password'          => bcrypt('123456'),
-            'status'            => Status::ACTIVE,
-            'country_code'      => '+880',
-            'is_guest'          => Ask::NO
-        ]);
-        $customer->assignRole(EnumRole::CUSTOMER);
+        $customer = User::firstOrCreate(
+            ['username' => 'default-customer'],
+            [
+                'name'              => 'Walking Customer',
+                'email'             => 'walkingcustomer@example.com',
+                'phone'             => '125444455',
+                'email_verified_at' => now(),
+                'password'          => bcrypt('123456'),
+                'status'            => Status::ACTIVE,
+                'country_code'      => '+880',
+                'is_guest'          => Ask::NO,
+            ]
+        );
+        if (!$customer->hasRole(EnumRole::CUSTOMER)) {
+            $customer->assignRole(EnumRole::CUSTOMER);
+        }
         if (env('DEMO', false)) {
             Address::create([
                 'full_name'    => $customer->name,
