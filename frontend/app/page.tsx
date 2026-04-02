@@ -270,51 +270,55 @@ export default async function Home() {
                             </a>
                         </div>
                     </div>
-                    <div className="col-md-4"
+                    <div className="col-md-4 premium-slider-container"
                         data-anime='{"translateX":[50,0],"opacity":[0,1],"duration":600,"delay":150,"easing":"easeOutQuad"}'>
                         <div className="swiper position-relative h-100"
                             data-slider-options='{"slidesPerView":1,"loop":true,"allowTouchMove":true,"autoplay":{"delay":3000,"disableOnInteraction":false},"navigation":{"nextEl":".slider-one-slide-next-1","prevEl":".slider-one-slide-prev-1"},"effect":"fade"}'>
                             <div className="swiper-wrapper">
                                 {featuredProducts.length > 0 ? featuredProducts.map((product: any) => (
-                                    <div key={product.id} className="swiper-slide cover-background h-100 text-center"
-                                        style={{ backgroundImage: 'url(images/demo-decor-store-product-slider-bg-img.jpg)' }}>
-                                        <a href={`/product/${product.slug}`}>
+                                    <div key={product.id} className="swiper-slide h-100 text-center d-flex flex-column align-items-center justify-content-center p-4"
+                                        style={{ background: 'url(images/demo-decor-store-product-slider-bg-img.jpg) center center no-repeat', backgroundSize: 'contain' }}>
+                                        <a href={`/product/${product.slug}`} className="d-block mb-3">
                                             <Image alt={product.name}
                                                 src={product.cover || '/images/demo-decor-store-product-slider-01.png'}
-                                                width={520}
-                                                height={520}
+                                                width={480}
+                                                height={480}
                                                 unoptimized
-                                                style={{ maxHeight: '70%', objectFit: 'contain', width: 'auto', height: 'auto' }} />
+                                                style={{ maxHeight: '380px', objectFit: 'contain', width: 'auto', height: 'auto' }} />
                                         </a>
-                                        <div className="position-absolute bottom-70px xs-bottom-25px w-100 left-0 text-center ls-minus-05px">
-                                            <a className="text-dark-gray alt-font d-inline-block fs-20 fw-600"
+                                        <div className="slider-product-info">
+                                            <a className="slider-product-name"
                                                 href={`/product/${product.slug}`}>{product.name}</a>
-                                            <div className="d-block">
-                                                <div className="d-inline-block align-middle fs-18 fw-600 text-dark-gray">
-                                                    {product.is_offer
-                                                        ? <><del className="me-10px">{product.currency_price}</del>{product.discounted_price}</>
-                                                        : <>{product.currency_price}</>}
-                                                </div>
+                                            <div className="slider-product-price">
+                                                {product.is_offer
+                                                    ? (
+                                                        <>
+                                                            <span className="price-original">{product.currency_price}</span>
+                                                            <span className="price-discount">{product.discounted_price}</span>
+                                                        </>
+                                                    )
+                                                    : <span className="price-discount">{product.currency_price}</span>
+                                                }
                                             </div>
                                         </div>
                                     </div>
                                 )) : (
-                                    <div className="swiper-slide cover-background h-100 text-center"
-                                        style={{ backgroundImage: 'url(images/demo-decor-store-product-slider-bg-img.jpg)' }}>
+                                    <div className="swiper-slide h-100 text-center d-flex align-items-center justify-content-center"
+                                        style={{ background: 'url(images/demo-decor-store-product-slider-bg-img.jpg) center center no-repeat', backgroundSize: 'contain' }}>
                                         <a href="/shop">
-                                            <Image alt="Featured product" src="/images/demo-decor-store-product-slider-01.png" width={520} height={520} />
+                                            <Image alt="Featured product" src="/images/demo-decor-store-product-slider-01.png" width={480} height={480} />
                                         </a>
-                                        <div className="position-absolute bottom-70px w-100 left-0 text-center">
-                                            <a className="text-dark-gray alt-font fs-20 fw-600" href="/shop">Shop Collection</a>
+                                        <div className="slider-product-info">
+                                            <a className="slider-product-name" href="/shop">Shop Collection</a>
                                         </div>
                                     </div>
                                 )}
                             </div>
-                            <div className="slider-one-slide-prev-1 swiper-button-prev slider-navigation-style-06">
-                                <i className="bi bi-arrow-left icon-extra-medium text-dark-gray"></i>
+                            <div className="slider-one-slide-prev-1 swiper-button-prev slider-navigation-style-line">
+                                <i className="bi bi-chevron-left"></i>
                             </div>
-                            <div className="slider-one-slide-next-1 swiper-button-next slider-navigation-style-06">
-                                <i className="bi bi-arrow-right icon-extra-medium text-dark-gray"></i>
+                            <div className="slider-one-slide-next-1 swiper-button-next slider-navigation-style-line">
+                                <i className="bi bi-chevron-right"></i>
                             </div>
                         </div>
                     </div>

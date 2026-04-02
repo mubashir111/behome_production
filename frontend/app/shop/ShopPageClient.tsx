@@ -194,18 +194,18 @@ function ShopContent() {
                 : /* 4 */ 'row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4';
 
     return (
-        <main className="no-layout-pad" style={{ paddingTop: '150px' }}>
-            <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
-            <div className="container-fluid">
-                <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
-                    <ul>
-                        <li><a href="/" style={{textDecoration:'none'}}>Home</a></li>
-                        <li>Shop</li>
-                    </ul>
+        <main className="no-layout-pad shop-main-container">
+            <section className="shop-breadcrumb-section ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
+                <div className="container-fluid">
+                    <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+                        <ul>
+                            <li><a href="/" className="shop-nav-link-no-decor">Home</a></li>
+                            <li>Shop</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
             </section>
-            <section className="page-shell page-shell-tight ps-6 pe-6 lg-ps-3 lg-pe-3 sm-ps-0 sm-pe-0">
+            <section className="page-shell page-shell-tight shop-main-section ps-6 pe-6 lg-ps-3 lg-pe-3 sm-ps-0 sm-pe-0">
                 <div className="container-fluid">
                     <div className="row flex-row-reverse">
 
@@ -232,14 +232,14 @@ function ShopContent() {
                                             aria-pressed={viewMode === mode}
                                             title={label}
                                             onClick={() => setViewMode(mode)}
-                                            style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', background: 'transparent', border: 'none', padding: '6px', borderRadius: 4, cursor: 'pointer', opacity: viewMode === mode ? 1 : 0.4, outline: 'none', boxShadow: viewMode === mode ? '0 0 0 2px var(--base-color)' : 'none', transition: 'opacity 0.15s, box-shadow 0.15s' }}
+                                            className={`shop-view-mode-btn ${viewMode === mode ? 'active' : ''}`}
                                         >
-                                            <Image alt="" aria-hidden="true" style={{ filter: 'brightness(0) invert(1)', display: 'block' }} src={src} width={18} height={18} />
+                                            <Image alt="" aria-hidden="true" className="shop-view-mode-icon" src={src} width={18} height={18} />
                                         </button>
                                     ))}
                                 </div>
                                 {/* Inline search */}
-                                <form className="d-flex flex-grow-1 gap-2 align-items-center" style={{ maxWidth: 380 }} onSubmit={submitSearch} role="search">
+                                <form className="d-flex flex-grow-1 gap-2 align-items-center shop-search-form" onSubmit={submitSearch} role="search">
                                     <label htmlFor="shop-search" className="visually-hidden">Search products</label>
                                     <input
                                         id="shop-search"
@@ -247,31 +247,29 @@ function ShopContent() {
                                         name="search"
                                         autoComplete="off"
                                         spellCheck={false}
-                                        className="form-control form-control-sm"
                                         placeholder="Search products…"
                                         value={searchInput}
                                         onChange={event => setSearchInput(event.target.value)}
-                                        style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)', minWidth: 0, touchAction: 'manipulation' }}
+                                        className="form-control form-control-sm shop-search-input"
                                     />
-                                    <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap', touchAction: 'manipulation' }}>Search</button>
+                                    <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray shop-btn-nowrap">Search</button>
                                     {searchQuery && (
-                                        <button type="button" className="btn btn-transparent-white btn-small btn-rounded" onClick={() => { setSearchInput(''); setCurrentPage(1); applyShopParams({ search: null, page: null }, { scroll: false }); }} style={{ whiteSpace: 'nowrap', touchAction: 'manipulation' }}>Clear</button>
+                                        <button type="button" className="btn btn-transparent-white btn-small btn-rounded shop-btn-nowrap" onClick={() => { setSearchInput(''); setCurrentPage(1); applyShopParams({ search: null, page: null }, { scroll: false }); }}>Clear</button>
                                     )}
                                 </form>
                                 {/* Results count + Sort */}
                                 <div className="ms-auto d-flex align-items-center gap-3">
                                     {!loading && totalProducts > 0 && (
-                                        <span className="text-white opacity-6 fs-13" style={{ whiteSpace: 'nowrap' }}>
+                                        <span className="text-white opacity-6 fs-13 shop-results-count">
                                             {products.length} of {totalProducts} results
                                         </span>
                                     )}
                                     <label htmlFor="shop-sort" className="visually-hidden">Sort products</label>
                                     <select
                                         id="shop-sort"
-                                        className="form-select form-select-sm border-0"
                                         value={sortBy}
                                         onChange={e => setSortBy(e.target.value)}
-                                        style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', borderRadius: 6 }}
+                                        className="form-select form-select-sm border-0 shop-sort-select"
                                     >
                                         <option value="default">Default sorting</option>
                                         <option value="1">Popularity</option>
@@ -291,22 +289,22 @@ function ShopContent() {
                                             setSearchInput('');
                                             applyShopParams({ search: null, page: null }, { scroll: false });
                                         }}>
-                                            Search: {searchQuery} <span style={{ opacity: 0.6 }}>×</span>
+                                            Search: {searchQuery} <span className="shop-filter-pill-opacity">×</span>
                                         </button>
                                     )}
                                     {categorySlug && (
                                         <button className="filter-chip ui-filter-chip text-white border-0" onClick={() => applyShopParams({ category: null, page: null }, { scroll: false })}>
-                                            Category: {categorySlug} <span style={{ opacity: 0.6 }}>×</span>
+                                            Category: {categorySlug} <span className="shop-filter-pill-opacity">×</span>
                                         </button>
                                     )}
                                     {brandSlugParam && (
                                         <button className="filter-chip ui-filter-chip text-white border-0" onClick={() => applyShopParams({ brand: null, page: null }, { scroll: false })}>
-                                            Brand: {brandSlugParam} <span style={{ opacity: 0.6 }}>×</span>
+                                            Brand: {brandSlugParam} <span className="shop-filter-pill-opacity">×</span>
                                         </button>
                                     )}
                                     {priceRange && (
                                         <button className="filter-chip ui-filter-chip text-white border-0" onClick={() => setPriceRange(null)}>
-                                            {priceRange.label} <span style={{ opacity: 0.6 }}>×</span>
+                                            {priceRange.label} <span className="shop-filter-pill-opacity">×</span>
                                         </button>
                                     )}
                                 </div>
@@ -317,9 +315,9 @@ function ShopContent() {
                                 <div className={`row ${gridClass}`}>
                                     {[...Array(8)].map((_, i) => (
                                         <div key={i} className="col mb-45px">
-                                            <div style={{ height: viewMode === 'list' ? 100 : 260, background: 'rgba(255,255,255,0.05)', borderRadius: 4, marginBottom: 12 }} />
-                                            <div style={{ height: 14, width: '60%', background: 'rgba(255,255,255,0.05)', borderRadius: 4, marginBottom: 8 }} />
-                                            <div style={{ height: 12, width: '35%', background: 'rgba(255,255,255,0.04)', borderRadius: 4 }} />
+                                            <div className="shop-loading-placeholder-img" style={{ height: viewMode === 'list' ? 100 : 260 }} />
+                                            <div className="shop-loading-placeholder-title" />
+                                            <div className="shop-loading-placeholder-sub" />
                                         </div>
                                     ))}
                                 </div>
@@ -332,23 +330,22 @@ function ShopContent() {
                                             <div key={product.id} className="col mb-45px">
                                                 {viewMode === 'list' ? (
                                                     /* ── List layout ── */
-                                                    <div className="shop-box d-flex align-items-center gap-4 pb-20px" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                                                        <a href={`/product/${product.slug}`} style={{ flexShrink: 0, width: 110 }}>
-                                                            <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={110} height={130} unoptimized style={{ width: 110, height: 130, objectFit: 'cover', borderRadius: 4 }} />
+                                                    <div className="shop-box d-flex align-items-center gap-4 pb-20px shop-list-item-border">
+                                                        <a href={`/product/${product.slug}`} className="shop-list-thumb-wrapper">
+                                                            <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={110} height={130} unoptimized className="shop-list-thumb-img" />
                                                         </a>
-                                                        <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                                                        <div className="flex-grow-1 shop-flex-min-width-0">
                                                             <a className="text-white fs-16 fw-600 d-block mb-5px text-truncate" href={`/product/${product.slug}`}>{product.name}</a>
                                                             <div className="fw-500 fs-15 mb-15px">
                                                                 {product.is_offer ? (
-                                                                    <><del className="me-5px opacity-6">{product.currency_price}</del><span style={{ color: 'var(--base-color)' }}>{product.discounted_price}</span></>
+                                                                    <><del className="me-5px opacity-6">{product.currency_price}</del><span className="shop-price-accent">{product.discounted_price}</span></>
                                                                 ) : <span>{product.currency_price}</span>}
                                                             </div>
                                                             <div className="d-flex gap-2">
                                                                 <button
                                                                     aria-label={`Add ${product.name} to cart`}
-                                                                    className="btn btn-base-color btn-small btn-rounded text-dark-gray"
-                                                                    onClick={e => { e.preventDefault(); addToCart(product); }}
-                                                                    style={{ touchAction: 'manipulation' }}>
+                                                                    className="btn btn-base-color btn-small btn-rounded text-dark-gray shop-touch-manipulation"
+                                                                    onClick={e => { e.preventDefault(); addToCart(product); }}>
                                                                     Add to Cart
                                                                 </button>
                                                                 <WishlistButton
@@ -366,7 +363,7 @@ function ShopContent() {
                                                     <div className="shop-box pb-25px">
                                                         <div className="shop-image">
                                                             <a href={`/product/${product.slug}`}>
-                                                                <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={640} height={720} unoptimized style={{ width: '100%', height: 'auto' }} />
+                                                                <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={640} height={720} unoptimized className="shop-grid-img" />
                                                                 {product.is_offer && <span className="lable hot">Offer</span>}
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
@@ -380,9 +377,8 @@ function ShopContent() {
                                                                 />
                                                                 <button
                                                                     aria-label={`Add ${product.name} to cart`}
-                                                                    className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"
-                                                                    onClick={e => { e.preventDefault(); addToCart(product); }}
-                                                                    style={{ touchAction: 'manipulation' }}>
+                                                                    className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0 shop-touch-manipulation"
+                                                                    onClick={e => { e.preventDefault(); addToCart(product); }}>
                                                                     <i className="feather icon-feather-shopping-bag fs-15" aria-hidden="true"></i>
                                                                 </button>
                                                                 <a className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom"
@@ -395,7 +391,7 @@ function ShopContent() {
                                                             <a className="text-white fs-17 fw-600 d-block mb-5px" href={`/product/${product.slug}`}>{product.name}</a>
                                                             <div className="fw-500 fs-15 lh-normal">
                                                                 {product.is_offer ? (
-                                                                    <><del className="me-5px opacity-6">{product.currency_price}</del><span style={{ color: 'var(--base-color)' }}>{product.discounted_price}</span></>
+                                                                    <><del className="me-5px opacity-6">{product.currency_price}</del><span className="shop-price-accent">{product.discounted_price}</span></>
                                                                 ) : <span>{product.currency_price}</span>}
                                                             </div>
                                                         </div>
@@ -448,14 +444,14 @@ function ShopContent() {
                                 <span className="ui-sidebar-title">Filter by categories</span>
                                 <ul className="fs-15 shop-filter category-filter">
                                     <li>
-                                        <a href={buildShopUrl({ category: null, page: null })} style={!categorySlug ? { color: 'var(--base-color)' } : {}}>
+                                        <a href={buildShopUrl({ category: null, page: null })} className={!categorySlug ? 'active' : ''}>
                                             <span className="product-cb product-category-cb"></span>All
                                         </a>
                                     </li>
                                     {categories.map((cat: any) => (
                                         <li key={cat.id}>
                                             <a href={buildShopUrl({ category: cat.slug, page: null })}
-                                                style={categorySlug === cat.slug ? { color: 'var(--base-color)' } : {}}>
+                                                className={categorySlug === cat.slug ? 'active' : ''}>
                                                 <span className="product-cb product-category-cb"></span>{cat.name}
                                             </a>
                                             {(cat.products_count || cat.product_count) > 0 && (
@@ -474,7 +470,7 @@ function ShopContent() {
                                         {brands.map((b: any) => (
                                             <li key={b.id}>
                                                 <a href={buildShopUrl({ brand: b.slug, page: null })}
-                                                    style={brandSlugParam === b.slug ? { color: 'var(--base-color)' } : {}}>
+                                                    className={brandSlugParam === b.slug ? 'active' : ''}>
                                                     <span className="product-cb product-category-cb"></span>{b.name}
                                                 </a>
                                             </li>
@@ -492,8 +488,7 @@ function ShopContent() {
                                         return (
                                             <li key={range.label}>
                                                 <button
-                                                    className="shop-filter-btn"
-                                                    style={active ? { color: 'var(--base-color)' } : {}}
+                                                    className={`shop-filter-btn ${active ? 'active' : ''}`}
                                                     onClick={() => { setPriceRange(active ? null : range); setSidebarOpen(false); }}
                                                 >
                                                     <span className="product-cb product-category-cb"></span>
@@ -532,7 +527,7 @@ function ShopContent() {
                                             <div className="price">
                                                 {currentArrival.is_offer ? (
                                                     <>
-                                                        <del style={{ opacity: 0.5, marginRight: 6, fontSize: 12 }}>{currentArrival.currency_price}</del>
+                                                        <del className="shop-arrival-del">{currentArrival.currency_price}</del>
                                                         {currentArrival.discounted_price}
                                                     </>
                                                 ) : currentArrival.currency_price}

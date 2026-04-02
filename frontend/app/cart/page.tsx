@@ -230,13 +230,13 @@ export default function Cart() {
     }
 
     return (
-        <main className="no-layout-pad" style={{ paddingTop: '100px' }}>
+        <main className="no-layout-pad" className="page-top-100">
             <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
             <div className="container-fluid">
                 <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
                     <ul>
-                        <li><a href="/" style={{textDecoration:'none'}}>Home</a></li>
-                        <li><a href="/shop" style={{textDecoration:'none'}}>Shop</a></li>
+                        <li><a href="/" className="breadcrumb-link">Home</a></li>
+                        <li><a href="/shop" className="breadcrumb-link">Shop</a></li>
                         <li>Cart</li>
                     </ul>
                 </div>

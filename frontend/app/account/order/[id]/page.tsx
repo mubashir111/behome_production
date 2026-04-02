@@ -227,7 +227,7 @@ export default function OrderDetail() {
     const returnSubmitted = order.status === 10 && existingReturn;
 
     return (
-        <main className="no-layout-pad" style={{ paddingTop: '100px' }}>
+        <main className="no-layout-pad" className="page-top-100">
             <section className="page-shell page-shell-tight">
                 <div className="container">
 
@@ -272,7 +272,7 @@ export default function OrderDetail() {
                     {/* Header */}
                     <div className="row mb-50px">
                         <div className="col-12">
-                            <Link href="/account?tab=orders" className="text-white opacity-6 fs-14 d-inline-flex align-items-center gap-2 mb-20px icon-hover-push-left" style={{ textDecoration: 'none' }}>
+                            <Link href="/account?tab=orders" className="text-white opacity-6 fs-14 d-inline-flex align-items-center gap-2 mb-20px icon-hover-push-left" className="breadcrumb-link">
                                 <i className="feather icon-feather-arrow-left"></i> Back to Orders
                             </Link>
                             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -363,7 +363,7 @@ export default function OrderDetail() {
                                             />
                                         </div>
                                         <div className="flex-grow-1">
-                                            <a href={`/product/${item.product_slug}`} className="text-white fw-600 fs-15 d-block mb-5px" style={{ textDecoration: 'none' }}>
+                                            <a href={`/product/${item.product_slug}`} className="text-white fw-600 fs-15 d-block mb-5px" className="breadcrumb-link">
                                                 {item.product_name}
                                             </a>
                                             <p className="text-white opacity-5 fs-13 mb-0">Qty: {Math.abs(item.quantity)} × {item.currency_price}</p>

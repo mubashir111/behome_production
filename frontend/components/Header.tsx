@@ -288,7 +288,7 @@ export default async function Header() {
                         </div>
                         {/*  Right Side Icons  */}
                         <div className="col-6 col-xl-3 col-lg-2 order-2 order-lg-3 ms-auto d-flex justify-content-end align-items-center">
-                            <div className="d-flex align-items-center header-icons-row">
+                            <div className="d-flex align-items-center header-icons-row" style={{ gap: '13px' }}>
                                 {/*  Search — hidden on mobile (search is inside drawer)  */}
                                 <div className="d-none d-lg-flex">
                                     <HeaderSearch />

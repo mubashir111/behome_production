@@ -458,16 +458,16 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const attrNames = Object.keys(attrOptions);
 
     return (
-        <main className="no-layout-pad" style={{ paddingTop: '100px' }}>
+        <main className="no-layout-pad page-top-100">
             {/* ── Breadcrumb ─────────────────────────────────────────────── */}
             {/* Breadcrumb Section — Fixed top gap by removing top-space-margin */}
             <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
                 <div className="container-fluid">
                     <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
                         <ul>
-                            <li><Link href="/" style={{ textDecoration: 'none' }}>Home</Link></li>
-                            <li><Link href="/shop" style={{ textDecoration: 'none' }}>Shop</Link></li>
-                            {product.category?.name && <li><Link href={`/shop?category=${product.category.slug}`} style={{ textDecoration: 'none' }}>{product.category.name}</Link></li>}
+                            <li><Link href="/" className="breadcrumb-link">Home</Link></li>
+                            <li><Link href="/shop" className="breadcrumb-link">Shop</Link></li>
+                            {product.category?.name && <li><Link href={`/shop?category=${product.category.slug}`} className="breadcrumb-link">{product.category.name}</Link></li>}
                             <li>{product.name}</li>
                         </ul>
                     </div>
@@ -482,10 +482,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                         <div className="col-xl-7 col-lg-7">
                             <div className="d-flex flex-column flex-md-row gap-20px">
                                 {galleryImages.length > 1 && (
-                                    <div
-                                        className="d-flex d-md-grid gap-12px order-2 order-md-1"
-                                        style={{ gridAutoRows: '84px', width: '84px', minWidth: '84px', overflowX: 'auto' }}
-                                    >
+                                    <div className="d-flex d-md-grid gap-12px order-2 order-md-1 product-thumb-grid">
                                         {galleryImages.map((img: string, index: number) => {
                                             const isActive = index === safeActiveImageIndex;
 
@@ -495,18 +492,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                     type="button"
                                                     onClick={() => setActiveImageIndex(index)}
                                                     aria-label={`Preview image ${index + 1}`}
-                                                    style={{
-                                                        width: '84px',
-                                                        height: '84px',
-                                                        minWidth: '84px',
-                                                        borderRadius: '10px',
-                                                        overflow: 'hidden',
-                                                        padding: 0,
-                                                        border: isActive ? '2px solid #ff7a1a' : '1px solid rgba(255,255,255,0.12)',
-                                                        background: '#0f0f0f',
-                                                        boxShadow: isActive ? '0 0 0 3px rgba(255,122,26,0.16)' : 'none',
-                                                        opacity: isActive ? 1 : 0.7,
-                                                    }}
+                                                    className={`product-thumb-btn${isActive ? ' active' : ''}`}
                                                 >
                                                     <Image
                                                         alt={`${product.name} thumbnail ${index + 1}`}
@@ -514,7 +500,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                         width={168}
                                                         height={168}
                                                         unoptimized
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                                        className="product-thumb-img"
                                                     />
                                                 </button>
                                             );
@@ -523,64 +509,22 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                 )}
 
                                 <div className="flex-grow-1 position-relative order-1 order-md-2">
-                                    <div
-                                        style={{
-                                            position: 'relative',
-                                            borderRadius: '18px',
-                                            overflow: 'hidden',
-                                            background: '#141414',
-                                            border: '1px solid rgba(255,255,255,0.08)',
-                                            minHeight: '620px',
-                                        }}
-                                    >
+                                    <div className="product-img-frame">
                                         <Image
                                             alt={`${product.name} ${safeActiveImageIndex + 1}`}
                                             src={activeImage}
                                             width={1200}
                                             height={1200}
                                             unoptimized
-                                            className="w-100"
-                                            style={{ display: 'block', width: '100%', height: '100%', minHeight: '620px', objectFit: 'cover' }}
+                                            className="product-main-img"
                                         />
 
                                         {galleryImages.length > 1 && (
                                             <>
-                                                <button
-                                                    type="button"
-                                                    onClick={goToPrevImage}
-                                                    aria-label="Previous image"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '50%',
-                                                        left: '22px',
-                                                        transform: 'translateY(-50%)',
-                                                        width: '48px',
-                                                        height: '48px',
-                                                        borderRadius: '999px',
-                                                        border: '1px solid rgba(255,255,255,0.2)',
-                                                        background: 'rgba(10,10,10,0.62)',
-                                                        color: '#fff',
-                                                    }}
-                                                >
+                                                <button type="button" onClick={goToPrevImage} aria-label="Previous image" className="product-img-nav-btn prev">
                                                     <i className="fa fa-chevron-left" />
                                                 </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={goToNextImage}
-                                                    aria-label="Next image"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '50%',
-                                                        right: '22px',
-                                                        transform: 'translateY(-50%)',
-                                                        width: '48px',
-                                                        height: '48px',
-                                                        borderRadius: '999px',
-                                                        border: '1px solid rgba(255,255,255,0.2)',
-                                                        background: 'rgba(10,10,10,0.62)',
-                                                        color: '#fff',
-                                                    }}
-                                                >
+                                                <button type="button" onClick={goToNextImage} aria-label="Next image" className="product-img-nav-btn next">
                                                     <i className="fa fa-chevron-right" />
                                                 </button>
                                             </>
@@ -591,22 +535,14 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                         </div>
 
                         <div className="col-xl-5 col-lg-5">
-                            <div
-                                style={{
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                    borderRadius: '18px',
-                                    background: 'rgba(255,255,255,0.02)',
-                                    padding: '32px',
-                                }}
-                            >
+                            <div className="product-info-panel">
                                 {product.brand?.name && (
                                     <div className="d-flex align-items-center justify-content-between gap-3 mb-10px">
-                                        <span className="fs-13 fw-700 text-uppercase ls-2px" style={{ color: '#ff7a1a' }}>{product.brand.name}</span>
+                                        <span className="fs-13 fw-700 text-uppercase ls-2px product-brand-label">{product.brand.name}</span>
                                         <button
                                             type="button"
                                             onClick={shareProduct}
-                                            className="bg-transparent border-0 p-0 fs-13 fw-600"
-                                            style={{ color: '#ff7a1a' }}
+                                            className="bg-transparent border-0 p-0 fs-13 fw-600 product-brand-label"
                                         >
                                             <i className="feather icon-feather-share-2 me-5px" />
                                             Share
@@ -614,15 +550,14 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                     </div>
                                 )}
 
-                                <h2 className="text-white fw-700 mb-12px" style={{ fontSize: '34px', lineHeight: 1.15 }}>
+                                <h2 className="text-white fw-700 mb-12px product-title">
                                     {product.name}
                                 </h2>
 
-                                <div className="d-flex flex-wrap align-items-center gap-12px mb-20px" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                                <div className="d-flex flex-wrap align-items-center gap-12px mb-20px product-meta-text">
                                     <StarDisplay rating={product.rating || 0} />
                                     <button
-                                        className="bg-transparent border-0 p-0 text-decoration-underline fs-13 fw-500"
-                                        style={{ color: 'rgba(255,255,255,0.72)' }}
+                                        className="bg-transparent border-0 p-0 text-decoration-underline fs-13 fw-500 product-meta-text"
                                         onClick={() => setActiveTab('reviews')}
                                     >
                                         {product.reviews_count || 0} review{product.reviews_count !== 1 ? 's' : ''}
@@ -631,17 +566,17 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                 </div>
 
                                 <div className="d-flex flex-wrap align-items-end gap-10px mb-8px">
-                                    <span className="text-white fw-700" style={{ fontSize: '38px', lineHeight: 1 }}>{displayPrice}</span>
+                                    <span className="text-white fw-700 product-price-main">{displayPrice}</span>
                                     {displayOldPrice && (
-                                        <del className="fs-18 fw-500" style={{ color: 'rgba(255,255,255,0.42)' }}>{displayOldPrice}</del>
+                                        <del className="fs-18 fw-500 product-price-old">{displayOldPrice}</del>
                                     )}
                                     {discountPercent > 0 && (
-                                        <span className="fs-13 fw-700" style={{ color: '#67e8a5' }}>({discountPercent}% off)</span>
+                                        <span className="fs-13 fw-700 product-price-off">({discountPercent}% off)</span>
                                     )}
                                 </div>
 
                                 {shortDescription && (
-                                    <p className="mb-20px fs-14 lh-26" style={{ color: 'rgba(255,255,255,0.74)' }}>
+                                    <p className="mb-20px fs-14 lh-26 product-desc-text">
                                         {shortDescription}
                                         {plainDescription.length > 220 ? '...' : ''}
                                     </p>
@@ -649,19 +584,19 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
                                 <div className="mb-20px">
                                     {!canPurchase ? (
-                                        <span className="fs-13 fw-700" style={{ color: '#f59e0b' }}>
+                                        <span className="fs-13 fw-700 product-stock-low">
                                             <i className="feather icon-feather-slash me-5px" />Not available for purchase
                                         </span>
                                     ) : displayStock === null ? null : displayStock > 10 ? (
-                                        <span className="fs-13 fw-700" style={{ color: '#4ade80' }}>
+                                        <span className="fs-13 fw-700 product-stock-ok">
                                             <i className="feather icon-feather-check-circle me-5px" />In Stock
                                         </span>
                                     ) : displayStock > 0 ? (
-                                        <span className="fs-13 fw-700" style={{ color: '#fb923c' }}>
+                                        <span className="fs-13 fw-700 product-stock-out">
                                             <i className="feather icon-feather-alert-circle me-5px" />Only {displayStock} left in stock
                                         </span>
                                     ) : (
-                                        <span className="fs-13 fw-700" style={{ color: '#f59e0b' }}>
+                                        <span className="fs-13 fw-700 product-stock-low">
                                             <i className="feather icon-feather-x-circle me-5px" />Out of Stock
                                         </span>
                                     )}
@@ -674,7 +609,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                 <span className="d-block text-white fw-600 fs-14 mb-10px">
                                                     Select {attrName}
                                                     {selected[attrName] && (
-                                                        <span className="ms-8px fw-400" style={{ color: '#ff7a1a' }}>{selected[attrName]}</span>
+                                                        <span className="ms-8px fw-400 product-brand-label">{selected[attrName]}</span>
                                                     )}
                                                 </span>
                                                 <div className="d-flex flex-wrap gap-2">
@@ -691,101 +626,23 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                             return (
                                                                 <div
                                                                     key={opt}
-                                                                    style={{ position: 'relative', display: 'inline-block' }}
+                                                                    className="variation-swatch-wrap"
                                                                     onMouseEnter={() => setHoveredSwatch(swatchKey)}
                                                                     onMouseLeave={() => setHoveredSwatch(null)}
                                                                 >
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => setSelected(prev => ({ ...prev, [attrName]: opt }))}
-                                                                        style={{
-                                                                            width: '72px',
-                                                                            height: '72px',
-                                                                            padding: '3px',
-                                                                            borderRadius: '10px',
-                                                                            border: isActive ? '3px solid #ff7a1a' : '2px solid rgba(255,255,255,0.12)',
-                                                                            background: 'transparent',
-                                                                            overflow: 'hidden',
-                                                                            cursor: 'pointer',
-                                                                            transition: 'border-color 0.15s',
-                                                                            display: 'block',
-                                                                        }}
+                                                                        className={`var-swatch-btn${isActive ? ' active' : ''}`}
                                                                     >
-                                                                        <img
-                                                                            src={imageUrl!}
-                                                                            alt={opt}
-                                                                            style={{
-                                                                                width: '100%',
-                                                                                height: '100%',
-                                                                                objectFit: 'cover',
-                                                                                borderRadius: '7px',
-                                                                                display: 'block',
-                                                                            }}
-                                                                        />
+                                                                        <img src={imageUrl!} alt={opt} className="var-swatch-img" />
                                                                     </button>
-
-                                                                    {/* Option name label below swatch */}
-                                                                    <span style={{
-                                                                        display: 'block',
-                                                                        textAlign: 'center',
-                                                                        fontSize: '10px',
-                                                                        color: isActive ? '#ff7a1a' : 'rgba(255,255,255,0.55)',
-                                                                        marginTop: '4px',
-                                                                        maxWidth: '72px',
-                                                                        overflow: 'hidden',
-                                                                        textOverflow: 'ellipsis',
-                                                                        whiteSpace: 'nowrap',
-                                                                        fontWeight: isActive ? 700 : 400,
-                                                                    }}>
-                                                                        {opt}
-                                                                    </span>
-
-                                                                    {/* Hover popup — larger preview */}
+                                                                    <span className={`var-swatch-label${isActive ? ' active' : ''}`}>{opt}</span>
                                                                     {isHovered && (
-                                                                        <div style={{
-                                                                            position: 'absolute',
-                                                                            bottom: 'calc(100% + 10px)',
-                                                                            left: '50%',
-                                                                            transform: 'translateX(-50%)',
-                                                                            zIndex: 50,
-                                                                            background: '#1a1a1a',
-                                                                            border: '1px solid rgba(255,255,255,0.15)',
-                                                                            borderRadius: '12px',
-                                                                            padding: '8px',
-                                                                            boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
-                                                                            pointerEvents: 'none',
-                                                                            minWidth: '160px',
-                                                                        }}>
-                                                                            <img
-                                                                                src={imageUrl!}
-                                                                                alt={opt}
-                                                                                style={{
-                                                                                    width: '144px',
-                                                                                    height: '144px',
-                                                                                    objectFit: 'cover',
-                                                                                    borderRadius: '8px',
-                                                                                    display: 'block',
-                                                                                }}
-                                                                            />
-                                                                            <p style={{
-                                                                                margin: '6px 0 0',
-                                                                                textAlign: 'center',
-                                                                                fontSize: '12px',
-                                                                                fontWeight: 600,
-                                                                                color: '#fff',
-                                                                            }}>{opt}</p>
-                                                                            {/* Arrow pointing down */}
-                                                                            <div style={{
-                                                                                position: 'absolute',
-                                                                                bottom: '-6px',
-                                                                                left: '50%',
-                                                                                transform: 'translateX(-50%)',
-                                                                                width: 0,
-                                                                                height: 0,
-                                                                                borderLeft: '6px solid transparent',
-                                                                                borderRight: '6px solid transparent',
-                                                                                borderTop: '6px solid rgba(255,255,255,0.15)',
-                                                                            }} />
+                                                                        <div className="var-swatch-popup">
+                                                                            <img src={imageUrl!} alt={opt} className="var-swatch-popup-img" />
+                                                                            <p className="var-swatch-popup-name">{opt}</p>
+                                                                            <div className="var-swatch-popup-arrow" />
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -798,17 +655,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                                 key={opt}
                                                                 type="button"
                                                                 onClick={() => setSelected(prev => ({ ...prev, [attrName]: opt }))}
-                                                                style={{
-                                                                    minWidth: '56px',
-                                                                    padding: '9px 14px',
-                                                                    borderRadius: '10px',
-                                                                    border: isActive ? '1.5px solid #ff7a1a' : '1px solid rgba(255,255,255,0.14)',
-                                                                    background: isActive ? 'rgba(255,122,26,0.12)' : 'rgba(255,255,255,0.02)',
-                                                                    color: '#fff',
-                                                                    fontSize: '13px',
-                                                                    fontWeight: 600,
-                                                                    cursor: 'pointer',
-                                                                }}
+                                                                className={`var-pill-btn${isActive ? ' active' : ''}`}
                                                             >
                                                                 {opt}
                                                             </button>
@@ -820,50 +667,23 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                     </div>
                                 )}
 
-                                <div
-                                    className="mb-20px"
-                                    style={{
-                                        borderTop: '1px solid rgba(255,255,255,0.08)',
-                                        borderBottom: '1px solid rgba(255,255,255,0.08)',
-                                        padding: '18px 0',
-                                    }}
-                                >
+                                <div className="mb-20px product-actions-divider">
                                     <div className="d-flex flex-column gap-3">
                                         {/* Row 1: Quantity + Add to Cart + Wishlist */}
                                         <div className="d-flex align-items-center gap-2">
                                             {/* Quantity Selector */}
-                                            <div className="d-flex align-items-center" style={{ height: '50px', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', background: '#0a0a0a' }}>
-                                                <button
-                                                    className="bg-transparent border-0 text-white"
-                                                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                                                    style={{ width: '45px', height: '100%', fontSize: '20px', cursor: 'pointer' }}
-                                                >-</button>
-                                                <span
-                                                    className="d-flex align-items-center justify-content-center fw-700 text-white mx-1"
-                                                    style={{ width: '40px', height: '100%', fontSize: '18px', cursor: 'default' }}
-                                                >
-                                                    {quantity}
-                                                </span>
-                                                <button
-                                                    className="bg-transparent border-0 text-white"
-                                                    onClick={() => setQuantity(q => q + 1)}
-                                                    style={{ width: '45px', height: '100%', fontSize: '18px', cursor: 'pointer' }}
-                                                >+</button>
+                                            <div className="d-flex align-items-center product-qty-wrap">
+                                                <button className="bg-transparent border-0 text-white product-qty-btn" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+                                                <span className="d-flex align-items-center justify-content-center fw-700 text-white mx-1 product-qty-val">{quantity}</span>
+                                                <button className="bg-transparent border-0 text-white product-qty-btn" onClick={() => setQuantity(q => q + 1)}>+</button>
                                             </div>
 
                                             {/* Add to Cart */}
                                             <button
-                                                className="flex-grow-1 d-flex align-items-center justify-content-center gap-2 border-radius-6px fw-600 fs-15 transition-all"
+                                                className="flex-grow-1 d-flex align-items-center justify-content-center gap-2 border-radius-6px fw-600 fs-15 transition-all product-atc-btn"
                                                 onClick={() => addToCart()}
                                                 disabled={!stockOk}
-                                                style={{
-                                                    height: '50px',
-                                                    background: '#0a0a0a',
-                                                    color: '#fff',
-                                                    border: '1px solid rgba(255,255,255,0.15)',
-                                                    opacity: stockOk ? 1 : 0.5,
-                                                    padding: '0 20px',
-                                                }}
+                                                style={{ opacity: stockOk ? 1 : 0.5 }}
                                             >
                                                 <i className="bi bi-bag fs-18" />
                                                 <span>Add to cart</span>
@@ -874,33 +694,18 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                 type="button"
                                                 onClick={toggleWishlist}
                                                 disabled={wishlistLoading}
-                                                className="d-flex align-items-center justify-content-center border-radius-6px transition-all"
-                                                style={{
-                                                    width: '50px',
-                                                    height: '50px',
-                                                    background: '#0a0a0a',
-                                                    border: '1px solid rgba(255,255,255,0.15)',
-                                                    color: '#d1b06b',
-                                                    flexShrink: 0,
-                                                }}
+                                                className="d-flex align-items-center justify-content-center border-radius-6px transition-all product-wishlist-btn"
                                             >
-                                                <i className={inWishlist ? 'bi bi-heart-fill' : 'bi bi-heart'} style={{ fontSize: '20px' }} />
+                                                <i className={`${inWishlist ? 'bi bi-heart-fill' : 'bi bi-heart'} product-wishlist-icon`} />
                                             </button>
                                         </div>
 
                                         {/* Row 2: Buy Now (Full Width) */}
                                         <button
-                                            className="btn btn-extra-large btn-switch-text btn-box-shadow btn-none-transform border-radius-6px w-100 fw-600 transition-all"
+                                            className="btn btn-extra-large btn-switch-text btn-box-shadow btn-none-transform border-radius-6px w-100 fw-600 transition-all product-buy-now-btn"
                                             onClick={buyNow}
                                             disabled={!stockOk}
-                                            style={{
-                                                height: '50px',
-                                                background: '#ff7a1a',
-                                                color: '#fff',
-                                                border: 'none',
-                                                opacity: stockOk ? 1 : 0.5,
-                                                fontSize: '15px',
-                                            }}
+                                            style={{ opacity: stockOk ? 1 : 0.5 }}
                                         >
                                             Buy Now
                                         </button>
@@ -908,26 +713,11 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                 </div>
 
                                 <div className="d-flex flex-column gap-15px mb-20px">
-                                    <div
-                                        style={{
-                                            border: '1px solid rgba(255,255,255,0.08)',
-                                            borderRadius: '12px',
-                                            padding: '14px 16px',
-                                            background: 'rgba(255,255,255,0.02)',
-                                        }}
-                                    >
+                                    <div className="product-detail-card">
                                         <span className="d-block text-white fw-600 mb-5px">Delivery & Assembly Details</span>
-                                        <span className="d-block fs-13" style={{ color: 'rgba(255,255,255,0.64)' }}>Estimated delivery in 5-8 business days. Add pincode integration when shipping zones are available.</span>
+                                        <span className="d-block fs-13 product-delivery-note">Estimated delivery in 5-8 business days. Add pincode integration when shipping zones are available.</span>
                                     </div>
-
-                                    <div
-                                        style={{
-                                            border: '1px solid rgba(255,255,255,0.08)',
-                                            borderRadius: '12px',
-                                            padding: '14px 16px',
-                                            background: 'rgba(255,255,255,0.02)',
-                                        }}
-                                    >
+                                    <div className="product-detail-card">
                                         <span className="d-block text-white fw-600 mb-5px">Secure Checkout</span>
                                         <div className="d-flex flex-wrap gap-2">
                                             {['visa', 'mastercard', 'american-express', 'discover'].map((logo) => (
@@ -948,39 +738,28 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                     {product.category?.name && (
                                         <div>
                                             <span className="text-white fw-600">Category: </span>
-                                            <Link href={`/shop?category=${product.category.slug}`} className="text-white" style={{ opacity: 0.72 }}>{product.category.name}</Link>
+                                            <Link href={`/shop?category=${product.category.slug}`} className="text-white product-opacity-link">{product.category.name}</Link>
                                         </div>
                                     )}
                                     {product.brand?.name && (
                                         <div>
                                             <span className="text-white fw-600">Brand: </span>
-                                            <span className="text-white" style={{ opacity: 0.72 }}>{product.brand.name}</span>
+                                            <span className="text-white product-opacity-link">{product.brand.name}</span>
                                         </div>
                                     )}
                                 </div>
 
                                 <button
                                     type="button"
+                                    className="product-write-review-btn"
                                     onClick={() => {
                                         setActiveTab('reviews');
                                         setTimeout(() => {
                                             document.getElementById('review-form-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                         }, 100);
                                     }}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: 8,
-                                        background: 'transparent',
-                                        border: '1px solid rgba(255,255,255,0.12)',
-                                        borderRadius: 10,
-                                        color: 'rgba(255,255,255,0.76)',
-                                        fontSize: 13,
-                                        fontWeight: 600,
-                                        padding: '11px 18px',
-                                    }}
                                 >
-                                    <i className="feather icon-feather-edit-2" style={{ fontSize: 14 }} />
+                                    <i className="feather icon-feather-edit-2 fs-14" />
                                     Write a Review
                                 </button>
                             </div>
@@ -1003,14 +782,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                 key={tab.id}
                                 type="button"
                                 onClick={() => setActiveTab(tab.id)}
-                                className="bg-transparent border-0 pb-15px px-25px fs-15 fw-600 text-capitalize whitespace-nowrap"
-                                style={{
-                                    color: activeTab === tab.id ? '#d1b06b' : 'rgba(255,255,255,0.5)',
-                                    borderBottom: activeTab === tab.id ? '2px solid #d1b06b' : '2px solid transparent',
-                                    marginBottom: '-1px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                }}
+                                className={`product-tab-btn${activeTab === tab.id ? ' active' : ''}`}
                             >
                                 {tab.label}
                             </button>
@@ -1019,8 +791,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
                     {activeTab === 'description' && (
                         <div
-                            className="fs-15 lh-28 text-white opacity-8"
-                            style={{ maxWidth: '900px' }}
+                            className="fs-15 lh-28 text-white opacity-8 product-tab-desc"
                             dangerouslySetInnerHTML={{ __html: product.description || '<p>No description available.</p>' }}
                         />
                     )}
@@ -1033,7 +804,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                         {product.additional_info && Array.isArray(product.additional_info) && product.additional_info.length > 0 ? (
                                             product.additional_info.map((info: any, i: number) => (
                                                 <tr key={i}>
-                                                    <th className="fw-600 border-color-transparent-white-light py-15px ps-0" style={{ width: '150px' }}>{info.label}</th>
+                                                    <th className="fw-600 border-color-transparent-white-light py-15px ps-0 product-info-table-label">{info.label}</th>
                                                     <td className="border-color-transparent-white-light py-15px opacity-7">{info.value}</td>
                                                 </tr>
                                             ))
@@ -1049,7 +820,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                     )}
 
                     {activeTab === 'shipping' && (
-                        <div className="fs-15 lh-28 text-white opacity-8" style={{ maxWidth: '900px' }}>
+                        <div className="fs-15 lh-28 text-white opacity-8 product-tab-desc">
                             {product.shipping_and_return ? (
                                 <div dangerouslySetInnerHTML={{ __html: product.shipping_and_return.replace(/\n/g, '<br />') }} />
                             ) : (
@@ -1069,8 +840,8 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                         <button
                                             type="button"
                                             onClick={() => setShowReviews(v => !v)}
-                                            className="bg-transparent border-0 p-0 fs-13 fw-500"
-                                            style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}
+                                            
+                                            className="bg-transparent border-0 p-0 fs-13 fw-500 product-review-toggle-btn"
                                         >
                                             <i className={`feather ${showReviews ? 'icon-feather-eye-off' : 'icon-feather-eye'} me-5px`} />
                                             {showReviews ? 'Hide reviews' : 'Show reviews'}
@@ -1127,7 +898,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                         onMouseEnter={() => setHoverStar(star)}
                                                         onMouseLeave={() => setHoverStar(0)}
                                                         onClick={() => setReviewForm(f => ({ ...f, star }))}
-                                                        style={{ background: 'none', border: 'none', padding: '2px', cursor: 'pointer', fontSize: '22px' }}
+                                                        className="product-review-star-btn"
                                                     >
                                                         <i className={`bi bi-star-fill ${star <= (hoverStar || reviewForm.star) ? 'text-golden-yellow' : 'text-extra-medium-gray'}`} />
                                                     </button>
@@ -1139,12 +910,12 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                             <label className="text-white fs-14 fw-600 d-block mb-10px">Your Review <span className="text-red">*</span></label>
                                             <textarea
                                                 rows={4}
-                                                className="border-radius-4px w-100 text-white"
+                                                
                                                 placeholder="Share your experience with this product..."
                                                 value={reviewForm.review}
                                                 onChange={e => setReviewForm(f => ({ ...f, review: e.target.value }))}
                                                 required
-                                                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', padding: '12px', resize: 'vertical' }}
+                                                className="border-radius-4px w-100 product-review-textarea"
                                             />
                                         </div>
 

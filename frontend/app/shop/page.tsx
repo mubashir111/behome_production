@@ -192,7 +192,7 @@ function ShopContent() {
 
     return (
         <main>
-            <section className="top-space-padding page-shell page-shell-tight ps-6 pe-6 lg-ps-3 lg-pe-3 sm-ps-0 sm-pe-0">
+            <section className="page-shell page-shell-tight ps-6 pe-6 lg-ps-3 lg-pe-3 sm-ps-0 sm-pe-0">
                 <div className="container-fluid">
                     <div className="row flex-row-reverse">
 
@@ -223,7 +223,7 @@ function ShopContent() {
                                     onClick={() => setShowMobileFilters(true)}
                                     style={{ display: 'flex', alignItems: 'center', gap: 7, flex: 1, justifyContent: 'center', padding: '9px 14px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, color: '#fff', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
                                 >
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="11" y1="18" x2="13" y2="18" /></svg>
                                     Filters {(categorySlug || brandSlugParam || priceRange) ? <span style={{ background: 'var(--base-color)', color: '#000', borderRadius: '50%', width: 18, height: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800 }}>{[categorySlug, brandSlugParam, priceRange].filter(Boolean).length}</span> : null}
                                 </button>
                                 <select
