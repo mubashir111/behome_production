@@ -50,6 +50,7 @@ class Product extends Model implements HasMedia
 
     ];
     protected array $dates = ['deleted_at'];
+    protected $appends = ['cover', 'thumb', 'image'];
     protected $casts = [
         'id'                           => 'integer',
         'name'                         => 'string',

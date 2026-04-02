@@ -87,7 +87,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::active()->where('slug', $slug)
-                ->with(['category', 'brand', 'variations', 'taxes', 'reviews.user'])
+                ->with(['category', 'brand', 'variations.media', 'taxes', 'reviews.user'])
                 ->withSum('productStocks', 'quantity')
                 ->firstOrFail();
 

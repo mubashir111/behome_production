@@ -195,6 +195,16 @@ function ShopContent() {
 
     return (
         <main className="no-layout-pad" style={{ paddingTop: '150px' }}>
+            <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
+            <div className="container-fluid">
+                <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+                    <ul>
+                        <li><a href="/" style={{textDecoration:'none'}}>Home</a></li>
+                        <li>Shop</li>
+                    </ul>
+                </div>
+            </div>
+            </section>
             <section className="page-shell page-shell-tight ps-6 pe-6 lg-ps-3 lg-pe-3 sm-ps-0 sm-pe-0">
                 <div className="container-fluid">
                     <div className="row flex-row-reverse">

@@ -15,6 +15,41 @@ class StaticPageController extends Controller
         return view('admin.pages.index', compact('pages'));
     }
 
+    public function create()
+    {
+        return view('admin.pages.create');
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'title'            => 'required|string|max:255',
+            'slug'             => 'required|string|max:255|unique:static_pages,slug|regex:/^[a-z0-9\-]+$/',
+            'content'          => 'nullable|string',
+            'meta_title'       => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'is_active'        => 'nullable|boolean',
+        ]);
+
+        StaticPage::create([
+            'title'            => $data['title'],
+            'slug'             => $data['slug'],
+            'content'          => $data['content'] ?? null,
+            'sections'         => [],
+            'meta_title'       => $data['meta_title'] ?? null,
+            'meta_description' => $data['meta_description'] ?? null,
+            'is_active'        => $request->boolean('is_active'),
+        ]);
+
+        return redirect()->route('admin.pages.index')->with('success', 'Page created successfully.');
+    }
+
+    public function destroy(StaticPage $page)
+    {
+        $page->delete();
+        return back()->with('success', 'Page deleted.');
+    }
+
     public function edit(StaticPage $page)
     {
         return view('admin.pages.edit', compact('page'));

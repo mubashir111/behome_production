@@ -22,12 +22,14 @@ function AccountContent() {
     // Auth States
     const [loginData, setLoginData] = useState({ email: '', password: '' });
     const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', password_confirmation: '' });
+    const [otpStep, setOtpStep] = useState(false);
+    const [otpToken, setOtpToken] = useState('');
+    const [otpEmail, setOtpEmail] = useState('');
 
     // Dashboard Data
     const [orders, setOrders] = useState<any[]>([]);
     const [addresses, setAddresses] = useState<any[]>([]);
     const [wishlistItems, setWishlistItems] = useState<any[]>([]);
-    const [walletTransactions, setWalletTransactions] = useState<any[]>([]);
 
     // Profile editing
     const [profileData, setProfileData] = useState({ name: '', email: '', phone: '', country_code: '' });
@@ -61,17 +63,6 @@ function AccountContent() {
             } else if (activeTab === 'wishlist') {
                 const response = await apiFetch('/frontend/wishlist');
                 if (response.status) setWishlistItems(Array.isArray(response.data) ? response.data : []);
-            } else if (activeTab === 'wallet') {
-                const [profileRes, txRes] = await Promise.all([
-                    apiFetch('/profile'),
-                    apiFetch('/wallet/transactions'),
-                ]);
-                const u = profileRes?.data ?? profileRes;
-                if (u?.name !== undefined) {
-                    setUser(u);
-                    localStorage.setItem('user', JSON.stringify(u));
-                }
-                setWalletTransactions(Array.isArray(txRes.data) ? txRes.data : []);
             } else if (activeTab === 'addresses') {
                 const response = await apiFetch('/addresses');
                 if (response.status) setAddresses(response.data);
@@ -105,12 +96,44 @@ function AccountContent() {
         }
     }, [fetchTabData]);
 
+    // Load Google GSI script and render button when on login screen
+    useEffect(() => {
+        if (isLoggedIn) return;
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        if (!clientId) return;
+
+        const initGoogle = () => {
+            (window as any).google?.accounts.id.initialize({
+                client_id: clientId,
+                callback: (res: any) => {
+                    if (res.credential) handleGoogleLogin(res.credential);
+                },
+            });
+            (window as any).google?.accounts.id.renderButton(
+                document.getElementById('google-login-btn'),
+                { theme: 'filled_black', size: 'large', width: 320, text: 'continue_with', shape: 'pill' }
+            );
+        };
+
+        if ((window as any).google?.accounts) {
+            initGoogle();
+        } else {
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            script.onload = initGoogle;
+            document.head.appendChild(script);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoggedIn]);
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
         try {
-            const response = await apiFetch('/auth/login', {
+            const response = await apiFetch('/v1/auth/login', {
                 method: 'POST',
                 body: JSON.stringify(loginData),
             });
@@ -128,6 +151,28 @@ function AccountContent() {
         }
     };
 
+    const handleGoogleLogin = async (credential: string) => {
+        setLoading(true);
+        setError('');
+        try {
+            const response = await apiFetch('/auth/google', {
+                method: 'POST',
+                body: JSON.stringify({ credential }),
+            });
+            if (response.status) {
+                localStorage.setItem('token', response.data.access_token);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                window.location.reload();
+            } else {
+                setError(response.message || 'Google login failed');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Google login failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         if (registerData.password !== registerData.password_confirmation) {
@@ -136,7 +181,7 @@ function AccountContent() {
         }
         setLoading(true);
         try {
-            const response = await apiFetch('/auth/register', {
+            const response = await apiFetch('/auth/signup/register', {
                 method: 'POST',
                 body: JSON.stringify({
                     name: registerData.name,
@@ -145,22 +190,61 @@ function AccountContent() {
                 }),
             });
             if (response.status) {
-                localStorage.setItem('token', response.data.access_token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-                window.location.reload();
+                // OTP sent to email — move to OTP step
+                setOtpEmail(registerData.email);
+                setOtpStep(true);
+                showToast('A verification code has been sent to your email.', 'success');
             } else {
                 showToast(response.message || 'Registration failed', 'error');
             }
-        } catch (err) {
-            showToast('An error occurred during registration', 'error');
+        } catch (err: any) {
+            showToast(err.message || 'An error occurred during registration', 'error');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!otpToken.trim()) {
+            showToast('Please enter the OTP code', 'error');
+            return;
+        }
+        setLoading(true);
+        try {
+            const response = await apiFetch('/auth/signup/verify-email', {
+                method: 'POST',
+                body: JSON.stringify({ email: otpEmail, token: otpToken }),
+            });
+            if (response.status) {
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('user', JSON.stringify(response.user?.data ?? response.user));
+                window.location.reload();
+            } else {
+                showToast(response.message || 'Invalid OTP code', 'error');
+            }
+        } catch (err: any) {
+            showToast(err.message || 'Verification failed', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResendOtp = async () => {
+        try {
+            await apiFetch('/auth/signup/otp-email', {
+                method: 'POST',
+                body: JSON.stringify({ email: otpEmail }),
+            });
+            showToast('A new OTP has been sent to your email.', 'success');
+        } catch {
+            showToast('Failed to resend OTP', 'error');
+        }
+    };
+
     const handleLogout = async () => {
         try {
-            await apiFetch('/auth/logout', { method: 'POST' });
+            await apiFetch('/v1/auth/logout', { method: 'POST' });
         } catch {
             // ignore
         }
@@ -298,7 +382,6 @@ function AccountContent() {
                                     { tab: 'addresses', icon: 'icon-feather-map-pin',      label: 'Addresses'  },
                                     { tab: 'security',  icon: 'icon-feather-lock',         label: 'Security'   },
                                     { tab: 'wishlist',  icon: 'icon-feather-heart',        label: 'Wishlist'   },
-                                    { tab: 'wallet',    icon: 'icon-feather-dollar-sign',  label: 'Wallet'     },
                                 ].map(({ tab, icon, label }) => (
                                     <Link key={tab} href={`/account?tab=${tab}`}
                                         style={{
@@ -355,9 +438,6 @@ function AccountContent() {
                                         <li className={`mb-10px ${activeTab === 'wishlist' ? 'active-link' : ''}`}>
                                             <Link href="/account?tab=wishlist"><i className="feather icon-feather-heart me-10px"></i>Wishlist</Link>
                                         </li>
-                                        <li className={`mb-10px ${activeTab === 'wallet' ? 'active-link' : ''}`}>
-                                            <Link href="/account?tab=wallet"><i className="feather icon-feather-dollar-sign me-10px"></i>Wallet</Link>
-                                        </li>
                                         <li className="mt-10px pt-10px" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                                             <button onClick={handleLogout} className="text-white"><i className="feather icon-feather-log-out me-10px"></i>Logout</button>
                                         </li>
@@ -371,24 +451,6 @@ function AccountContent() {
                                 {/* Profile Tab */}
                                 {activeTab === 'profile' && (
                                     <div className="ui-stack-md">
-                                        {/* Wallet Balance Card */}
-                                        {user?.balance !== undefined && parseFloat(user.balance) > 0 && (
-                                            <div className="d-flex align-items-center justify-content-between p-20px border-radius-6px" style={{ background: 'rgba(251,153,28,0.08)', border: '1px solid rgba(251,153,28,0.25)' }}>
-                                                <div className="d-flex align-items-center gap-15px">
-                                                    <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'rgba(251,153,28,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                        <i className="feather icon-feather-dollar-sign fs-18" style={{ color: '#FB991C' }}></i>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-white fw-600 mb-2px fs-15">Wallet Balance</p>
-                                                        <p className="mb-0 fs-13" style={{ color: 'rgba(255,255,255,0.55)' }}>Available to use at checkout</p>
-                                                    </div>
-                                                </div>
-                                                <div className="text-end">
-                                                    <p className="fw-700 fs-20 mb-2px" style={{ color: '#FB991C' }}>{user.currency_balance}</p>
-                                                    <Link href="/account?tab=wallet" className="fs-12" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>View history</Link>
-                                                </div>
-                                            </div>
-                                        )}
                                         <h4 className="ui-section-title">Edit Profile</h4>
                                         <div className="bg-dark-gray border-radius-6px box-shadow-extra-large border border-color-extra-medium-gray ui-panel ui-panel-lg">
                                             <form onSubmit={handleProfileSave}>
@@ -682,76 +744,6 @@ function AccountContent() {
                                     </div>
                                 )}
 
-                                {/* Wallet Tab */}
-                                {activeTab === 'wallet' && (
-                                    <div className="ui-stack-md">
-                                        <h4 className="ui-section-title mb-0">Wallet</h4>
-
-                                        {/* Balance Card */}
-                                        <div className="wallet-balance-card d-flex align-items-center justify-content-between p-25px border-radius-6px" style={{ background: 'rgba(251,153,28,0.08)', border: '1px solid rgba(251,153,28,0.25)' }}>
-                                            <div className="d-flex align-items-center gap-15px">
-                                                <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'rgba(251,153,28,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                    <i className="feather icon-feather-dollar-sign fs-22" style={{ color: '#FB991C' }}></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-white opacity-5 fs-12 mb-3px" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Available Balance</p>
-                                                    <p className="fw-700 fs-28 mb-0" style={{ color: '#FB991C' }}>{user?.currency_balance ?? '0'}</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-end">
-                                                <p className="text-white opacity-4 fs-12 mb-5px">Use at checkout</p>
-                                                <Link href="/checkout" className="btn btn-small btn-round-edge" style={{ background: 'rgba(251,153,28,0.15)', border: '1px solid rgba(251,153,28,0.3)', color: '#FB991C', fontSize: 12 }}>
-                                                    Shop Now
-                                                </Link>
-                                            </div>
-                                        </div>
-
-                                        {/* Info box */}
-                                        <div className="p-15px border-radius-6px d-flex align-items-start gap-12px" style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
-                                            <i className="feather icon-feather-info fs-16 mt-1px flex-shrink-0" style={{ color: '#818cf8' }}></i>
-                                            <p className="text-white opacity-6 fs-13 mb-0">Wallet balance is credited when orders are cancelled or returned. You can use it to pay for future orders — select "Pay with Wallet" at checkout when your balance is sufficient.</p>
-                                        </div>
-
-                                        {/* Transaction History */}
-                                        <div>
-                                            <h5 className="text-white fw-600 fs-16 mb-15px">Transaction History</h5>
-                                            {walletTransactions.length === 0 ? (
-                                                <div className="bg-dark-gray border-radius-6px border border-color-extra-medium-gray ui-panel text-center py-40px">
-                                                    <i className="feather icon-feather-clock text-white opacity-3" style={{ fontSize: 36, display: 'block', marginBottom: 12 }}></i>
-                                                    <p className="text-white opacity-4 fs-14 mb-0">No transactions yet.</p>
-                                                </div>
-                                            ) : (
-                                                <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
-                                                    {walletTransactions.map((tx: any, idx: number) => {
-                                                        const isCredit = tx.type === 'cash_back';
-                                                        const isLast = idx === walletTransactions.length - 1;
-                                                        return (
-                                                            <div key={tx.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                                                                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: isCredit ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                                        <i className={`feather ${isCredit ? 'icon-feather-arrow-down-left' : 'icon-feather-arrow-up-right'} fs-14`} style={{ color: isCredit ? '#10b981' : '#ef4444' }}></i>
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="text-white fw-600 mb-1px fs-14">{isCredit ? 'Refund Received' : 'Payment'}</p>
-                                                                        <p className="mb-0 fs-12" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                                                                            {tx.order_serial_no ? `Order #${tx.order_serial_no}` : ''}
-                                                                            {tx.order_serial_no && tx.created_at ? ' · ' : ''}
-                                                                            {tx.created_at}
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                                <p className="fw-700 fs-16 mb-0" style={{ color: isCredit ? '#10b981' : 'rgba(255,255,255,0.8)' }}>
-                                                                    {isCredit ? '+' : '-'}{tx.currency_amount}
-                                                                </p>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
                                 {/* Wishlist Tab */}
                                 {activeTab === 'wishlist' && (
                                     <div className="ui-stack-md">
@@ -820,35 +812,89 @@ function AccountContent() {
                                         {loading ? 'Logging in...' : 'Login'}
                                     </button>
                                 </form>
+
+                                {/* Divider */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+                                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                                    <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, whiteSpace: 'nowrap' }}>or continue with</span>
+                                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                                </div>
+
+                                {/* Google Sign-In */}
+                                <div id="google-login-btn" style={{ display: 'flex', justifyContent: 'center' }}></div>
                             </div>
                         </div>
                         <div className="col-lg-6 col-md-10 offset-xl-1">
                             <div className="box-shadow-extra-large border-radius-6px bg-dark-gray border border-color-extra-medium-gray ui-panel ui-panel-lg">
-                                <span className="fs-26 xs-fs-24 alt-font fw-600 text-white mb-20px d-block">Create an account</span>
-                                <p className="mb-25px text-white">Registering for this site allows you to access your order status and history.</p>
-                                <form onSubmit={handleRegister}>
-                                    <div className="row">
-                                        <div className="col-md-6 mb-20px">
-                                            <label className="text-white mb-10px fw-500 fs-14">Full Name<span className="text-red">*</span></label>
-                                            <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Enter your name" type="text" value={registerData.name} onChange={e => setRegisterData({ ...registerData, name: e.target.value })} required />
+                                {!otpStep ? (
+                                    <>
+                                        <span className="fs-26 xs-fs-24 alt-font fw-600 text-white mb-20px d-block">Create an account</span>
+                                        <p className="mb-25px text-white">Registering for this site allows you to access your order status and history.</p>
+                                        <form onSubmit={handleRegister}>
+                                            <div className="row">
+                                                <div className="col-md-6 mb-20px">
+                                                    <label className="text-white mb-10px fw-500 fs-14">Full Name<span className="text-red">*</span></label>
+                                                    <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Enter your name" type="text" value={registerData.name} onChange={e => setRegisterData({ ...registerData, name: e.target.value })} required />
+                                                </div>
+                                                <div className="col-md-6 mb-20px">
+                                                    <label className="text-white mb-10px fw-500 fs-14">Email address<span className="text-red">*</span></label>
+                                                    <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Enter email" type="email" value={registerData.email} onChange={e => setRegisterData({ ...registerData, email: e.target.value })} required />
+                                                </div>
+                                                <div className="col-md-6 mb-20px">
+                                                    <label className="text-white mb-10px fw-500 fs-14">Password<span className="text-red">*</span></label>
+                                                    <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Enter password" type="password" value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} required minLength={6} />
+                                                </div>
+                                                <div className="col-md-6 mb-20px">
+                                                    <label className="text-white mb-10px fw-500 fs-14">Confirm password<span className="text-red">*</span></label>
+                                                    <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Confirm password" type="password" value={registerData.password_confirmation} onChange={e => setRegisterData({ ...registerData, password_confirmation: e.target.value })} required minLength={6} />
+                                                </div>
+                                            </div>
+                                            <button className="btn btn-medium btn-round-edge btn-white btn-box-shadow w-100 text-transform-none fw-600 mt-10px" type="submit" disabled={loading}>
+                                                {loading ? 'Creating account...' : 'Register'}
+                                            </button>
+                                        </form>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-center mb-25px">
+                                            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(197,160,89,0.12)', border: '1px solid rgba(197,160,89,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                                                <i className="feather icon-feather-mail fs-24" style={{ color: 'var(--base-color)' }}></i>
+                                            </div>
+                                            <span className="fs-26 xs-fs-22 alt-font fw-600 text-white mb-10px d-block">Verify your email</span>
+                                            <p className="text-white opacity-6 fs-14 mb-0">We sent a 6-digit code to</p>
+                                            <p className="fw-600 fs-14 mb-0" style={{ color: 'var(--base-color)' }}>{otpEmail}</p>
                                         </div>
-                                        <div className="col-md-6 mb-20px">
-                                            <label className="text-white mb-10px fw-500 fs-14">Email address<span className="text-red">*</span></label>
-                                            <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Enter email" type="email" value={registerData.email} onChange={e => setRegisterData({ ...registerData, email: e.target.value })} required />
+                                        <form onSubmit={handleVerifyOtp}>
+                                            <div className="mb-20px">
+                                                <label className="text-white mb-10px fw-500 fs-14">Verification Code <span className="text-red">*</span></label>
+                                                <input
+                                                    className="bg-dark-gray-light text-white border-color-transparent-white-light form-control text-center fw-700 fs-22 letter-spacing-5px"
+                                                    placeholder="000000"
+                                                    type="text"
+                                                    maxLength={6}
+                                                    value={otpToken}
+                                                    onChange={e => setOtpToken(e.target.value.replace(/\D/g, ''))}
+                                                    required
+                                                    autoFocus
+                                                    style={{ letterSpacing: '0.35em', fontSize: 22, textAlign: 'center' }}
+                                                />
+                                            </div>
+                                            <button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow w-100 text-transform-none fw-600" type="submit" disabled={loading}>
+                                                {loading ? 'Verifying...' : 'Verify & Continue'}
+                                            </button>
+                                        </form>
+                                        <div className="text-center mt-20px">
+                                            <p className="text-white opacity-5 fs-13 mb-8px">Didn't receive the code?</p>
+                                            <button onClick={handleResendOtp} className="btn-link text-white opacity-7 fs-13 fw-500" style={{ background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+                                                Resend OTP
+                                            </button>
+                                            <span className="text-white opacity-3 mx-10px">·</span>
+                                            <button onClick={() => { setOtpStep(false); setOtpToken(''); }} className="btn-link text-white opacity-7 fs-13 fw-500" style={{ background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+                                                Change email
+                                            </button>
                                         </div>
-                                        <div className="col-md-6 mb-20px">
-                                            <label className="text-white mb-10px fw-500 fs-14">Password<span className="text-red">*</span></label>
-                                            <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Enter password" type="password" value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} required minLength={6} />
-                                        </div>
-                                        <div className="col-md-6 mb-20px">
-                                            <label className="text-white mb-10px fw-500 fs-14">Confirm password<span className="text-red">*</span></label>
-                                            <input className="bg-dark-gray-light text-white border-color-transparent-white-light form-control required" placeholder="Confirm password" type="password" value={registerData.password_confirmation} onChange={e => setRegisterData({ ...registerData, password_confirmation: e.target.value })} required minLength={6} />
-                                        </div>
-                                    </div>
-                                    <button className="btn btn-medium btn-round-edge btn-white btn-box-shadow w-100 text-transform-none fw-600 mt-10px" type="submit" disabled={loading}>
-                                        {loading ? 'Creating account...' : 'Register'}
-                                    </button>
-                                </form>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

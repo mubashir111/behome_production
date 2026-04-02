@@ -1895,6 +1895,34 @@ footer.footer-dark ul:not(.small-icon) li a:hover {
 
 /* --- Global UI Overrides for Dark Theme --- */
 
+/* Breadcrumb — fix Bootstrap 5 flex conflict */
+.breadcrumb.breadcrumb-style-01 {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    list-style: none !important;
+}
+.breadcrumb.breadcrumb-style-01 ul {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+}
+.breadcrumb.breadcrumb-style-01 ul li {
+    display: inline-flex !important;
+    align-items: center !important;
+    font-size: 13px !important;
+    color: rgba(255,255,255,0.55) !important;
+}
+.breadcrumb.breadcrumb-style-01 ul li:last-child {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 600 !important;
+}
+
 /* Breadcrumb Visibility */
 section .breadcrumb.breadcrumb-style-01 ul li a,
 .breadcrumb.breadcrumb-style-01 ul li a {

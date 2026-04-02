@@ -19,7 +19,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 async function getFaqs() {
     try {
         const res = await fetch(`${API_URL}/frontend/faqs`, {
-            next: { revalidate: 300 },
+            cache: 'no-store',
             headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
         });
         if (!res.ok) return [];
@@ -35,6 +35,18 @@ export default async function FAQ() {
 
     return (
         <main className="no-layout-pad" style={{ paddingTop: '100px' }}>
+
+            {/* Breadcrumb */}
+            <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
+            <div className="container-fluid">
+                <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+                    <ul>
+                        <li><a href="/" style={{textDecoration:'none'}}>Home</a></li>
+                        <li>FAQ</li>
+                    </ul>
+                </div>
+            </div>
+            </section>
 
             {/* page title */}
             <section className="mb-5">

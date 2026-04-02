@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Admin\Web;
 
-use App\Enums\Ask;
 use App\Enums\RefundStatus;
 use App\Enums\ReturnOrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\ReturnAndRefund;
-use App\Models\User;
 use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Smartisan\Settings\Facades\Settings;
@@ -125,18 +123,29 @@ class ReturnAndRefundWebController extends Controller
 
         if ($newRefundStatus === RefundStatus::REFUND_ISSUED) {
             $return->refund_issued_at = now();
+            $return->loadMissing('returnProducts');
+            $refundAmount = (float) $return->returnProducts->sum('return_price');
 
-            // Credit balance to user now (item inspected and approved)
-            $order = Order::find($return->order_id);
-            if ($order && $order->payment_method !== 1) {
-                $creditEnabled = Settings::group('site')->get('site_is_return_product_price_add_to_credit');
-                if ($creditEnabled === Ask::YES) {
-                    $user = User::find($return->user_id);
-                    if ($user) {
-                        $return->loadMissing('returnProducts');
-                        $user->balance += $return->returnProducts->sum('return_price');
-                        $user->save();
+            // Attempt Stripe refund if enabled
+            $stripeEnabled = Settings::group('integrations')->get('stripe_refund_enabled');
+            $stripeSecret  = Settings::group('integrations')->get('stripe_refund_secret_key');
+
+            if ((int) $stripeEnabled === 5 && $stripeSecret) {
+                try {
+                    $transaction = \App\Models\Transaction::where('order_id', $return->order_id)
+                        ->where('sign', '+')
+                        ->first();
+                    if ($transaction && $transaction->transaction_no) {
+                        $stripe = new \Stripe\StripeClient($stripeSecret);
+                        $stripeRefund = $stripe->refunds->create([
+                            'charge' => $transaction->transaction_no,
+                            'amount' => (int) ($refundAmount * 100),
+                        ]);
+                        $return->reject_reason = 'STRIPE_REFUND_ID:' . $stripeRefund->id;
                     }
+                } catch (\Exception $stripeEx) {
+                    \Illuminate\Support\Facades\Log::error('[STRIPE_REFUND] ' . $stripeEx->getMessage());
+                    session()->flash('warning', 'Refund status updated but Stripe API refund failed: ' . $stripeEx->getMessage());
                 }
             }
         }

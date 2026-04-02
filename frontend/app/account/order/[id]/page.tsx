@@ -131,7 +131,7 @@ export default function OrderDetail() {
                     // Refresh messages so the request shows in the thread
                     if (showMessages) fetchMessages();
                 } else {
-                    setActionMsg({ type: 'success', text: 'Your order has been cancelled. The full amount has been refunded to your wallet balance.' });
+                    setActionMsg({ type: 'success', text: 'Your order has been cancelled. A refund will be issued to your original payment method within 5–7 days.' });
                 }
                 fetchOrder();
             } else {
@@ -177,7 +177,7 @@ export default function OrderDetail() {
             });
 
             if (res.status || res.data) {
-                setActionMsg({ type: 'success', text: 'Return request submitted. Once approved, your refund will be credited to your wallet balance.' });
+                setActionMsg({ type: 'success', text: 'Return request submitted. Once approved, your refund will be issued to your original payment method within 5–7 days.' });
                 setShowReturnModal(false);
                 fetchOrder();
             } else {
@@ -522,9 +522,9 @@ export default function OrderDetail() {
                                                     </p>
                                                     <p className="text-white opacity-6 fs-13 mb-0">
                                                         {refundAmt ? (
-                                                            <><strong style={{ color: '#10b981' }}>{refundAmt}</strong> has been credited to your wallet balance and can be used on your next order.</>
+                                                            <><strong style={{ color: '#10b981' }}>{refundAmt}</strong> has been refunded to your original payment method.</>
                                                         ) : (
-                                                            'Your refund has been credited to your wallet balance.'
+                                                            'Your refund has been issued to your original payment method.'
                                                         )}
                                                     </p>
                                                 </div>
@@ -755,7 +755,7 @@ export default function OrderDetail() {
                         <div className="p-15px border-radius-4px mb-20px" style={{ background: 'rgba(251,153,28,0.06)', border: '1px solid rgba(251,153,28,0.15)' }}>
                             <p className="text-white fw-600 fs-13 mb-8px">Return Policy</p>
                             <ul style={{ paddingLeft: 18, margin: 0 }}>
-                                {['Returns accepted within 7 days of delivery', 'Items must be unused and in original packaging', 'Refund credited to your wallet or original payment method within 5–7 days', 'Size/colour issues, manufacturing defects, and damaged goods are eligible'].map((pt, i) => (
+                                {['Returns accepted within 7 days of delivery', 'Items must be unused and in original packaging', 'Refund issued to original payment method within 5–7 days', 'Size/colour issues, manufacturing defects, and damaged goods are eligible'].map((pt, i) => (
                                     <li key={i} className="text-white opacity-6 fs-12 mb-5px">{pt}</li>
                                 ))}
                             </ul>

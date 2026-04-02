@@ -6,7 +6,7 @@ const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
 async function getPageData() {
     try {
         const res = await fetch(`${API_URL}/frontend/static-pages/privacy-policy`, {
-            next: { revalidate: 300 },
+            cache: 'no-store',
             headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
         });
         if (!res.ok) return null;

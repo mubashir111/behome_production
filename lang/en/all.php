@@ -125,6 +125,7 @@ return [
         'return_request_exist'             => 'The Return request already exist.',
         'minimum_one_outlet_required'      => 'The last outlet can not be delete',
         "email_send"                       => "Email Send Successfully.",
-        "price_total_invalid"              => "The amount is invalid."
+        "price_total_invalid"              => "The amount is invalid.",
+        "account_pending_verification"     => "Your account is pending verification. Please check your email/phone for the OTP."
     ]
 ];

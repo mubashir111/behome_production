@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\DefaultAccessService;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\PermissionResource;
+use App\Models\PendingRegistration;
 
 class LoginController extends Controller
 {
@@ -68,6 +69,12 @@ class LoginController extends Controller
 
         if ($request['email']) {
             if (!Auth::guard('web')->attempt($request->only('email', 'password', 'status'))) {
+                $pending = PendingRegistration::where('email', $request['email'])->first();
+                if ($pending) {
+                    return new JsonResponse([
+                        'errors' => ['validation' => trans('all.message.account_pending_verification')]
+                    ], 403);
+                }
                 return new JsonResponse([
                     'errors' => ['validation' => trans('all.message.credentials_invalid')]
                 ], 400);
@@ -75,6 +82,12 @@ class LoginController extends Controller
             $user = User::where('email', $request['email'])->first();
         } else {
             if (!Auth::guard('web')->attempt($request->only('country_code', 'phone', 'password', 'status'))) {
+                $pending = PendingRegistration::where(['phone' => $request['phone'], 'country_code' => $request->country_code])->first();
+                if ($pending) {
+                    return new JsonResponse([
+                        'errors' => ['validation' => trans('all.message.account_pending_verification')]
+                    ], 403);
+                }
                 return new JsonResponse([
                     'errors' => ['validation' => trans('all.message.credentials_invalid')]
                 ], 400);

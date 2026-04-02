@@ -21,12 +21,9 @@ export default function Checkout() {
     const [orderAreas, setOrderAreas] = useState<any[]>([]);
     const [shippingSettings, setShippingSettings] = useState<any>(null);
     const [paymentGateways, setPaymentGateways] = useState<any[]>([]);
-    const [walletBalance, setWalletBalance] = useState(0);
-    const [walletCurrencyBalance, setWalletCurrencyBalance] = useState('');
-    const [walletGatewayId, setWalletGatewayId] = useState<number | null>(null);
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
     const { showToast } = useToast();
-    const { symbol: currencySymbol, formatAmount } = useCurrency();
+    const { currency: { symbol: currencySymbol }, formatAmount } = useCurrency();
     const [couponCode, setCouponCode] = useState('');
     const [couponDiscount, setCouponDiscount] = useState(0);
     const [couponMessage, setCouponMessage] = useState('');
@@ -47,9 +44,8 @@ export default function Checkout() {
     });
 
     const totalAmount = Math.max(subtotal + tax + shippingCost - couponDiscount, 0);
-    const isWalletPayment = formData.payment_method === 'wallet';
-    const selectedGateway = isWalletPayment ? null : (paymentGateways.find(g => String(g.id) === formData.payment_method) ?? null);
-    const paymentGateway = isWalletPayment ? 'credit' : (selectedGateway?.slug ?? 'stripe');
+    const selectedGateway = paymentGateways.find(g => String(g.id) === formData.payment_method) ?? null;
+    const paymentGateway = selectedGateway?.slug ?? 'stripe';
 
     const getAreaList = (response: any) => Array.isArray(response)
         ? response
@@ -163,13 +159,12 @@ export default function Checkout() {
                 setCouponId(storedCoupon.id);
             }
 
-            const [cartResponse, addressResponse, orderAreaResponse, gatewayResponse, settingResponse, profileResponse] = await Promise.all([
+            const [cartResponse, addressResponse, orderAreaResponse, gatewayResponse, settingResponse] = await Promise.all([
                 apiFetch('/cart'),
                 apiFetch('/addresses'),
                 apiFetch('/frontend/order-area').catch(() => ({ data: [] })),
                 apiFetch('/frontend/payment-gateway').catch(() => ({ data: [] })),
                 apiFetch('/frontend/setting').catch(() => ({})),
-                apiFetch('/profile').catch(() => null),
             ]);
 
             if (cartResponse.status) {
@@ -193,14 +188,6 @@ export default function Checkout() {
                 setFormData(prev => ({ ...prev, payment_method: String(gateways[0].id) }));
             }
 
-            // Wallet balance
-            const creditGateway = allGateways.find((g: any) => g.slug === 'credit');
-            if (creditGateway) setWalletGatewayId(creditGateway.id);
-            const profileData = profileResponse?.data ?? profileResponse;
-            if (profileData?.balance !== undefined) {
-                setWalletBalance(parseFloat(profileData.balance) || 0);
-                setWalletCurrencyBalance(profileData.currency_balance ?? '');
-            }
 
             if (addressResponse.status && addressResponse.data.length > 0) {
                 setAddresses(addressResponse.data);
@@ -337,7 +324,7 @@ export default function Checkout() {
                 shipping_id: addressId,
                 billing_id: addressId,
                 source: 5, // WEB
-                payment_method: isWalletPayment ? (walletGatewayId ?? 0) : parseInt(formData.payment_method),
+                payment_method: parseInt(formData.payment_method),
                 reason: formData.order_note.trim() || undefined,
                 products: JSON.stringify(products),
             };
@@ -467,6 +454,17 @@ export default function Checkout() {
 
     return (
         <main className="no-layout-pad" style={{ paddingTop: '100px' }}>
+            <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
+            <div className="container-fluid">
+                <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+                    <ul>
+                        <li><a href="/" style={{textDecoration:'none'}}>Home</a></li>
+                        <li><a href="/cart" style={{textDecoration:'none'}}>Cart</a></li>
+                        <li>Checkout</li>
+                    </ul>
+                </div>
+            </div>
+            </section>
             <section className="page-shell page-shell-tight">
                 <div className="container">
                     <form onSubmit={placeOrder}>
@@ -618,49 +616,12 @@ export default function Checkout() {
                                         )}
                                     </div>
 
-                                    {/* Wallet balance notice */}
-                                    {walletBalance > 0 && (
-                                        <div className="mt-20px p-15px border-radius-6px d-flex align-items-center justify-content-between gap-10px" style={{ background: 'rgba(251,153,28,0.07)', border: '1px solid rgba(251,153,28,0.2)' }}>
-                                            <div className="d-flex align-items-center gap-10px">
-                                                <i className="feather icon-feather-dollar-sign fs-15" style={{ color: '#FB991C' }}></i>
-                                                <p className="text-white fs-13 mb-0">
-                                                    You have <strong style={{ color: '#FB991C' }}>{walletCurrencyBalance}</strong> in wallet balance
-                                                    {walletBalance >= totalAmount ? ' — enough to cover this order.' : '.'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
-
                                     <div className="mt-20px mb-20px">
                                         <span className="text-white fw-600 d-block mb-12px">Payment Method</span>
-                                        {paymentGateways.length === 0 && walletBalance < totalAmount ? (
+                                        {paymentGateways.length === 0 ? (
                                             <p className="text-white opacity-6 fs-14">No payment methods available.</p>
                                         ) : (
                                             <div className="checkout-payment-grid">
-                                                {/* Wallet option — show at top if balance is sufficient */}
-                                                {walletBalance >= totalAmount && (
-                                                    <label
-                                                        htmlFor="gw_wallet"
-                                                        className={`checkout-payment-card${formData.payment_method === 'wallet' ? ' selected' : ''}`}
-                                                    >
-                                                        <input
-                                                            type="radio"
-                                                            name="payment_method"
-                                                            id="gw_wallet"
-                                                            value="wallet"
-                                                            checked={formData.payment_method === 'wallet'}
-                                                            onChange={handleInputChange}
-                                                            className="visually-hidden"
-                                                        />
-                                                        <i className="feather icon-feather-dollar-sign checkout-payment-icon" style={{ color: '#FB991C' }}></i>
-                                                        <span className="checkout-payment-name">Wallet ({walletCurrencyBalance})</span>
-                                                        {formData.payment_method === 'wallet' && (
-                                                            <span className="checkout-payment-check">
-                                                                <i className="feather icon-feather-check"></i>
-                                                            </span>
-                                                        )}
-                                                    </label>
-                                                )}
                                                 {paymentGateways.map((gw: any) => {
                                                     const isSelected = formData.payment_method === String(gw.id);
                                                     return (

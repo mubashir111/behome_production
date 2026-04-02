@@ -15,7 +15,7 @@ export default function Cart() {
     const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
     const [subtotal, setSubtotal] = useState(0);
     const { showToast } = useToast();
-    const { symbol: currencySymbol, formatAmount } = useCurrency();
+    const { currency: { symbol: currencySymbol }, formatAmount } = useCurrency();
     const [couponCode, setCouponCode] = useState('');
     const [couponDiscount, setCouponDiscount] = useState(0);
     const [couponMessage, setCouponMessage] = useState('');
@@ -231,6 +231,17 @@ export default function Cart() {
 
     return (
         <main className="no-layout-pad" style={{ paddingTop: '100px' }}>
+            <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
+            <div className="container-fluid">
+                <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+                    <ul>
+                        <li><a href="/" style={{textDecoration:'none'}}>Home</a></li>
+                        <li><a href="/shop" style={{textDecoration:'none'}}>Shop</a></li>
+                        <li>Cart</li>
+                    </ul>
+                </div>
+            </div>
+            </section>
             <section className="page-shell page-shell-tight min-h-600px d-flex align-items-center">
                 <div className="container-fluid">
                     <div className="content-layout-wrapper">

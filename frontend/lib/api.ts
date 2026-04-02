@@ -20,7 +20,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     let finalEndpoint = endpoint;
     if (!endpoint.startsWith('/v1') && !endpoint.startsWith('v1')) {
         // Only prefix with v1 if it's one of our new API modules
-        const v1Modules = ['/products', '/categories', '/cart', '/orders', '/auth', '/payment', '/addresses'];
+        const v1Modules = ['/products', '/categories', '/cart', '/orders', '/payment', '/addresses'];
         if (v1Modules.some(module => endpoint.startsWith(module))) {
             finalEndpoint = `/v1${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
         }

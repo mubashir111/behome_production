@@ -25,6 +25,7 @@ use App\Http\Requests\SignupEmailRequest;
 use App\Http\Requests\SignupPhoneRequest;
 use App\Http\Requests\VerifyEmailRequest;
 use App\Http\Requests\VerifyPhoneRequest;
+use App\Models\PendingRegistration;
 use App\Http\Resources\PermissionResource;
 use Illuminate\Http\Request;
 
@@ -48,6 +49,10 @@ class SignupController extends Controller
     ): \Illuminate\Http\Response | \Illuminate\Contracts\Foundation\Application | \Illuminate\Contracts\Routing\ResponseFactory {
         try {
             $this->otpManagerService->otpPhone($request);
+            $otp = \Illuminate\Support\Facades\DB::table('otps')->where('phone', $request->phone)->latest()->first();
+            if ($otp) {
+                PendingRegistration::where('phone', $request->phone)->update(['otp_token' => $otp->token]);
+            }
             return response(['status' => true, 'message' => trans("all.message.check_your_phone_for_code")]);
         } catch (Exception $exception) {
             return response(['status' => false, 'message' => $exception->getMessage()], 422);
@@ -59,6 +64,10 @@ class SignupController extends Controller
     ): \Illuminate\Http\Response | \Illuminate\Contracts\Foundation\Application | \Illuminate\Contracts\Routing\ResponseFactory {
         try {
             $this->otpManagerService->otpEmail($request);
+            $otp = \Illuminate\Support\Facades\DB::table('password_reset_tokens')->where('email', $request->email)->latest()->first();
+            if ($otp) {
+                PendingRegistration::where('email', $request->email)->update(['otp_token' => $otp->token]);
+            }
             return response(['status' => true, 'message' => trans("all.message.check_your_email_for_code")]);
         } catch (Exception $exception) {
             return response(['status' => false, 'message' => $exception->getMessage()], 422);
@@ -70,8 +79,21 @@ class SignupController extends Controller
     ): JsonResponse {
         try {
             $this->otpManagerService->verifyPhone($request);
-            $user = User::where(['phone' => $request->phone, 'country_code' => $request->country_code])->first();
-            if ($user) {
+            $pendingUser = PendingRegistration::where(['phone' => $request->phone, 'country_code' => $request->country_code])->first();
+            if ($pendingUser) {
+                $user = User::create([
+                    'name'              => $pendingUser->name,
+                    'username'          => Str::slug($pendingUser->name) . rand(1, 500),
+                    'email'             => $pendingUser->email,
+                    'phone'             => $pendingUser->phone,
+                    'country_code'      => $pendingUser->country_code,
+                    'email_verified_at' => Carbon::now()->getTimestamp(),
+                    'is_guest'          => Ask::NO,
+                    'password'          => $pendingUser->password,
+                ]);
+                $user->assignRole(EnumRole::CUSTOMER);
+                $pendingUser->delete();
+
                 Auth::guard('web')->loginUsingId($user->id);
                 $this->token = $user->createToken('auth_token')->plainTextToken;
                 $permission        = PermissionResource::collection($this->permissionService->permission($user->roles[0]));
@@ -100,8 +122,21 @@ class SignupController extends Controller
     ): JsonResponse {
         try {
             $this->otpManagerService->verifyEmail($request);
-            $user = User::where(['email' => $request->email])->first();
-            if ($user) {
+            $pendingUser = PendingRegistration::where(['email' => $request->email])->first();
+            if ($pendingUser) {
+                $user = User::create([
+                    'name'              => $pendingUser->name,
+                    'username'          => Str::slug($pendingUser->name) . rand(1, 500),
+                    'email'             => $pendingUser->email,
+                    'phone'             => $pendingUser->phone,
+                    'country_code'      => $pendingUser->country_code,
+                    'email_verified_at' => Carbon::now()->getTimestamp(),
+                    'is_guest'          => Ask::NO,
+                    'password'          => $pendingUser->password,
+                ]);
+                $user->assignRole(EnumRole::CUSTOMER);
+                $pendingUser->delete();
+
                 Auth::guard('web')->loginUsingId($user->id);
                 $this->token = $user->createToken('auth_token')->plainTextToken;
                 $permission        = PermissionResource::collection($this->permissionService->permission($user->roles[0]));
@@ -127,25 +162,47 @@ class SignupController extends Controller
 
     public function register(SignupRequest $request)
     {
-        $user = User::create([
-            'name'              => $request->post('name'),
-            'username'          => Str::slug($request->post('name')) . rand(1, 500),
-            'email'             => $request->post('email'),
-            'phone'             => $request->post('phone'),
-            'country_code'      => $request->post('country_code'),
-            'email_verified_at' => Carbon::now()->getTimestamp(),
-            'is_guest'          => Ask::NO,
-            'password'          => Hash::make($request->post('password'))
-        ]);
-        $user->assignRole(EnumRole::CUSTOMER);
-        if ($user) {
+        $pendingUser = PendingRegistration::updateOrCreate(
+            ['email' => $request->post('email'), 'phone' => $request->post('phone')],
+            [
+                'name'         => $request->post('name'),
+                'email'        => $request->post('email'),
+                'phone'        => $request->post('phone'),
+                'country_code' => $request->post('country_code'),
+                'password'     => Hash::make($request->post('password')),
+                'otp_token'    => '', // Will be updated by service if needed
+            ]
+        );
+
+        if ($pendingUser) {
             if (Settings::group('site')->get('site_phone_verification') == Activity::ENABLE && $request->post('country_code') && $request->post('phone')) {
                 $this->otpManagerService->otpPhone($request);
+                $otp = \Illuminate\Support\Facades\DB::table('otps')->where('phone', $request->phone)->latest()->first();
+                if ($otp) {
+                    $pendingUser->update(['otp_token' => $otp->token]);
+                }
                 return response(['status' => true, 'message' => trans("all.message.check_your_phone_for_code")]);
             } else if (Settings::group('site')->get('site_email_verification') == Activity::ENABLE && $request->post('email')) {
                 $this->otpManagerService->otpEmail($request);
+                $otp = \Illuminate\Support\Facades\DB::table('password_reset_tokens')->where('email', $request->email)->latest()->first();
+                if ($otp) {
+                    $pendingUser->update(['otp_token' => $otp->token]);
+                }
                 return response(['status' => true, 'message' => trans('all.message.check_your_email_for_code')]);
             } else {
+                // If no verification enabled, create user directly
+                $user = User::create([
+                    'name'              => $pendingUser->name,
+                    'username'          => Str::slug($pendingUser->name) . rand(1, 500),
+                    'email'             => $pendingUser->email,
+                    'phone'             => $pendingUser->phone,
+                    'country_code'      => $pendingUser->country_code,
+                    'email_verified_at' => Carbon::now()->getTimestamp(),
+                    'is_guest'          => Ask::NO,
+                    'password'          => $pendingUser->password,
+                ]);
+                $user->assignRole(EnumRole::CUSTOMER);
+                $pendingUser->delete();
                 return response(['status' => true, 'message' => trans('all.message.register_successfully')]);
             }
         } else {

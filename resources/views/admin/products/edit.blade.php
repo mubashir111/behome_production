@@ -399,7 +399,7 @@
             </div>
 
             <!-- Image Cropping Modal -->
-            <div id="crop-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div id="crop-modal" class="fixed inset-0 z-[99999] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
                 <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200" style="max-height:90vh;">
                     <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 flex-shrink-0">
                         <div>
@@ -914,7 +914,7 @@
             if (variant.media && variant.media.length > 0) {
                 document.getElementById('color-image-preview').classList.remove('hidden');
                 document.getElementById('color-image-preview-img').src = variant.media[0].original_url;
-                document.getElementById('color-image-btn').textContent = '🔄 Replace Image';
+                document.getElementById('color-image-btn-text').textContent = '🔄 Replace Image';
             }
         } else {
             colorSection.classList.add('hidden');
@@ -958,26 +958,13 @@
         }
     });
 
-    // Handle color image selection
-    document.getElementById('color-image-input').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Show preview
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            document.getElementById('color-image-preview').classList.remove('hidden');
-            document.getElementById('color-image-preview-img').src = event.target.result;
-            document.getElementById('color-image-btn').textContent = '✓ Image Selected';
-        };
-        reader.readAsDataURL(file);
-    });
+    // Color image preview is handled by the cropper save callback
 
     // Clear color image
     function clearColorImage() {
         document.getElementById('color-image-input').value = '';
         document.getElementById('color-image-preview').classList.add('hidden');
-        document.getElementById('color-image-btn').textContent = '📁 Choose Image';
+        document.getElementById('color-image-btn-text').textContent = '📁 Choose Image';
     }
 
     // Save variant (create or edit)
@@ -1367,6 +1354,11 @@
     const saveCropBtn = document.getElementById('save-crop-btn');
     const cropSpinner = document.getElementById('crop-btn-spinner');
 
+    // Move crop modal to body to escape any stacking context trap
+    if (cropModal.parentElement !== document.body) {
+        document.body.appendChild(cropModal);
+    }
+
     window.startCropping = function(contextOrBlockIndex, fieldOrIndex, input, itemIndex = null) {
         const file = input.files[0];
         if (!file) return;
@@ -1433,6 +1425,31 @@
             formData.append('_token', '{{ csrf_token() }}');
 
             const ctx = currentCroppingContext;
+
+            // variant_color: feed the cropped blob back into the file input for form submit
+            if (ctx.context === 'variant_color') {
+                const croppedFile = new File([blob], 'cropped.webp', { type: 'image/webp' });
+                const dt = new DataTransfer();
+                dt.items.add(croppedFile);
+                const colorInput = document.getElementById('color-image-input');
+                colorInput.files = dt.files;
+
+                // Update preview
+                const previewImg = document.getElementById('color-image-preview-img');
+                const previewWrap = document.getElementById('color-image-preview');
+                if (previewImg && previewWrap) {
+                    previewImg.src = URL.createObjectURL(blob);
+                    previewWrap.classList.remove('hidden');
+                }
+                const colorBtnText = document.getElementById('color-image-btn-text');
+                if (colorBtnText) colorBtnText.textContent = '✓ Image Selected';
+
+                cropSpinner.classList.add('hidden');
+                saveCropBtn.disabled = false;
+                closeCropModal();
+                return;
+            }
+
             let url = `/admin/products/{{ $product->id }}/upload-block-image`;
 
             if (ctx.context === 'gallery_add') {

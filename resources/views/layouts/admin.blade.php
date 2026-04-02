@@ -576,6 +576,22 @@
                     Purchases
                 </a>
 
+                <a href="{{ route('admin.damages.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.damages.*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    </svg>
+                    Damages
+                </a>
+
+                <a href="{{ route('admin.barcodes.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.barcodes.*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h1v12H4zm2 0h1v12H6zm3 0h2v12H9zm3 0h1v12h-1zm2 0h1v12h-1zm2 0h2v12h-2z"/>
+                    </svg>
+                    Barcodes
+                </a>
+
                 <a href="{{ route('admin.sliders.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}">
                     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -640,12 +656,44 @@
                     Site Settings
                 </a>
 
+                <a href="{{ route('admin.settings.theme') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.settings.theme*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Logos & Theme
+                </a>
+
                 <a href="{{ route('admin.settings.shipping') }}"
                    class="sidebar-link {{ request()->routeIs('admin.settings.shipping') ? 'active' : '' }}">
                     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
                     </svg>
                     Shipping
+                </a>
+
+                <a href="{{ route('admin.settings.seo') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.settings.seo*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    SEO Settings
+                </a>
+
+                <a href="{{ route('admin.settings.smtp') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.settings.smtp*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    Mail / SMTP
+                </a>
+
+                <a href="{{ route('admin.settings.integrations') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.settings.integrations*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                    </svg>
+                    Integrations
                 </a>
 
                 <a href="{{ route('admin.payment-gateways.index') }}"

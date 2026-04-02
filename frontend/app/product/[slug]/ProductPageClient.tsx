@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import ProductGrid from '@/components/ProductGrid';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
@@ -447,7 +448,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                     <div className="container text-center ui-panel ui-empty-state">
                         <h2 className="text-white mb-20px">Product Not Found</h2>
                         <p className="mb-20px">{error}</p>
-                        <a href="/shop" className="btn btn-base-color btn-medium btn-round-edge">Back to Shop</a>
+                        <Link href="/shop" className="btn btn-base-color btn-medium btn-round-edge">Back to Shop</Link>
                     </div>
                 </section>
             </main>
@@ -464,9 +465,9 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                 <div className="container-fluid">
                     <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
                         <ul>
-                            <li><a href="/" style={{ textDecoration: 'none' }}>Home</a></li>
-                            <li><a href="/shop" style={{ textDecoration: 'none' }}>Shop</a></li>
-                            {product.category?.name && <li><a href={`/shop?category=${product.category.slug}`} style={{ textDecoration: 'none' }}>{product.category.name}</a></li>}
+                            <li><Link href="/" style={{ textDecoration: 'none' }}>Home</Link></li>
+                            <li><Link href="/shop" style={{ textDecoration: 'none' }}>Shop</Link></li>
+                            {product.category?.name && <li><Link href={`/shop?category=${product.category.slug}`} style={{ textDecoration: 'none' }}>{product.category.name}</Link></li>}
                             <li>{product.name}</li>
                         </ul>
                     </div>
@@ -642,7 +643,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                 {shortDescription && (
                                     <p className="mb-20px fs-14 lh-26" style={{ color: 'rgba(255,255,255,0.74)' }}>
                                         {shortDescription}
-                                        {product.description && product.description.length > 220 ? '...' : ''}
+                                        {plainDescription.length > 220 ? '...' : ''}
                                     </p>
                                 )}
 
@@ -947,7 +948,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                     {product.category?.name && (
                                         <div>
                                             <span className="text-white fw-600">Category: </span>
-                                            <a href={`/shop?category=${product.category.slug}`} className="text-white" style={{ opacity: 0.72 }}>{product.category.name}</a>
+                                            <Link href={`/shop?category=${product.category.slug}`} className="text-white" style={{ opacity: 0.72 }}>{product.category.name}</Link>
                                         </div>
                                     )}
                                     {product.brand?.name && (

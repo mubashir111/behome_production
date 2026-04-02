@@ -125,6 +125,7 @@ Route::match(['get', 'post'], '/refresh-token', [RefreshTokenController::class, 
 
 Route::prefix('auth')->middleware(['installed', 'apiKey', 'localization'])->name('auth.')->namespace('Auth')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'handleToken']);
 
     Route::prefix('forgot-password')->name('forgot-password.')->group(function () {
         Route::post('/', [ForgotPasswordController::class, 'forgotPassword']);
@@ -730,6 +731,12 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
         Route::get('/products/{promotion:slug}', [FrontendPromotionProductController::class, 'index']);
     });
 
+    Route::prefix('static-pages')->name('static-pages.')->group(function () {
+        Route::get('/{slug}', [\App\Http\Controllers\Frontend\StaticPageController::class, 'show']);
+    });
+
+    Route::get('/faqs', [\App\Http\Controllers\Frontend\StaticPageController::class, 'faqs'])->name('faqs.index');
+
     Route::prefix('product-section')->name('productSection.')->group(function () {
         Route::get('/', [FrontendProductSectionController::class, 'index']);
         Route::get('/show/{productSection:slug}', [FrontendProductSectionController::class, 'show']);
@@ -792,7 +799,6 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
         Route::get('/total-orders', [OverviewController::class, 'totalOrders']);
         Route::get('/total-complete-orders', [OverviewController::class, 'totalCompletedOrders']);
         Route::get('/total-return-orders', [OverviewController::class, 'totalReturnedOrders']);
-        Route::get('/wallet-balance', [OverviewController::class, 'walletBalance']);
     });
 
     Route::prefix('product-review')->name('product-review.')->middleware(['auth:sanctum'])->group(function () {

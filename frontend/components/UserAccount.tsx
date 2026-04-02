@@ -30,7 +30,7 @@ export default function UserAccount() {
 
     const handleLogout = async () => {
         try {
-            await apiFetch('/auth/logout', { method: 'POST' });
+            await apiFetch('/v1/auth/logout', { method: 'POST' });
         } catch {
             // ignore — clear client side regardless
         }

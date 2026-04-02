@@ -1,6 +1,9 @@
 @if(session('success'))
 <div class="glass border-l-4 border-emerald-500 p-4 mb-4 rounded-2xl">{{ session('success') }}</div>
 @endif
+@if(session('warning'))
+<div class="glass border-l-4 border-amber-500 p-4 mb-4 rounded-2xl">{{ session('warning') }}</div>
+@endif
 @if(session('error'))
 <div class="glass border-l-4 border-rose-500 p-4 mb-4 rounded-2xl">{{ session('error') }}</div>
 @endif

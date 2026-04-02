@@ -7,7 +7,7 @@ const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
 async function getAboutData() {
     try {
         const res = await fetch(`${API_URL}/frontend/static-pages/about`, {
-            next: { revalidate: 300 },
+            cache: 'no-store',
             headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
         });
         if (!res.ok) return null;
@@ -56,6 +56,18 @@ export default async function About() {
 
     return (
         <main>
+
+{/* Breadcrumb */}
+<section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
+<div className="container-fluid">
+    <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+        <ul>
+            <li><a href="/" style={{textDecoration:'none'}}>Home</a></li>
+            <li>About Us</li>
+        </ul>
+    </div>
+</div>
+</section>
 
 {/*  start section  */}
 <section className="pt-60 md-pt-40 pb-3 position-relative overflow-hidden">

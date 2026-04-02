@@ -9,11 +9,14 @@ use App\Services\CompanyService;
 use App\Services\ThemeService;
 use App\Services\ShippingSetupService;
 use App\Services\NotificationService;
+use App\Services\MailService;
 use App\Http\Requests\SiteRequest;
 use App\Http\Requests\CompanyRequest;
 use App\Http\Requests\ThemeRequest;
 use App\Http\Requests\ShippingSetupRequest;
 use App\Http\Requests\NotificationRequest;
+use App\Http\Requests\MailRequest;
+use Smartisan\Settings\Facades\Settings;
 
 class SettingsController extends Controller
 {
@@ -92,6 +95,95 @@ class SettingsController extends Controller
         try {
             $service->update($request);
             return back()->with('success', 'Notification settings updated.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function seo()
+    {
+        $settings = Settings::group('seo')->all();
+        return view('admin.settings.seo', compact('settings'));
+    }
+
+    public function updateSeo(Request $request)
+    {
+        try {
+            $data = $request->only([
+                'seo_site_title', 'seo_title_separator', 'seo_meta_description',
+                'seo_meta_keywords', 'seo_google_analytics_id', 'seo_google_tag_manager_id', 'seo_robots_txt',
+            ]);
+            Settings::group('seo')->set(array_filter($data, fn($v) => !is_null($v)));
+            if ($request->hasFile('seo_og_image')) {
+                $setting = \App\Models\ThemeSetting::where('key', 'seo_og_image')->firstOrCreate(['key' => 'seo_og_image', 'value' => 'seo_og_image']);
+                $setting->clearMediaCollection('seo-og-image');
+                $setting->addMediaFromRequest('seo_og_image')->toMediaCollection('seo-og-image');
+            }
+            return back()->with('success', 'SEO settings updated.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function smtp()
+    {
+        $settings = Settings::group('mail')->all();
+        return view('admin.settings.smtp', compact('settings'));
+    }
+
+    public function updateSmtp(MailRequest $request, MailService $service)
+    {
+        try {
+            $service->update($request);
+            return back()->with('success', 'Mail settings updated.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function testSmtp(Request $request)
+    {
+        $request->validate(['test_email' => 'required|email']);
+        try {
+            \Illuminate\Support\Facades\Mail::raw(
+                'This is a test email from Behome admin panel. Your SMTP configuration is working correctly.',
+                function ($msg) use ($request) {
+                    $msg->to($request->test_email)->subject('Behome — SMTP Test Email');
+                }
+            );
+            return back()->with('success', 'Test email sent to ' . $request->test_email);
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Failed to send test email: ' . $e->getMessage());
+        }
+    }
+
+    public function integrations()
+    {
+        $settings = Settings::group('integrations')->all();
+        return view('admin.settings.integrations', compact('settings'));
+    }
+
+    public function updateIntegrations(Request $request)
+    {
+        try {
+            $data = $request->only([
+                'stripe_refund_enabled', 'stripe_refund_secret_key',
+                'google_client_id', 'google_client_secret',
+                'facebook_app_id', 'facebook_app_secret',
+            ]);
+            Settings::group('integrations')->set(array_filter($data, fn($v) => !is_null($v)));
+
+            // Sync Google keys to .env so services.php and frontend pick them up
+            $envEditor = app(\Dipokhalder\EnvEditor\EnvEditor::class);
+            $envData = [];
+            if ($request->filled('google_client_id'))     $envData['GOOGLE_CLIENT_ID']     = $request->google_client_id;
+            if ($request->filled('google_client_secret')) $envData['GOOGLE_CLIENT_SECRET'] = $request->google_client_secret;
+            if (!empty($envData)) {
+                $envEditor->addData($envData);
+                \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+            }
+
+            return back()->with('success', 'Integration settings updated.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }

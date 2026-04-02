@@ -24,9 +24,9 @@ class ThemeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'theme_logo'         => ['nullable', 'file', 'mimes:jpg,jpeg,png'],
-            'theme_favicon_logo' => ['nullable', 'file', 'mimes:jpg,jpeg,png'],
-            'theme_footer_logo'  => ['nullable', 'file', 'mimes:jpg,jpeg,png']
+            'theme_logo'         => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp'],
+            'theme_favicon_logo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp'],
+            'theme_footer_logo'  => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp']
         ];
     }
 }

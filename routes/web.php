@@ -92,6 +92,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('settings/shipping', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateShipping'])->name('settings.shipping.update');
         Route::get('settings/notification', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'notification'])->name('settings.notification');
         Route::post('settings/notification', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateNotification'])->name('settings.notification.update');
+        Route::get('settings/seo', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'seo'])->name('settings.seo');
+        Route::post('settings/seo', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateSeo'])->name('settings.seo.update');
+        Route::get('settings/smtp', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'smtp'])->name('settings.smtp');
+        Route::post('settings/smtp', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateSmtp'])->name('settings.smtp.update');
+        Route::post('settings/smtp/test', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'testSmtp'])->name('settings.smtp.test');
+        Route::get('settings/integrations', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'integrations'])->name('settings.integrations');
+        Route::post('settings/integrations', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateIntegrations'])->name('settings.integrations.update');
 
         Route::get('shipping/order-areas', [\App\Http\Controllers\Admin\Web\ShippingController::class, 'orderAreas'])->name('shipping.order-areas');
         Route::post('shipping/order-areas', [\App\Http\Controllers\Admin\Web\ShippingController::class, 'storeOrderArea'])->name('shipping.order-areas.store');
@@ -140,8 +147,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Static Pages & FAQ
         Route::get('pages', [\App\Http\Controllers\Admin\Web\StaticPageController::class, 'index'])->name('pages.index');
+        Route::get('pages/create', [\App\Http\Controllers\Admin\Web\StaticPageController::class, 'create'])->name('pages.create');
+        Route::post('pages', [\App\Http\Controllers\Admin\Web\StaticPageController::class, 'store'])->name('pages.store');
         Route::get('pages/{page}/edit', [\App\Http\Controllers\Admin\Web\StaticPageController::class, 'edit'])->name('pages.edit');
         Route::put('pages/{page}', [\App\Http\Controllers\Admin\Web\StaticPageController::class, 'update'])->name('pages.update');
+        Route::delete('pages/{page}', [\App\Http\Controllers\Admin\Web\StaticPageController::class, 'destroy'])->name('pages.destroy');
 
         Route::get('faq', [\App\Http\Controllers\Admin\Web\FaqWebController::class, 'index'])->name('faq.index');
         Route::get('faq/create', [\App\Http\Controllers\Admin\Web\FaqWebController::class, 'create'])->name('faq.create');
@@ -193,6 +203,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'server_time'      => now()->valueOf(),
             ]);
         })->name('notifications.poll');
+
+        // Damages
+        Route::get('damages', [\App\Http\Controllers\Admin\Web\DamageWebController::class, 'index'])->name('damages.index');
+        Route::delete('damages/{damage}', [\App\Http\Controllers\Admin\Web\DamageWebController::class, 'destroy'])->name('damages.destroy');
+
+        // Barcodes
+        Route::get('barcodes', [\App\Http\Controllers\Admin\Web\BarcodeWebController::class, 'index'])->name('barcodes.index');
+        Route::post('barcodes', [\App\Http\Controllers\Admin\Web\BarcodeWebController::class, 'store'])->name('barcodes.store');
+        Route::delete('barcodes/{barcode}', [\App\Http\Controllers\Admin\Web\BarcodeWebController::class, 'destroy'])->name('barcodes.destroy');
 
         Route::get('/', function () {
             return redirect()->route('admin.dashboard');
