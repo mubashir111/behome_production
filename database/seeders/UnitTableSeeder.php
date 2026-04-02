@@ -14,33 +14,18 @@ class UnitTableSeeder extends Seeder
      */
     public function run()
     {
-        if (env('DEMO', false)) {
-            Unit::insert([
-                [
-                    'name'       => 'Piece',
-                    'code'       => 'pc',
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
-                [
-                    'name'       => 'Gram',
-                    'code'       => 'gm',
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
-                [
-                    'name'       => 'Litre',
-                    'code'       => 'lt',
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
-                [
-                    'name'       => 'Milliliter',
-                    'code'       => 'ml',
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
-            ]);
+        $units = [
+            ['name' => 'Piece',      'code' => 'pc'],
+            ['name' => 'Gram',       'code' => 'gm'],
+            ['name' => 'Litre',      'code' => 'lt'],
+            ['name' => 'Milliliter', 'code' => 'ml'],
+        ];
+
+        foreach ($units as $unit) {
+            Unit::firstOrCreate(
+                ['code' => $unit['code']],
+                array_merge($unit, ['created_at' => now(), 'updated_at' => now()])
+            );
         }
     }
 }
