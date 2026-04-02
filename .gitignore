@@ -25,3 +25,5 @@ public/css/app.css
 /storage/media-library
 storage/media-library
 */storage/media-library
+frontend/.next/
+frontend/node_modules/
