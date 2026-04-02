@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Unit;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class UnitTableSeeder extends Seeder
 {
@@ -15,8 +14,7 @@ class UnitTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Unit::insert([
                 [
                     'name'       => 'Piece',

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\PushNotification;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class PushNotificationTableSeeder extends Seeder
 {
@@ -15,8 +14,7 @@ class PushNotificationTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             PushNotification::insert([
                 [
                     'title'       => "Hurry! Flash Sale Now Live!",

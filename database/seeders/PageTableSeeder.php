@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Page;
 use App\Enums\Status;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class PageTableSeeder extends Seeder
 {
@@ -16,8 +15,7 @@ class PageTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             Page::insert([
                 [
                     'title'            => 'FAQ',

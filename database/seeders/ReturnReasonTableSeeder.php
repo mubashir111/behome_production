@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\Status;
 use App\Models\ReturnReason;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class ReturnReasonTableSeeder extends Seeder
 {
@@ -24,8 +23,7 @@ class ReturnReasonTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             foreach ($this->returnReasons as $returnReason) {
                 ReturnReason::create([
                     'title'   => $returnReason,

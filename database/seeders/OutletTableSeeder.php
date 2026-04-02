@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\Status;
 use App\Models\Outlet;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class OutletTableSeeder extends Seeder
 {
@@ -16,8 +15,7 @@ class OutletTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Outlet::insert([
                 [
                     'name'         => 'Mirpur 1',

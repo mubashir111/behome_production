@@ -6,7 +6,6 @@ use App\Enums\Status;
 use Illuminate\Support\Str;
 use App\Models\ProductBrand;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class ProductBrandTableSeeder extends Seeder
 {
@@ -29,8 +28,7 @@ class ProductBrandTableSeeder extends Seeder
 
     public function run(): void
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             foreach ($this->fashionBrands as $fashionBrand) {
                 $productBand = ProductBrand::create([
                     'name'        => $fashionBrand,

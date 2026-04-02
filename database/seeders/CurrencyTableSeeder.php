@@ -5,7 +5,6 @@ namespace Database\Seeders;
 
 use App\Enums\Ask;
 use App\Models\Currency;
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 
 
@@ -28,8 +27,7 @@ class CurrencyTableSeeder extends Seeder
             ],
         ]);
 
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Currency::insert([
                 [
                     'name' => 'Rupee',

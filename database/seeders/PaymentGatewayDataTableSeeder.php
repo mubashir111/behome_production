@@ -6,7 +6,6 @@ use App\Enums\GatewayMode;
 use App\Enums\Activity;
 use App\Models\GatewayOption;
 use App\Models\PaymentGateway;
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 
 class PaymentGatewayDataTableSeeder extends Seeder
@@ -387,8 +386,7 @@ class PaymentGatewayDataTableSeeder extends Seeder
 
     public function run(): void
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             foreach ($this->gateways as $gateway) {
                 $payment = PaymentGateway::where(['slug' => $gateway['slug']])->first();
                 if ($payment) {

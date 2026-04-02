@@ -16,7 +16,6 @@ use App\Models\ProductVariation;
 use App\Models\Stock;
 use App\Models\StockTax;
 use App\Models\Transaction;
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 use App\Models\Order;
 
@@ -29,8 +28,7 @@ class OrderTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             Order::insert([
                 [
                     'order_serial_no' => date('dmy') . '1',

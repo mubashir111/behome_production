@@ -6,7 +6,6 @@ namespace Database\Seeders;
 use App\Enums\ReturnOrderStatus;
 use App\Models\ReturnAndRefund;
 use App\Models\ReturnAndRefundProduct;
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 
 class ReturnAndRefundTableSeeder extends Seeder
@@ -18,8 +17,7 @@ class ReturnAndRefundTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             ReturnAndRefund::insert([
                 [
                     'return_reason_id' => 1,

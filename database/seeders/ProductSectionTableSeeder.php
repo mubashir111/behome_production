@@ -10,7 +10,6 @@ use App\Models\ProductSectionProduct;
 use App\Models\Promotion;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class ProductSectionTableSeeder extends Seeder
 {
@@ -28,8 +27,7 @@ class ProductSectionTableSeeder extends Seeder
 
     public function run(): void
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             foreach ($this->promotions as $promotion) {
                 $section = ProductSection::create([
                     'name'   => $promotion['name'],

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\ProductAttribute;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class ProductAttributeTableSeeder extends Seeder
 {
@@ -20,8 +19,7 @@ class ProductAttributeTableSeeder extends Seeder
 
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             foreach ($this->fashionAttributes as $fashionAttribute) {
                 ProductAttribute::create([
                     'name'   => $fashionAttribute,

@@ -7,7 +7,6 @@ use App\Models\Analytic;
 use App\Enums\AnalyticSection as AnalyticSectionEnum;
 use App\Models\AnalyticSection;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class AnalyticTableSeeder extends Seeder
 {
@@ -18,8 +17,7 @@ class AnalyticTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Analytic::create([
                 'name'   => 'Google',
                 'status' => Status::ACTIVE,

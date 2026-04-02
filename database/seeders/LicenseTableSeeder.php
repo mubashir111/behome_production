@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 use Smartisan\Settings\Facades\Settings;
@@ -17,16 +16,9 @@ class LicenseTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $envService = new EnvEditor();
         Settings::group('license')->set([
-            'license_key' => $envService->getValue('MIX_API_KEY')
+            'license_key' => env('MIX_API_KEY', false)
         ]);
-        if ($envService->getValue('DEMO')) {
-            Settings::group('license')->set([
-                'license_key' => 'i9u99tt4-f0w6-71w7-8394-y968t02516r11'
-            ]);
-            $envService->addData(['MIX_API_KEY' => 'i9u99tt4-f0w6-71w7-8394-y968t02516r11']);
-            Artisan::call('optimize:clear');
-        }
+        Artisan::call('optimize:clear');
     }
 }

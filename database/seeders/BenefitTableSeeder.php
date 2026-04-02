@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\Status;
 use App\Models\Benefit;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 
 class BenefitTableSeeder extends Seeder
@@ -13,8 +12,7 @@ class BenefitTableSeeder extends Seeder
 
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             $benefits = [
                 [
                     'title'       => 'Professional Service',

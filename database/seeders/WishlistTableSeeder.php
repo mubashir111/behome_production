@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Wishlist;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 
 class WishlistTableSeeder extends Seeder
@@ -50,8 +49,7 @@ class WishlistTableSeeder extends Seeder
 
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             foreach ($this->wishlists as $wishlist) {
                 foreach ($wishlist['product'] as $product) {
                     Wishlist::create([

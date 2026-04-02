@@ -11,7 +11,6 @@ use App\Enums\PurchaseStatus;
 use App\Models\Stock;
 use App\Services\ProductVariationService;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 
 class PurchaseTableSeeder extends Seeder
@@ -116,8 +115,7 @@ class PurchaseTableSeeder extends Seeder
                 'total'        => 0,
             ],
         ];
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             foreach ($purchases as $purchase) {
                 Purchase::create([
                     'supplier_id'  => $purchase['supplier'],
@@ -131,7 +129,7 @@ class PurchaseTableSeeder extends Seeder
                 ]);
             }
 
-            if ($envService->getValue('DISPLAY') == 'fashion') {
+            if (env('DISPLAY', false) == 'fashion') {
                 $productVariationService = new ProductVariationService();
                 $products                = Product::select('id', 'can_purchasable')->where('can_purchasable', Ask::NO)->get()->pluck('id')->toArray();
                 $productVariations       = ProductVariation::where('parent_id', '!=', null)->get();

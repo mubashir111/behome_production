@@ -6,7 +6,6 @@ use App\Enums\Status;
 use Illuminate\Support\Str;
 use App\Models\ProductCategory;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class ProductCategoryTableSeeder extends Seeder
 {
@@ -115,8 +114,7 @@ class ProductCategoryTableSeeder extends Seeder
 
     public function run(): void
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             foreach ($this->fashionCategories as $fashionCategory) {
                 $productCategory = ProductCategory::create([
                     'parent_id'   => NULL,

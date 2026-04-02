@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use App\Enums\TaxType;
 use App\Models\Coupon;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 
 class CouponTableSeeder extends Seeder
@@ -14,8 +13,7 @@ class CouponTableSeeder extends Seeder
 
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             $coupons = [
                 [
                     'name'             => 'Super Denim Collection',

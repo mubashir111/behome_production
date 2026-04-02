@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Tax;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class TaxTableSeeder extends Seeder
 {
@@ -15,8 +14,7 @@ class TaxTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Tax::insert([
                 [
                     'name'       => 'No-VAT',

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 use Smartisan\Settings\Facades\Settings;
@@ -26,10 +25,6 @@ class CompanyTableSeeder extends Seeder
             'company_address'      => ''
         ]);
 
-        $envService = new EnvEditor();
-        $envService->addData([
-            'APP_NAME' => 'Behome'
-        ]);
         Artisan::call('optimize:clear');
     }
 }

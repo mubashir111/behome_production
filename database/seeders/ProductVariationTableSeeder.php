@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 use App\Models\ProductVariation;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class ProductVariationTableSeeder extends Seeder
 {
@@ -56,8 +55,7 @@ class ProductVariationTableSeeder extends Seeder
 
     public function run(): void
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO') && $envService->getValue('DISPLAY') == 'fashion') {
+        if (env('DEMO', false) && env('DISPLAY', false) == 'fashion') {
             $products = Product::select('id', 'variation_price')->get();
 
             foreach ($products as $product) {

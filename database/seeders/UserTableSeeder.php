@@ -8,7 +8,6 @@ use App\Enums\Status;
 use App\Models\Address;
 use App\Enums\Role as EnumRole;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 
 class UserTableSeeder extends Seeder
@@ -20,7 +19,6 @@ class UserTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $envService = new EnvEditor();
 
         $admin      = User::create([
             'name'              => 'John Doe',
@@ -34,7 +32,7 @@ class UserTableSeeder extends Seeder
             'is_guest'          => Ask::NO
         ]);
         $admin->assignRole(EnumRole::ADMIN);
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Address::create([
                 'full_name'    => $admin->name,
                 'email'        => $admin->email,
@@ -73,7 +71,7 @@ class UserTableSeeder extends Seeder
             'is_guest'          => Ask::NO
         ]);
         $customer->assignRole(EnumRole::CUSTOMER);
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Address::create([
                 'full_name'    => $customer->name,
                 'email'        => $customer->email,
@@ -88,7 +86,7 @@ class UserTableSeeder extends Seeder
             ]);
         }
 
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             $customerOne = User::create([
                 'name'              => 'Will Smith',
                 'email'             => 'customer@example.com',

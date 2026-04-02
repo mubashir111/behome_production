@@ -5,7 +5,6 @@ namespace Database\Seeders;
 
 use App\Enums\Ask;
 use App\Models\Subscriber;
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 
 
@@ -19,8 +18,7 @@ class SubscriberTableSeeder extends Seeder
     public function run()
     {
 
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             Subscriber::insert([
                 [
                     'email' => 'subscriber@example.com',

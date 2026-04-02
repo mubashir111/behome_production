@@ -10,7 +10,6 @@ use App\Models\ProductVariation;
 use App\Models\Stock;
 use App\Services\ProductVariationService;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 
 class DamageTableSeeder extends Seeder
@@ -35,8 +34,7 @@ class DamageTableSeeder extends Seeder
                 'reference_no' => "1003"
             ]
         ];
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
+        if (env('DEMO', false)) {
             foreach ($damages as $damage) {
                 Damage::create([
                     'date'         => $damage['date'],
@@ -48,7 +46,7 @@ class DamageTableSeeder extends Seeder
                 ]);
             }
 
-            if ($envService->getValue('DISPLAY') == 'fashion') {
+            if (env('DISPLAY', false) == 'fashion') {
                 $productVariationService = new ProductVariationService();
                 $products                = Product::inRandomOrder()->limit(3)->get()->pluck('id')->toArray();
                 $productVariations       = ProductVariation::whereIn('product_id', $products)->where('parent_id', '!=', null)->get();

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Barcode;
 use Illuminate\Database\Seeder;
-use Dipokhalder\EnvEditor\EnvEditor;
 
 class BarcodeTableSeeder extends Seeder
 {

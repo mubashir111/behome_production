@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 
-use Dipokhalder\EnvEditor\EnvEditor;
 use Illuminate\Database\Seeder;
 
 use Smartisan\Settings\Facades\Settings;
@@ -17,13 +16,12 @@ class SocialMediaTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
 
         Settings::group('social_media')->set([
-            'social_media_facebook'  => $envService->getValue('DEMO') ? 'https://www.facebook.com/behome' : '',
-            'social_media_youtube'   => $envService->getValue('DEMO') ? 'https://www.youtube.com/@behome' : '',
-            'social_media_instagram' => $envService->getValue('DEMO') ? 'https://www.instagram.com/behome' : '',
-            'social_media_twitter'   => $envService->getValue('DEMO') ? 'https://twitter.com/behome' : ''
+            'social_media_facebook'  => env('DEMO', false) ? 'https://www.facebook.com/behome' : '',
+            'social_media_youtube'   => env('DEMO', false) ? 'https://www.youtube.com/@behome' : '',
+            'social_media_instagram' => env('DEMO', false) ? 'https://www.instagram.com/behome' : '',
+            'social_media_twitter'   => env('DEMO', false) ? 'https://twitter.com/behome' : ''
         ]);
     }
 }
