@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
         $this->call(RolePermissionTableSeeder::class);
         $this->call(LanguageTableSeeder::class);
         $this->call(BarcodeTableSeeder::class);
+        $this->call(UnitTableSeeder::class);
+        $this->call(TaxTableSeeder::class);
         $this->call(MenuTemplateTableSeeder::class);
         $this->call(BenefitTableSeeder::class);
         $this->call(MenuSectionTableSeeder::class);
@@ -37,8 +39,6 @@ class DatabaseSeeder extends Seeder
         $this->call(MailTableSeeder::class);
         $this->call(SliderTableSeeder::class);
         $this->call(RealProductSeeder::class);
-        $this->call(TaxTableSeeder::class);
-        $this->call(UnitTableSeeder::class);
         $this->call(SupplierTableSeeder::class);
         $this->call(PushNotificationTableSeeder::class);
         $this->call(CouponTableSeeder::class);
