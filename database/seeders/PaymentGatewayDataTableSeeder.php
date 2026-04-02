@@ -1,4 +1,4 @@
-`1`     12qaszx90y  <?php
+<?php
 
 namespace Database\Seeders;
 
