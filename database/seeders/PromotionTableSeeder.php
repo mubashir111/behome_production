@@ -20,28 +20,28 @@ class PromotionTableSeeder extends Seeder
             'subtitle' => 'New Spring Collection 2025',
             'link'     => '/shop?category=sofa',
             'type'     => 10, // BIG
-            'image'    => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/secret_realm_curved_sofa_v5_1774928953422.png'
+            'image'    => 'database/seeders/images/secret_realm_curved_sofa_v5_1774928953422.png'
         ],
         [
             'name'     => 'Modern Minimalism',
             'subtitle' => 'Up to 30% Off',
             'link'     => '/shop?category=tableware',
             'type'     => 5, // SMALL
-            'image'    => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/yalong_signature_tableware_v5_1774928996290.png'
+            'image'    => 'database/seeders/images/yalong_signature_tableware_v5_1774928996290.png'
         ],
         [
             'name'     => 'Outdoor Sanctuary',
             'subtitle' => 'Built to Last',
             'link'     => '/shop?category=outdoor-furniture',
             'type'     => 5, // SMALL
-            'image'    => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/howvin_outdoor_set_v5_1774928970239.png'
+            'image'    => 'database/seeders/images/howvin_outdoor_set_v5_1774928970239.png'
         ],
         [
             'name'     => 'Signature Lounge',
             'subtitle' => 'Exclusively at Behome',
             'link'     => '/shop?category=sofa',
             'type'     => 1, // FEATURE
-            'image'    => '/Users/mubashirt/.gemini/antigravity/brain/c71c6385-e841-4437-bad8-b888bea5b73f/ink_shadow_modular_sofa_v5_1774928925715.png'
+            'image'    => 'database/seeders/images/ink_shadow_modular_sofa_v5_1774928925715.png'
         ],
     ];
 
@@ -66,10 +66,9 @@ class PromotionTableSeeder extends Seeder
 
             // Add Image
             $fullPath = base_path($data['image']);
-            if (file_exists($fullPath) || file_exists($data['image'])) {
-                $path = file_exists($data['image']) ? $data['image'] : $fullPath;
+            if (file_exists($fullPath)) {
                 try {
-                    $promotion->addMedia($path)
+                    $promotion->addMedia($fullPath)
                         ->preservingOriginal()
                         ->toMediaCollection('promotion');
                 } catch (\Exception $e) {
