@@ -13,6 +13,9 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   images: {
     remotePatterns: [

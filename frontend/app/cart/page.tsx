@@ -230,7 +230,7 @@ export default function Cart() {
     }
 
     return (
-        <main className="no-layout-pad" className="page-top-100">
+        <main className="no-layout-pad page-top-100">
             <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
             <div className="container-fluid">
                 <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
