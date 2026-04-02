@@ -147,4 +147,14 @@ class CartController extends Controller
             return $this->errorResponse($e->getMessage());
         }
     }
+
+    public function clear()
+    {
+        try {
+            Cart::where('user_id', Auth::id())->delete();
+            return $this->successResponse([], 'Cart cleared');
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+    }
 }

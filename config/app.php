@@ -57,6 +57,7 @@ return [
 
     'url'          => env('APP_URL', 'http://localhost'),
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+    'mix_api_key'  => env('MIX_API_KEY'),
 
     'asset_url' => env('ASSET_URL'),
 

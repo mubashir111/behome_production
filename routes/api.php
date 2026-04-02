@@ -737,6 +737,8 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
 
     Route::get('/faqs', [\App\Http\Controllers\Frontend\StaticPageController::class, 'faqs'])->name('faqs.index');
 
+    Route::post('/contact', [\App\Http\Controllers\Frontend\ContactController::class, 'store'])->name('contact.store');
+
     Route::prefix('product-section')->name('productSection.')->group(function () {
         Route::get('/', [FrontendProductSectionController::class, 'index']);
         Route::get('/show/{productSection:slug}', [FrontendProductSectionController::class, 'show']);
@@ -844,6 +846,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/cart', [ApiCartController::class, 'index']);
         Route::post('/cart', [ApiCartController::class, 'store']);
         Route::put('/cart/{id}', [ApiCartController::class, 'update']);
+        Route::delete('/cart/clear', [ApiCartController::class, 'clear']);
         Route::delete('/cart/{id}', [ApiCartController::class, 'destroy']);
 
         Route::get('/orders', [ApiOrderController::class, 'index']);
