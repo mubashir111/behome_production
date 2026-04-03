@@ -8,6 +8,12 @@ use App\Models\StaticPage;
 
 class StaticPageController extends Controller
 {
+    public function index()
+    {
+        $pages = StaticPage::where('is_active', true)->get(['id', 'title', 'slug']);
+        return response()->json(['status' => true, 'data' => $pages]);
+    }
+
     public function show(string $slug)
     {
         $page = StaticPage::where('slug', $slug)->where('is_active', true)->first();

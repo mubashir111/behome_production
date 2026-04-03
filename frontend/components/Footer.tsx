@@ -1,8 +1,23 @@
-
+'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-
+import { apiFetch } from '@/lib/api';
 
 export default function Footer() {
+    const [pages, setPages] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchPages = async () => {
+            try {
+                const response = await apiFetch('/frontend/static-pages');
+                setPages(response?.data || []);
+            } catch (error) {
+                console.error('Error fetching footer pages:', error);
+            }
+        };
+        fetchPages();
+    }, []);
+
     return (
         <footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background"
             style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'/images/new/bg/bg1.png\')' }}>
@@ -41,12 +56,18 @@ export default function Footer() {
                     <div className="col-4 col-lg-2">
                         <span className="fs-13 fw-600 text-white d-block mb-15px text-uppercase ls-1px opacity-9">Information</span>
                         <ul className="footer-link-list">
-                            <li><a href="/about">About us</a></li>
-                            <li><a href="/blog">Blog</a></li>
-                            <li><a href="/contact">Contact</a></li>
-                            <li><a href="/faq">FAQs</a></li>
-                            <li><a href="/privacy-policy">Privacy Policy</a></li>
-                            <li><a href="/terms-conditions">Terms</a></li>
+                            {pages.length > 0 ? (
+                                pages.map((page) => (
+                                    <li key={page.id}><a href={`/${page.slug}`}>{page.title}</a></li>
+                                ))
+                            ) : (
+                                <>
+                                    <li><a href="/about">About us</a></li>
+                                    <li><a href="/blog">Blog</a></li>
+                                    <li><a href="/contact">Contact</a></li>
+                                    <li><a href="/faq">FAQs</a></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 

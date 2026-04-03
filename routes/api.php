@@ -732,6 +732,7 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
     });
 
     Route::prefix('static-pages')->name('static-pages.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Frontend\StaticPageController::class, 'index']);
         Route::get('/{slug}', [\App\Http\Controllers\Frontend\StaticPageController::class, 'show']);
     });
 

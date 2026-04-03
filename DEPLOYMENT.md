@@ -239,8 +239,8 @@ server {
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
-    # Laravel backend — API, admin panel, storage
-    location ~ ^/(api|admin|install|storage|sanctum)/ {
+    # Laravel backend — API, admin panel, storage, and static assets
+    location ~ ^/(api|admin|install|storage|sanctum|css|js|images|fonts|audio|lib|themes|paymentGateways)/ {
         root /var/www/behome/public;
         try_files $uri $uri/ /index.php?$query_string;
 
@@ -252,10 +252,11 @@ server {
         }
     }
 
-    # Serve uploaded files directly
-    location /storage {
+    # Optional: Cache static assets
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|woff|woff2|ttf|svg)$ {
         root /var/www/behome/public;
-        try_files $uri =404;
+        expires 7d;
+        add_header Cache-Control "public, no-transform";
     }
 }
 ```
@@ -503,7 +504,12 @@ php artisan tinker
 
 ### Images not loading (404 on `/storage/...`)
 ```bash
+# Ensure you are using the correct project path
+cd /var/www/behome
 php artisan storage:link --force
+
+# Verify Nginx is pointing to the correct root
+# Should be: root /var/www/behome/public;
 ```
 
 ### Next.js shows old content after deploy
