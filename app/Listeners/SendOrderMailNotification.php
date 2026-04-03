@@ -11,7 +11,11 @@ class SendOrderMailNotification
     public function handle(SendOrderMail $event)
     {
         try{
-            $orderMailNotificationBuilderService = new OrderMailNotificationBuilder($event->info['order_id'], $event->info['status']);
+            $orderMailNotificationBuilderService = new OrderMailNotificationBuilder(
+                $event->info['order_id'],
+                $event->info['status'],
+                $event->info['force'] ?? false
+            );
             $orderMailNotificationBuilderService->send();
         } catch(\Exception $e) {
             Log::info($e->getMessage());

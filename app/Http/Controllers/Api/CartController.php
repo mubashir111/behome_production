@@ -37,8 +37,8 @@ class CartController extends Controller
                 $tax        = $taxPerUnit * $item->quantity;
                 $total      = $subtotal + $tax;
 
-                if ($item->tax != $taxPerUnit || $item->subtotal != $subtotal || $item->total != $total) {
-                    $item->tax      = $taxPerUnit;
+                if ($item->tax != $tax || $item->subtotal != $subtotal || $item->total != $total) {
+                    $item->tax      = $tax;
                     $item->subtotal = $subtotal;
                     $item->total    = $total;
                     $item->save();
@@ -93,8 +93,18 @@ class CartController extends Controller
 
             if ($cartItem) {
                 $cartItem->quantity += $request->quantity;
+                
+                // Recalculate tax and totals for the new quantity
+                $taxRate = 0;
+                foreach ($product->taxes as $productTax) {
+                    if ($productTax->tax) {
+                        $taxRate += (float) $productTax->tax->tax_rate;
+                    }
+                }
+                
                 $cartItem->subtotal = $cartItem->price * $cartItem->quantity;
-                $cartItem->total    = $cartItem->subtotal + ($cartItem->tax * $cartItem->quantity);
+                $cartItem->tax      = round(($cartItem->subtotal * $taxRate) / 100, (int) env('CURRENCY_DECIMAL_POINT', 2));
+                $cartItem->total    = $cartItem->subtotal + $cartItem->tax;
                 $cartItem->save();
             } else {
                 $cartItem = Cart::create([
@@ -124,10 +134,22 @@ class CartController extends Controller
         ]);
 
         try {
-            $cartItem = Cart::where('user_id', Auth::id())->findOrFail($id);
+            $cartItem = Cart::where('user_id', Auth::id())->with('product.taxes.tax')->findOrFail($id);
             $cartItem->quantity = $request->quantity;
-            $cartItem->subtotal = $cartItem->price * $request->quantity;
-            $cartItem->total    = $cartItem->subtotal + ($cartItem->tax * $request->quantity);
+            
+            // Recalculate tax and totals
+            $taxRate = 0;
+            if ($cartItem->product) {
+                foreach ($cartItem->product->taxes as $productTax) {
+                    if ($productTax->tax) {
+                        $taxRate += (float) $productTax->tax->tax_rate;
+                    }
+                }
+            }
+            
+            $cartItem->subtotal = $cartItem->price * $cartItem->quantity;
+            $cartItem->tax      = round(($cartItem->subtotal * $taxRate) / 100, (int) env('CURRENCY_DECIMAL_POINT', 2));
+            $cartItem->total    = $cartItem->subtotal + $cartItem->tax;
             $cartItem->save();
             $cartItem->load(['product', 'variation']);
 

@@ -277,7 +277,7 @@ class OrderService
     /**
      * @throws Exception
      */
-    public function changeStatus(Order $order, OrderStatusRequest $request, $auth = false): Order|array
+    public function changeStatus(Order $order, OrderStatusRequest $request, $auth = false, $sendEmail = true): Order|array
     {
         try {
             if ($auth) {
@@ -295,7 +295,7 @@ class OrderService
                             );
                         }
                     }
-                    SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                    SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
                     SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                     SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                     $oldStatus = $order->status;
@@ -321,7 +321,7 @@ class OrderService
                         );
                     }
                 }
-                SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
                 SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                 SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                 $oldStatus = $order->status;

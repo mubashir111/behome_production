@@ -18,12 +18,14 @@ class OrderMailNotificationBuilder
     public int $orderId;
     public mixed $status;
     public object $order;
+    public bool $force;
 
-    public function __construct($orderId, $status)
+    public function __construct($orderId, $status, $force = false)
     {
         $this->orderId = $orderId;
         $this->status  = $status;
         $this->order   = Order::find($orderId);
+        $this->force   = $force;
     }
 
     public function send(): void
@@ -67,48 +69,48 @@ class OrderMailNotificationBuilder
     private function pending($name, $email, $orderId): void
     {
         $notificationAlert = NotificationAlert::where(['language' => 'order_pending_message'])->first();
-        if ($notificationAlert && $notificationAlert->mail == SwitchBox::ON) {
-            $this->mail($name, $email, $orderId, $notificationAlert->mail_message);
+        if ($this->force || ($notificationAlert && $notificationAlert->mail == SwitchBox::ON)) {
+            $this->mail($name, $email, $orderId, $notificationAlert->mail_message ?? '');
         }
     }
 
     private function confirmed($name, $email, $orderId): void
     {
         $notificationAlert = NotificationAlert::where(['language' => 'order_confirmation_message'])->first();
-        if ($notificationAlert && $notificationAlert->mail == SwitchBox::ON) {
-            $this->mail($name, $email, $orderId, $notificationAlert->mail_message);
+        if ($this->force || ($notificationAlert && $notificationAlert->mail == SwitchBox::ON)) {
+            $this->mail($name, $email, $orderId, $notificationAlert->mail_message ?? '');
         }
     }
 
     private function onTheWay($name, $email, $orderId): void
     {
         $notificationAlert = NotificationAlert::where(['language' => 'order_on_the_way_message'])->first();
-        if ($notificationAlert && $notificationAlert->mail == SwitchBox::ON) {
-            $this->mail($name, $email, $orderId, $notificationAlert->mail_message);
+        if ($this->force || ($notificationAlert && $notificationAlert->mail == SwitchBox::ON)) {
+            $this->mail($name, $email, $orderId, $notificationAlert->mail_message ?? '');
         }
     }
 
     private function delivered($name, $email, $orderId): void
     {
         $notificationAlert = NotificationAlert::where(['language' => 'order_delivered_message'])->first();
-        if ($notificationAlert && $notificationAlert->mail == SwitchBox::ON) {
-            $this->mail($name, $email, $orderId, $notificationAlert->mail_message);
+        if ($this->force || ($notificationAlert && $notificationAlert->mail == SwitchBox::ON)) {
+            $this->mail($name, $email, $orderId, $notificationAlert->mail_message ?? '');
         }
     }
 
     private function canceled($name, $email, $orderId): void
     {
         $notificationAlert = NotificationAlert::where(['language' => 'order_canceled_message'])->first();
-        if ($notificationAlert && $notificationAlert->mail == SwitchBox::ON) {
-            $this->mail($name, $email, $orderId, $notificationAlert->mail_message);
+        if ($this->force || ($notificationAlert && $notificationAlert->mail == SwitchBox::ON)) {
+            $this->mail($name, $email, $orderId, $notificationAlert->mail_message ?? '');
         }
     }
 
     private function rejected($name, $email, $orderId): void
     {
         $notificationAlert = NotificationAlert::where(['language' => 'order_rejected_message'])->first();
-        if ($notificationAlert && $notificationAlert->mail == SwitchBox::ON) {
-            $this->mail($name, $email, $orderId, $notificationAlert->mail_message);
+        if ($this->force || ($notificationAlert && $notificationAlert->mail == SwitchBox::ON)) {
+            $this->mail($name, $email, $orderId, $notificationAlert->mail_message ?? '');
         }
     }
 }

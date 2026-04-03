@@ -92,6 +92,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('settings/shipping', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateShipping'])->name('settings.shipping.update');
         Route::get('settings/notification', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'notification'])->name('settings.notification');
         Route::post('settings/notification', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateNotification'])->name('settings.notification.update');
+        Route::get('settings/notification-alerts', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'notificationAlerts'])->name('settings.notification-alerts');
+        Route::post('settings/notification-alerts', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateNotificationAlerts'])->name('settings.notification-alerts.update');
         Route::get('settings/seo', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'seo'])->name('settings.seo');
         Route::post('settings/seo', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateSeo'])->name('settings.seo.update');
         Route::get('settings/smtp', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'smtp'])->name('settings.smtp');

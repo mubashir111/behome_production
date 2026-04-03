@@ -173,7 +173,12 @@
 
                     <div class="admin-form-field">
                         <label for="reason" class="admin-form-label">Reason</label>
-                        <textarea name="reason" id="reason" rows="3" class="admin-form-input" placeholder="Required when canceling or rejecting an order.">{{ old('reason', $order->adminStatusReason()) }}</textarea>
+                        <textarea name="reason" id="reason" rows="2" class="admin-form-input" placeholder="Required when canceling or rejecting an order.">{{ old('reason', $order->adminStatusReason()) }}</textarea>
+                    </div>
+
+                    <div class="flex items-center gap-2 py-1">
+                        <input type="checkbox" name="send_email" id="send_email_status" value="1" checked class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                        <label for="send_email_status" class="text-sm font-medium text-slate-700">Send Email Notification</label>
                     </div>
 
                     <button type="submit" class="admin-btn-primary w-full">
@@ -254,13 +259,17 @@
                 </div>
 
                 <!-- Reply Form -->
-                <form method="POST" action="{{ route('admin.orders.reply', $order) }}">
+                <form method="POST" action="{{ route('admin.orders.reply', $order) }}" class="space-y-3">
                     @csrf
                     <div class="flex gap-3">
                         <textarea name="message" rows="2" required maxlength="2000"
                             placeholder="Type a reply to the customer…"
                             class="flex-1 px-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"></textarea>
                         <button type="submit" class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition self-end">Send</button>
+                    </div>
+                    <div class="flex items-center gap-2 px-1">
+                        <input type="checkbox" name="send_email" id="send_email_reply" value="1" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                        <label for="send_email_reply" class="text-sm font-medium text-slate-600">Send Copy to Customer Email</label>
                     </div>
                 </form>
             </div>

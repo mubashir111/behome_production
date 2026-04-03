@@ -186,7 +186,11 @@
                             <div class="pe-section-subtitle">Product name, SKU, description</div>
                         </div>
                     </div>
-                    <div class="p-6 space-y-6">
+
+<!-- Toast Notification Container -->
+<div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+<div class="p-6 space-y-6">
                         <div class="space-y-1.5">
                             <label for="name" class="text-sm font-medium text-slate-700">Product Title</label>
                             <input type="text" name="name" id="name" value="{{ $p_name }}" required
@@ -1054,13 +1058,47 @@
         return div.innerHTML;
     }
 
-    function showToast(message, type = 'info') {
-        // Alert for now (replace with your toast implementation)
-        if (window.toastr) {
-            window.toastr[type](message);
-        } else {
-            alert(message);
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        let bgColor = 'bg-white';
+        let textColor = 'text-slate-800';
+        let iconColor = 'text-indigo-500';
+        let icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+
+        if (type === 'success') {
+            iconColor = 'text-emerald-500';
+            icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+        } else if (type === 'error') {
+            iconColor = 'text-rose-500';
+            icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
         }
+
+        toast.className = `
+            pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border border-white/20
+            ${bgColor} ${textColor}
+            translate-x-full transition-all duration-300 ease-out opacity-0
+            backdrop-blur-md bg-opacity-95
+        `;
+        
+        toast.innerHTML = `
+            <div class="${iconColor} flex-shrink-0">${icon}</div>
+            <div class="text-sm font-semibold tracking-tight">${message}</div>
+        `;
+
+        container.appendChild(toast);
+
+        // Animate in
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0');
+        });
+
+        // Auto remove
+        setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
     }
 
     // --- Rich Content Blocks Logic ---
@@ -1532,6 +1570,7 @@
                     return;
                 }
 
+                if (res.status) {
                     if (ctx.itemIndex !== null) {
                         updateBlockGridItem(ctx.context, ctx.itemIndex, ctx.field, res.data.url);
                     } else {

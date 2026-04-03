@@ -9,6 +9,7 @@ use App\Services\CompanyService;
 use App\Services\ThemeService;
 use App\Services\ShippingSetupService;
 use App\Services\NotificationService;
+use App\Services\NotificationAlertService;
 use App\Services\MailService;
 use App\Http\Requests\SiteRequest;
 use App\Http\Requests\CompanyRequest;
@@ -16,6 +17,8 @@ use App\Http\Requests\ThemeRequest;
 use App\Http\Requests\ShippingSetupRequest;
 use App\Http\Requests\NotificationRequest;
 use App\Http\Requests\MailRequest;
+use App\Models\NotificationAlert;
+use App\Enums\SwitchBox;
 use Smartisan\Settings\Facades\Settings;
 
 class SettingsController extends Controller
@@ -184,6 +187,32 @@ class SettingsController extends Controller
             }
 
             return back()->with('success', 'Integration settings updated.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function notificationAlerts(NotificationAlertService $service)
+    {
+        $alerts = $service->list();
+        return view('admin.settings.notification_alerts', compact('alerts'));
+    }
+
+    public function updateNotificationAlerts(Request $request)
+    {
+        try {
+            $alertsData = $request->input('alerts', []);
+            foreach ($alertsData as $id => $data) {
+                NotificationAlert::where('id', $id)->update([
+                    'mail'                      => isset($data['mail']) ? SwitchBox::ON : SwitchBox::OFF,
+                    'sms'                       => isset($data['sms']) ? SwitchBox::ON : SwitchBox::OFF,
+                    'push_notification'         => isset($data['push_notification']) ? SwitchBox::ON : SwitchBox::OFF,
+                    'mail_message'              => $data['mail_message'] ?? '',
+                    'sms_message'               => $data['sms_message'] ?? '',
+                    'push_notification_message' => $data['push_notification_message'] ?? '',
+                ]);
+            }
+            return back()->with('success', 'Notification alerts updated.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }

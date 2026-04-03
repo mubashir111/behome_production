@@ -66,7 +66,8 @@ class OrderController extends Controller
     public function update(OrderStatusRequest $request, Order $order)
     {
         try {
-            $this->orderService->changeStatus($order, $request);
+            $sendEmail = $request->has('send_email');
+        $this->orderService->changeStatus($order, $request, false, $sendEmail);
             return back()->with('success', 'Order status updated successfully.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -87,14 +88,24 @@ class OrderController extends Controller
     {
         $request->validate(['message' => 'required|string|max:2000']);
 
-        $order->messages()->create([
+        $message = OrderMessage::create([
+            'order_id'    => $order->id,
             'user_id'     => auth()->id(),
+            'message'     => $request->message,
             'sender_type' => 'admin',
-            'message'     => $request->input('message'),
-            'is_read'     => false,
         ]);
 
-        return back()->with('success', 'Reply sent to customer.');
+        if ($request->has('send_email') && $order->user && $order->user->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($order->user->email)->send(
+                    new \App\Mail\OrderReplyMail($order, $request->message)
+                );
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send order reply email: " . $e->getMessage());
+            }
+        }
+
+        return redirect()->back()->with('success', 'Reply sent successfully.');
     }
 
     public function updatePaymentStatus(PaymentStatusRequest $request, Order $order)
