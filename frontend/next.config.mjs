@@ -16,9 +16,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    esmExternals: false,
-  },
+  transpilePackages: ['html-react-parser', 'html-dom-parser'],
 
   images: {
     remotePatterns: [
