@@ -62,8 +62,8 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Status</label>
                     <select name="status" class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2">
-                        <option value="1" {{ old('status', $customer->status) == 1 ? 'selected' : '' }}>Active</option>
-                        <option value="0" {{ old('status', $customer->status) != 1 ? 'selected' : '' }}>Inactive</option>
+                        <option value="5" {{ old('status', $customer->status) == 5 ? 'selected' : '' }}>Active</option>
+                        <option value="10" {{ old('status', $customer->status) == 10 ? 'selected' : '' }}>Inactive</option>
                     </select>
                     @error('status')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>

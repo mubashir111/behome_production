@@ -85,8 +85,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Status: 
-                <span class="ml-1 font-semibold {{ $admin->status == 1 ? 'text-emerald-500' : 'text-slate-400' }}">
-                    {{ $admin->status == 1 ? 'Active' : 'Inactive' }}
+                <span class="ml-1 font-semibold {{ $admin->status == 5 ? 'text-emerald-500' : 'text-slate-400' }}">
+                    {{ $admin->status == 5 ? 'Active' : 'Inactive' }}
                 </span>
             </div>
         </div>

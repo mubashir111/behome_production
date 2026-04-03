@@ -76,8 +76,8 @@
             <div class="admin-form-field">
                 <label>Account Status</label>
                 <select name="status" required>
-                    <option value="1" {{ old('status', $user->status) == '1' ? 'selected' : '' }}>Active</option>
-                    <option value="0" {{ old('status', $user->status) == '0' ? 'selected' : '' }}>Inactive</option>
+                    <option value="5" {{ old('status', $user->status) == '5' ? 'selected' : '' }}>Active</option>
+                    <option value="10" {{ old('status', $user->status) == '10' ? 'selected' : '' }}>Inactive</option>
                 </select>
             </div>
         </div>

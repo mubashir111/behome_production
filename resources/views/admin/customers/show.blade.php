@@ -39,7 +39,7 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div class="p-3 bg-slate-50 rounded-lg">
                                 <p class="text-xs text-slate-500 font-semibold">Status</p>
-                                @if($customer->status == 1)
+                                @if($customer->status == 5)
                                     <span class="inline-block mt-1 px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded">Active</span>
                                 @else
                                     <span class="inline-block mt-1 px-2 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded">Inactive</span>

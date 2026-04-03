@@ -34,8 +34,8 @@
                 <div class="admin-form-field">
                     <label class="admin-form-label">Status</label>
                     <select name="status" class="admin-form-input">
-                        <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>Active</option>
-                        <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>Inactive</option>
+                        <option value="5" {{ old('status', 5) == 5 ? 'selected' : '' }}>Active</option>
+                        <option value="10" {{ old('status') == 10 ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
                 <div class="admin-form-actions">
@@ -65,7 +65,7 @@
                             <td class="admin-table-cell text-sm text-slate-700">{{ $tax->name }}</td>
                             <td class="admin-table-cell text-sm text-slate-600">{{ $tax->code }}</td>
                             <td class="admin-table-cell text-sm text-slate-700">{{ number_format($tax->tax_rate, 2) }}%</td>
-                            <td class="admin-table-cell">@if($tax->status == 1)<span class="px-2 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded">Active</span>@else<span class="px-2 py-1 text-xs font-semibold text-rose-700 bg-rose-50 rounded">Inactive</span>@endif</td>
+                            <td class="admin-table-cell">@if($tax->status == 5)<span class="px-2 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded">Active</span>@else<span class="px-2 py-1 text-xs font-semibold text-rose-700 bg-rose-50 rounded">Inactive</span>@endif</td>
                             <td class="admin-table-actions space-x-1">
                                 <a href="#" class="admin-btn-secondary py-2 px-3 text-xs">Edit</a>
                                 <button type="button" onclick="confirmSubmit('del-tax-{{ $tax->id }}', { title: 'Delete Tax Rule', message: 'Are you sure you want to delete this tax rule? This action cannot be undone.', confirmText: 'Yes, Delete', type: 'danger' })" class="admin-btn-secondary py-2 px-3 text-xs text-rose-600 hover:bg-rose-50">Delete</button>

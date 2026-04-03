@@ -68,7 +68,7 @@
                         </span>
                     </td>
                     <td class="admin-table-cell hidden sm:table-cell">
-                        @if($customer->status == 1)
+                        @if($customer->status == 5)
                             <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-lg text-emerald-700 bg-emerald-50">Active</span>
                         @else
                             <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-700 bg-rose-50">Inactive</span>

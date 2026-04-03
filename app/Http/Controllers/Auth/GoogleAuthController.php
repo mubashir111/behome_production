@@ -69,15 +69,13 @@ class GoogleAuthController extends Controller
                 ]);
                 $user->assignRole(EnumRole::CUSTOMER);
             } else {
-                // Update google_id if not set
-                if (!$user->google_id) {
-                    $user->google_id = $googleId;
-                    $user->save();
+                // Update google_id and activate if not set
+                $user->google_id = $user->google_id ?: $googleId;
+                $user->status = Status::ACTIVE;
+                if (!$user->email_verified_at) {
+                    $user->email_verified_at = Carbon::now();
                 }
-
-                if ($user->status !== Status::ACTIVE) {
-                    return new JsonResponse(['status' => false, 'message' => 'Your account is inactive.'], 403);
-                }
+                $user->save();
             }
 
             $token = $user->createToken('google_auth')->plainTextToken;

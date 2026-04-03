@@ -43,8 +43,8 @@
             <div class="admin-form-field">
                 <label class="admin-form-label">Status <span class="text-rose-500">*</span></label>
                 <select name="status" class="admin-form-input" required>
-                    <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>Active</option>
-                    <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>Inactive</option>
+                    <option value="5" {{ old('status', 5) == 5 ? 'selected' : '' }}>Active</option>
+                    <option value="10" {{ old('status') == 10 ? 'selected' : '' }}>Inactive</option>
                 </select>
             </div>
             <div class="admin-form-field flex items-end">
@@ -77,8 +77,8 @@
                         <td class="admin-table-cell text-sm text-slate-500">{{ $area->state ?: '—' }}</td>
                         <td class="admin-table-cell text-sm text-slate-500">{{ $area->city ?: '—' }}</td>
                         <td class="admin-table-cell text-sm font-medium text-slate-800">{{ $currencySymbol }}{{ number_format($area->shipping_cost, 2) }}</td>
-                        <td class="admin-table-cell">
-                            @if($area->status == 1)
+                         <td class="admin-table-cell">
+                            @if($area->status == 5)
                                 <span class="px-2 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded">Active</span>
                             @else
                                 <span class="px-2 py-1 text-xs font-semibold text-rose-700 bg-rose-50 rounded">Inactive</span>
@@ -88,9 +88,9 @@
                             <button type="button" onclick="toggleEditRow({{ $area->id }})" class="admin-btn-secondary py-2 px-3 text-xs">Edit</button>
                             <form action="{{ route('admin.shipping.order-areas.update', $area) }}" method="POST" class="inline">
                                 @csrf @method('PUT')
-                                <input type="hidden" name="status" value="{{ $area->status ? 0 : 1 }}">
+                                <input type="hidden" name="status" value="{{ $area->status == 5 ? 10 : 5 }}">
                                 <button type="submit" class="admin-btn-secondary py-2 px-3 text-xs">
-                                    {{ $area->status ? 'Deactivate' : 'Activate' }}
+                                    {{ $area->status == 5 ? 'Deactivate' : 'Activate' }}
                                 </button>
                             </form>
                             <button type="button" onclick="confirmSubmit('del-area-{{ $area->id }}', { title: 'Delete Delivery Area', message: 'Are you sure you want to delete this delivery area?', confirmText: 'Yes, Delete', type: 'danger' })" class="admin-btn-secondary py-2 px-3 text-xs text-rose-600 hover:bg-rose-50">Delete</button>
@@ -127,8 +127,8 @@
                                 <div>
                                     <label class="block text-xs font-medium text-slate-600 mb-1">Status *</label>
                                     <select name="status" class="admin-form-input text-sm">
-                                        <option value="1" {{ $area->status == 1 ? 'selected' : '' }}>Active</option>
-                                        <option value="0" {{ $area->status == 0 ? 'selected' : '' }}>Inactive</option>
+                                        <option value="5" {{ $area->status == 5 ? 'selected' : '' }}>Active</option>
+                                        <option value="10" {{ $area->status == 10 ? 'selected' : '' }}>Inactive</option>
                                     </select>
                                 </div>
                                 <div class="flex gap-2">

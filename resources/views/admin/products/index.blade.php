@@ -128,7 +128,7 @@
                         <span class="text-sm font-bold text-slate-900">${{ number_format($product->selling_price, 2) }}</span>
                     </td>
                     <td class="px-6 py-4">
-                        @if($product->status == 1)
+                        @if($product->status == 5)
                             <span class="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg">Active</span>
                         @else
                             <span class="px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 rounded-lg">Inactive</span>
