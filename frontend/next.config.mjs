@@ -53,6 +53,10 @@ const nextConfig = {
         source: '/storage/:path*',
         destination: `${BACKEND_URL}/storage/:path*`,
       },
+      {
+        source: '/images/:path*',
+        destination: `${BACKEND_URL}/images/:path*`,
+      },
     ];
   },
 };

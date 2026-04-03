@@ -133,6 +133,18 @@ class ProductController extends Controller
                 return response(['status' => false, 'message' => 'No image uploaded'], 400);
             }
 
+            // Delete old image if provided and valid
+            if ($request->has('old_path') && !empty($request->old_path)) {
+                $oldPath = $request->old_path;
+                // Security check: ensure the path is within the blocks directory
+                if (str_starts_with($oldPath, '/images/products/blocks/') && !str_contains($oldPath, '..')) {
+                    $fullOldPath = public_path($oldPath);
+                    if (file_exists($fullOldPath)) {
+                        @unlink($fullOldPath);
+                    }
+                }
+            }
+
             $image = $request->file('image');
             $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             

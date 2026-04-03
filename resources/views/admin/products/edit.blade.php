@@ -1113,6 +1113,19 @@
                         <div class="space-y-3">
                             <div>
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Image Selection</label>
+                                ${block.image ? `
+                                <div class="mb-3 relative group">
+                                    <img src="${escapeHtml(block.image)}" class="w-full h-40 object-cover rounded-lg border border-slate-200 shadow-sm" alt="Preview">
+                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                        <span class="text-white text-[10px] font-bold uppercase tracking-wider">Current Image</span>
+                                    </div>
+                                </div>
+                                ` : `
+                                <div class="mb-3 w-full h-40 bg-slate-50 border border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center text-slate-400">
+                                    <svg class="w-8 h-8 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>
+                                    <span class="text-[10px] font-medium uppercase tracking-tight">No image selected</span>
+                                </div>
+                                `}
                                 <div class="flex items-center gap-2">
                                     <input type="text" id="img_${index}" value="${escapeHtml(block.image || '')}" onchange="updateBlockField(${index}, 'image', this.value)" 
                                            class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-md text-sm font-mono" placeholder="/path/to/img.webp">
@@ -1149,16 +1162,26 @@
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Banner Image Selection</label>
+                            ${block.image ? `
+                            <div class="mb-3 relative group">
+                                <img src="${escapeHtml(block.image)}" class="w-full h-32 object-cover rounded-lg border border-slate-200 shadow-sm" alt="Banner Preview">
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                    <span class="text-white text-[10px] font-bold uppercase tracking-wider">Banner Image</span>
+                                </div>
+                            </div>
+                            ` : `
+                            <div class="mb-3 p-4 bg-slate-900 rounded-lg text-center h-32 flex flex-col items-center justify-center">
+                                <span class="text-[10px] font-black text-white/10 tracking-[10px] uppercase mb-2">MODERN</span>
+                                <span class="text-white/40 text-[9px] uppercase font-bold tracking-widest">No Banner Selected</span>
+                            </div>
+                            `}
                             <div class="flex items-center gap-2">
                                 <input type="text" id="img_${index}" value="${escapeHtml(block.image || '')}" onchange="updateBlockField(${index}, 'image', this.value)" 
                                        class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-md text-sm font-mono">
                                 <label class="px-3 py-2 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-md text-[10px] font-bold cursor-pointer hover:bg-indigo-100 transition-colors whitespace-nowrap">
                                     <input type="file" class="hidden" accept="image/*" onchange="startCropping(${index}, 'image', this)">
-                                    Crop
+                                    Crop & Upload
                                 </label>
-                            </div>
-                            <div class="mt-4 p-4 bg-slate-900 rounded-lg text-center">
-                                <span class="text-[10px] font-black text-white/5 tracking-[10px] uppercase">MODERN</span>
                             </div>
                         </div>
                     </div>
@@ -1171,7 +1194,13 @@
                             const item = (block.items || [])[i] || {title:'', text:'', image:''};
                             return `
                             <div class="p-3 bg-slate-50 border border-slate-100 rounded-lg space-y-2">
-                                ${item.image ? `<img src="${escapeHtml(item.image)}" alt="" class="w-full h-16 object-cover rounded mb-1">` : ''}
+                                ${item.image ? `
+                                    <img src="${escapeHtml(item.image)}" alt="" class="w-full h-20 object-cover rounded-lg border border-slate-200 shadow-sm mb-1">
+                                ` : `
+                                    <div class="w-full h-20 bg-slate-100/50 border border-dashed border-slate-200 rounded-lg flex items-center justify-center mb-1">
+                                        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>
+                                    </div>
+                                `}
                                 <div class="flex items-center gap-1">
                                     <label class="flex-1 p-1.5 px-3 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded text-[10px] font-bold cursor-pointer hover:bg-indigo-100 transition-colors text-center">
                                         <input type="file" class="hidden" accept="image/*" onchange="startCropping(${index}, 'image', this, ${i})">
@@ -1450,6 +1479,25 @@
                 return;
             }
 
+            // For rich content blocks, identify the old image to delete it on the server
+            if (typeof ctx.context === 'number') {
+                let oldPath = '';
+                const block = blocksData[ctx.context];
+                if (ctx.itemIndex !== null) {
+                    // Icon Grid item
+                    if (block.items && block.items[ctx.itemIndex]) {
+                        oldPath = block.items[ctx.itemIndex][ctx.field || 'image'];
+                    }
+                } else {
+                    // Feature Split or Hero Banner
+                    oldPath = block[ctx.field || 'image'];
+                }
+                
+                if (oldPath) {
+                    formData.append('old_path', oldPath);
+                }
+            }
+
             let url = `/admin/products/{{ $product->id }}/upload-block-image`;
 
             if (ctx.context === 'gallery_add') {
@@ -1476,14 +1524,14 @@
             .then(res => {
                 if (ctx.context === 'gallery_add' || ctx.context === 'gallery_replace') {
                     if (res.status) {
-                        window.location.reload();
+                        showToast('Gallery updated successfully', 'success');
+                        setTimeout(() => window.location.reload(), 500);
                     } else {
-                        alert('Upload failed: ' + (res.message || 'Unknown error'));
+                        showToast(res.message || 'Upload failed', 'error');
                     }
                     return;
                 }
 
-                if (res.status && res.data.url) {
                     if (ctx.itemIndex !== null) {
                         updateBlockGridItem(ctx.context, ctx.itemIndex, ctx.field, res.data.url);
                     } else {
@@ -1491,13 +1539,14 @@
                     }
                     renderBlocks();
                     closeCropModal();
+                    showToast('Image uploaded successfully', 'success');
                 } else {
-                    alert('Upload failed: ' + (res.message || 'Unknown error'));
+                    showToast(res.message || 'Upload failed', 'error');
                 }
             })
             .catch(err => {
                 console.error('Upload error:', err);
-                alert(`Upload error: ${err.message}. Please refresh the page and try again.`);
+                showToast(`Upload error: ${err.message}`, 'error');
             })
             .finally(() => {
                 cropSpinner.classList.add('hidden');

@@ -7,7 +7,9 @@ import Image from 'next/image';
 function getImageUrl(src?: string): string {
     if (!src) return '';
     if (src.startsWith('http')) return src;
-    return src.startsWith('/') ? src : `/${src}`;
+    let url = src.startsWith('/') ? src : `/${src}`;
+    // Ensure we don't have double slashes at the start if src was something like "//images/..."
+    return url.replace(/\/+/g, '/');
 }
 
 interface Block {
