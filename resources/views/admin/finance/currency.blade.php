@@ -97,22 +97,24 @@
                             <td class="admin-table-cell text-sm text-slate-600">{{ $currency->symbol }}</td>
                             <td class="admin-table-cell text-sm text-slate-700">{{ number_format($currency->exchange_rate, 6) }}</td>
                             <td class="admin-table-cell">@if($currency->is_cryptocurrency) <span class="px-2 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded">Yes</span> @else <span class="px-2 py-1 text-xs font-semibold text-slate-500 bg-slate-100 rounded">No</span> @endif</td>
-                            <td class="admin-table-actions space-x-1">
-                                <a href="{{ route('admin.finance.currency.edit', $currency) }}" class="admin-btn-secondary py-2 px-3 text-xs">Edit</a>
-                                @if($currency->id !== $defaultCurrencyId)
-                                    <form action="{{ route('admin.finance.currency.default', $currency) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="admin-btn-secondary py-2 px-3 text-xs text-indigo-700 hover:bg-indigo-50">Set Default</button>
+                            <td class="admin-table-actions">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('admin.finance.currency.edit', $currency) }}" class="admin-btn-secondary py-2 px-3 text-xs">Edit</a>
+                                    @if($currency->id !== $defaultCurrencyId)
+                                        <form action="{{ route('admin.finance.currency.default', $currency) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="admin-btn-secondary py-2 px-3 text-xs text-indigo-700 hover:bg-indigo-50">Set Default</button>
+                                        </form>
+                                    @endif
+                                    @if($currency->id !== $defaultCurrencyId)
+                                    <button type="button" onclick="confirmSubmit('del-currency-{{ $currency->id }}', { title: 'Delete Currency', message: 'Are you sure you want to delete this currency? This action cannot be undone.', confirmText: 'Yes, Delete', type: 'danger' })" class="admin-btn-secondary py-2 px-3 text-xs text-rose-600 hover:bg-rose-50" title="Delete this currency">Delete</button>
+                                    <form id="del-currency-{{ $currency->id }}" action="{{ route('admin.finance.currency.destroy', $currency) }}" method="POST" style="display:none;">
+                                        @csrf @method('DELETE')
                                     </form>
-                                @endif
-                                @if($currency->id !== $defaultCurrencyId)
-                                <button type="button" onclick="confirmSubmit('del-currency-{{ $currency->id }}', { title: 'Delete Currency', message: 'Are you sure you want to delete this currency? This action cannot be undone.', confirmText: 'Yes, Delete', type: 'danger' })" class="admin-btn-secondary py-2 px-3 text-xs text-rose-600 hover:bg-rose-50" title="Delete this currency">Delete</button>
-                                <form id="del-currency-{{ $currency->id }}" action="{{ route('admin.finance.currency.destroy', $currency) }}" method="POST" style="display:none;">
-                                    @csrf @method('DELETE')
-                                </form>
-                                @else
-                                <button type="button" disabled class="admin-btn-secondary py-2 px-3 text-xs text-rose-600 opacity-50 cursor-not-allowed" title="Default currency cannot be deleted">Delete</button>
-                                @endif
+                                    @else
+                                    <button type="button" disabled class="admin-btn-secondary py-2 px-3 text-xs text-rose-600 opacity-50 cursor-not-allowed" title="Default currency cannot be deleted">Delete</button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @empty
