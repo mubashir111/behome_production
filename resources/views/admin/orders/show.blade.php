@@ -61,7 +61,10 @@
                                 @endif
                             </div>
                             <div class="flex-1">
-                                <p class="font-semibold text-slate-900">{{ $item->product_name }}</p>
+                                <p class="font-semibold text-slate-900">{{ $item->product?->name ?? 'N/A' }}</p>
+                                @if($item->variation_names)
+                                    <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-tight">{{ $item->variation_names }}</p>
+                                @endif
                                 <p class="text-sm text-slate-600">{{ $currencySymbol }}{{ number_format($item->price, 2) }} × {{ abs($item->quantity) }}</p>
                             </div>
                         </div>

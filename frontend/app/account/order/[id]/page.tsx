@@ -224,7 +224,7 @@ export default function OrderDetail() {
 
     const statusColor = STATUS_COLORS[order.status as number] || '#888';
     const canCancel = (order.status === 1 || order.status === 5) && !order.cancellation_requested;
-    const canReturn = order.status === 10 && !existingReturn;
+    const canReturn = order.status === 10 && !existingReturn && order.order_products?.some((item: any) => item.is_refundable);
     const returnSubmitted = !!existingReturn;
     const cancellationPending = !!order.cancellation_requested;
 
@@ -594,7 +594,7 @@ export default function OrderDetail() {
                                 </div>
 
                                 {/* Return Policy Info */}
-                                {order.status === 10 && !existingReturn && (
+                                {canReturn && (
                                     <div className="ui-note-block" style={{ background: 'rgba(251,153,28,0.06)', border: '1px solid rgba(251,153,28,0.15)', borderRadius: 8, padding: '12px 14px' }}>
                                         <p className="text-white opacity-6 fs-12 mb-5px fw-600">Return Policy</p>
                                         <p className="text-white opacity-5 fs-12 mb-0 lh-20">You may request a return or refund within 7 days of delivery for size, colour, or defect issues.</p>
@@ -621,7 +621,7 @@ export default function OrderDetail() {
                     </div>
 
                     {/* ── Order Actions ─────────────────────────────────────── */}
-                    {(canCancel || canReturn || returnSubmitted || cancellationPending) && (
+                    {(canCancel || returnSubmitted || cancellationPending) && (
                         <div className="row mt-30px">
                             <div className="col-12">
                                 <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '24px 28px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
@@ -653,16 +653,7 @@ export default function OrderDetail() {
                                                 Request Pending
                                             </span>
                                         )}
-                                        {canReturn && (
-                                            <button
-                                                onClick={() => setShowReturnModal(true)}
-                                                className="btn btn-medium btn-round-edge px-25px text-nowrap"
-                                                style={{ background: 'rgba(251,153,28,0.12)', border: '1px solid rgba(251,153,28,0.3)', color: '#FB991C', fontSize: 14 }}
-                                            >
-                                                <i className="feather icon-feather-rotate-ccw me-2"></i>
-                                                Return / Refund
-                                            </button>
-                                        )}
+                                        {/* Return / Refund button removed from footer as it is now in the sidebar */}
                                         {returnSubmitted && (
                                             <span className="badge px-15px py-10px fs-13 fw-600" style={{ background: 'rgba(251,153,28,0.12)', color: '#FB991C', border: '1px solid rgba(251,153,28,0.3)', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                                                 <i className="feather icon-feather-check-circle" style={{ fontSize: 14 }}></i>

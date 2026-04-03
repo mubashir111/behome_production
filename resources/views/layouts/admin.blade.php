@@ -119,7 +119,7 @@
             background: #ef4444;
             color: white;
             border-radius: 100px;
-            padding: 1px 7px;
+            padding: 1px 10px;
         }
 
         @keyframes pulse-badge {

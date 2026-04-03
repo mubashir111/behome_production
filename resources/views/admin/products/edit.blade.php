@@ -523,6 +523,26 @@
                             </div>
                         </div>
 
+                        {{-- Refundable --}}
+                        <div class="status-toggle-card" onclick="toggleSwitch('refundable_toggle')">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:34px;height:34px;border-radius:10px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <svg class="w-4 h-4" style="color:#8b5cf6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                                </div>
+                                <div>
+                                    <div style="font-size:13px;font-weight:600;color:#1e293b;">Refundable</div>
+                                    <div style="font-size:11px;color:#94a3b8;">Is this item refundable?</div>
+                                </div>
+                            </div>
+                            <div style="position:relative;pointer-events:none;">
+                                <input type="hidden" name="refundable" value="10">
+                                <input type="checkbox" name="refundable" value="5" {{ $p_refundable == 5 ? 'checked' : '' }} class="sr-only" id="refundable_toggle">
+                                <div id="refundable_toggle_track" style="display:block;width:44px;height:24px;{{ $p_refundable == 5 ? 'background:#6366f1;' : 'background:#e2e8f0;' }}border-radius:12px;position:relative;transition:background 0.2s;">
+                                    <span id="refundable_toggle_knob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);{{ $p_refundable == 5 ? 'transform:translateX(20px);' : '' }}"></span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
