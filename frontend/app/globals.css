@@ -1559,3 +1559,76 @@ li:hover .item-qty {
   cursor: pointer !important;
   margin-top: 8px !important;
 }
+
+/* ── Product Share Menu ──────────────────────────────────────────────────────── */
+.share-menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    width: 200px;
+    background: rgba(15, 15, 15, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.share-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.share-menu-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.share-menu-item i {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+.share-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+}
+
+/* Animations from globals.css or tailwind */
+.animate-in {
+    animation-duration: 0.2s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation-name: fadeIn;
+}
+
+@keyframes slideInFromTop {
+    from { transform: translateY(-8px); }
+    to { transform: translateY(0); }
+}
+
+.slide-in-from-top-2 {
+    animation-name: slideInFromTop;
+}

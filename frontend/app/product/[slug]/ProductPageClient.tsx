@@ -120,6 +120,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const [activeTab, setActiveTab] = useState<'description' | 'reviews' | 'additional_info' | 'shipping'>('description');
     const [hoverStar, setHoverStar] = useState(0);
     const [showReviews, setShowReviews] = useState(true);
+    const [showShareMenu, setShowShareMenu] = useState(false);
 
     // ── Fetch product & related ──────────────────────────────────────────────
     useEffect(() => {
@@ -346,26 +347,28 @@ export default function ProductPageClient({ params }: { params: { slug: string }
         await addToCart(true);
     };
 
-    const shareProduct = async () => {
-        const shareData = {
-            title: product.name,
-            text: shortDescription || product.name,
-            url: typeof window !== 'undefined' ? window.location.href : '',
-        };
+    const shareToWhatsApp = () => {
+        const url = typeof window !== 'undefined' ? window.location.href : '';
+        const text = encodeURIComponent(`Check out this ${product?.name} at Behome! ${url}`);
+        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        setShowShareMenu(false);
+    };
 
+    const shareToFacebook = () => {
+        const url = typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : '';
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        setShowShareMenu(false);
+    };
+
+    const copyToClipboard = async () => {
+        const url = typeof window !== 'undefined' ? window.location.href : '';
         try {
-            if (navigator.share) {
-                await navigator.share(shareData);
-                return;
-            }
-
-            if (shareData.url) {
-                await navigator.clipboard.writeText(shareData.url);
-                notify('Product link copied to clipboard', 'success');
-            }
+            await navigator.clipboard.writeText(url);
+            notify('Product link copied to clipboard! ✓', 'success');
         } catch {
-            // ignore cancelled shares
+            notify('Failed to copy link', 'error');
         }
+        setShowShareMenu(false);
     };
 
     // ── Wishlist toggle ──────────────────────────────────────────────────────
@@ -540,19 +543,50 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
                         <div className="col-xl-5 col-lg-5">
                             <div className="product-info-panel">
-                                {product.brand?.name && (
-                                    <div className="d-flex align-items-center justify-content-between gap-3 mb-10px">
+                                <div className="d-flex align-items-center justify-content-between gap-3 mb-15px">
+                                    {product.brand?.name ? (
                                         <span className="fs-13 fw-700 text-uppercase ls-2px product-brand-label">{product.brand.name}</span>
+                                    ) : (
+                                        <span className="fs-13 fw-700 text-uppercase ls-2px product-brand-label">Product</span>
+                                    )}
+                                    
+                                    <div className="position-relative">
                                         <button
                                             type="button"
-                                            onClick={shareProduct}
-                                            className="bg-transparent border-0 p-0 fs-13 fw-600 product-brand-label"
+                                            onClick={() => setShowShareMenu(!showShareMenu)}
+                                            className="bg-transparent border-0 p-0 fs-13 fw-600 product-brand-label hover-text-white transition-all d-flex align-items-center gap-1"
+                                            title="Share this product"
                                         >
-                                            <i className="feather icon-feather-share-2 me-5px" />
-                                            Share
+                                            <i className="feather icon-feather-share-2" />
+                                            <span>Share</span>
                                         </button>
+
+                                        {showShareMenu && (
+                                            <>
+                                                <div className="share-menu-backdrop" onClick={() => setShowShareMenu(false)} />
+                                                <div className="share-menu-dropdown animate-in fade-in slide-in-from-top-2 duration-200">
+                                                    <div className="p-3 border-bottom border-white/5">
+                                                        <span className="fs-12 fw-700 text-white/40 text-uppercase ls-1px">Share via</span>
+                                                    </div>
+                                                    <div className="d-flex flex-column">
+                                                        <button onClick={shareToWhatsApp} className="share-menu-item">
+                                                            <i className="bi bi-whatsapp" style={{ color: '#25D366' }} />
+                                                            <span>WhatsApp</span>
+                                                        </button>
+                                                        <button onClick={shareToFacebook} className="share-menu-item">
+                                                            <i className="bi bi-facebook" style={{ color: '#1877F2' }} />
+                                                            <span>Facebook</span>
+                                                        </button>
+                                                        <button onClick={copyToClipboard} className="share-menu-item border-top border-white/5">
+                                                            <i className="feather icon-feather-copy" />
+                                                            <span>Copy Link</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
-                                )}
+                                </div>
 
                                 <h2 className="text-white fw-700 mb-12px product-title">
                                     {product.name}

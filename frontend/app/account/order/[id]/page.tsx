@@ -132,7 +132,7 @@ export default function OrderDetail() {
                     // Refresh messages so the request shows in the thread
                     if (showMessages) fetchMessages();
                 } else {
-                    showToast('Your order has been cancelled. A refund will be issued to your original payment method within 5–7 days.', 'success');
+                    showToast('Cancelled successfully', 'success');
                 }
                 fetchOrder();
             } else {
@@ -247,7 +247,7 @@ export default function OrderDetail() {
                                             <p className="mb-0 fs-13" style={{ color: 'rgba(255,255,255,0.55)' }}>Thank you for your order. We'll send a confirmation email shortly.</p>
                                         </div>
                                     </div>
-                                    <span className="px-12px py-6px border-radius-4px fs-12 fw-600 text-nowrap" style={{ background: 'rgba(16,185,129,0.18)', color: '#34d399' }}>
+                                    <span className="px-16px py-8px border-radius-4px fs-12 fw-600 text-nowrap" style={{ background: 'rgba(16,185,129,0.18)', color: '#34d399', padding: '10px 16px' }}>
                                         Confirmed
                                     </span>
                                 </div>
