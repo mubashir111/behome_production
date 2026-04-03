@@ -860,6 +860,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/orders', [ApiOrderController::class, 'index']);
         Route::post('/orders', [ApiOrderController::class, 'store']);
         Route::get('/orders/{id}', [ApiOrderController::class, 'show']);
+        Route::post('/orders/{id}/cancel', [ApiOrderController::class, 'cancel']);
         Route::get('/orders/{id}/messages', [ApiOrderController::class, 'messages']);
         Route::post('/orders/{id}/messages', [ApiOrderController::class, 'storeMessage']);
 

@@ -95,7 +95,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
-    const { showToast } = useToast();
+    const { showToast, showCartToast } = useToast();
     const { formatAmount } = useCurrency();
     const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -322,7 +322,11 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                 }),
             });
             if (res.status) {
-                notify(`${product.name} added to cart!`, 'success');
+                showCartToast({
+                    name: product.name,
+                    image: activeVariation?.media?.[0]?.url || product.image || product.cover,
+                    price: displayPrice
+                });
                 window.dispatchEvent(new CustomEvent('cart:updated', {}));
                 if (redirectToCart) {
                     window.location.href = '/cart';

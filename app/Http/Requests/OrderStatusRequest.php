@@ -27,6 +27,7 @@ class OrderStatusRequest extends FormRequest
 
         return [
             'status' => ['required', 'numeric'],
+            'reason' => ['nullable', 'string', 'max:700'],
         ];
     }
 }

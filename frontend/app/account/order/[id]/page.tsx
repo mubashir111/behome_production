@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { useToast } from '@/components/ToastProvider';
 
 const STATUS_COLORS: Record<number, string> = {
     1: '#f59e0b',
@@ -25,6 +26,7 @@ export default function OrderDetail() {
     const params = useParams();
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { showToast } = useToast();
     const id = params.id as string;
     const [isNewOrder, setIsNewOrder] = useState(false);
 
@@ -44,7 +46,6 @@ export default function OrderDetail() {
     const [cancelling, setCancelling] = useState(false);
     const [cancelReason, setCancelReason] = useState('');
     const [showCancelModal, setShowCancelModal] = useState(false);
-    const [actionMsg, setActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // Return/Refund
     const [showReturnModal, setShowReturnModal] = useState(false);
@@ -126,19 +127,19 @@ export default function OrderDetail() {
             });
             if (res.status) {
                 setShowCancelModal(false);
-                if (res.type === 'requested') {
-                    setActionMsg({ type: 'success', text: 'Cancellation request submitted. Our team will review and respond within 24 hours.' });
+                if (res.data?.type === 'requested') {
+                    showToast('Cancellation request submitted. Our team will review and respond within 24 hours.', 'success');
                     // Refresh messages so the request shows in the thread
                     if (showMessages) fetchMessages();
                 } else {
-                    setActionMsg({ type: 'success', text: 'Your order has been cancelled. A refund will be issued to your original payment method within 5–7 days.' });
+                    showToast('Your order has been cancelled. A refund will be issued to your original payment method within 5–7 days.', 'success');
                 }
                 fetchOrder();
             } else {
-                setActionMsg({ type: 'error', text: res.message || 'Failed to cancel order.' });
+                showToast(res.message || 'Failed to cancel order.', 'error');
             }
         } catch (e: any) {
-            setActionMsg({ type: 'error', text: e.message || 'Failed to cancel order.' });
+            showToast(e.message || 'Failed to cancel order.', 'error');
         } finally {
             setCancelling(false);
         }
@@ -177,14 +178,14 @@ export default function OrderDetail() {
             });
 
             if (res.status || res.data) {
-                setActionMsg({ type: 'success', text: 'Return request submitted. Once approved, your refund will be issued to your original payment method within 5–7 days.' });
+                showToast('Return request submitted. Once approved, your refund will be issued to your original payment method within 5–7 days.', 'success');
                 setShowReturnModal(false);
                 fetchOrder();
             } else {
-                setActionMsg({ type: 'error', text: res.message || 'Failed to submit return request.' });
+                showToast(res.message || 'Failed to submit return request.', 'error');
             }
         } catch (e: any) {
-            setActionMsg({ type: 'error', text: e.message || 'Failed to submit return request.' });
+            showToast(e.message || 'Failed to submit return request.', 'error');
         } finally {
             setSubmittingReturn(false);
         }
@@ -222,9 +223,10 @@ export default function OrderDetail() {
     );
 
     const statusColor = STATUS_COLORS[order.status as number] || '#888';
-    const canCancel = order.status === 1 || order.status === 5;
+    const canCancel = (order.status === 1 || order.status === 5) && !order.cancellation_requested;
     const canReturn = order.status === 10 && !existingReturn;
-    const returnSubmitted = order.status === 10 && existingReturn;
+    const returnSubmitted = !!existingReturn;
+    const cancellationPending = !!order.cancellation_requested;
 
     return (
         <main className="no-layout-pad page-top-100">
@@ -253,21 +255,6 @@ export default function OrderDetail() {
                         </div>
                     )}
 
-                    {/* Action Feedback */}
-                    {actionMsg && (
-                        <div className="row mb-20px">
-                            <div className="col-12">
-                                <div className="d-flex align-items-center justify-content-between gap-15px p-20px border-radius-6px"
-                                    style={{ background: actionMsg.type === 'success' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)', border: `1px solid ${actionMsg.type === 'success' ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
-                                    <div className="d-flex align-items-center gap-12px">
-                                        <i className={`bi ${actionMsg.type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-18`} style={{ color: actionMsg.type === 'success' ? '#10b981' : '#ef4444' }}></i>
-                                        <p className="text-white fs-14 mb-0">{actionMsg.text}</p>
-                                    </div>
-                                    <button onClick={() => setActionMsg(null)} className="btn-close btn-close-white opacity-5" style={{ fontSize: 10 }}></button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Header */}
                     <div className="row mb-50px">
@@ -378,15 +365,15 @@ export default function OrderDetail() {
                             {/* Return Status (if submitted) */}
                             {existingReturn && (() => {
                                 // Return status: 5=Pending, 10=Accepted, 15=Rejected
-                                const isPending  = existingReturn.status === 5;
+                                const isPending = existingReturn.status === 5;
                                 const isAccepted = existingReturn.status === 10;
                                 const isRejected = existingReturn.status === 15;
 
                                 // Refund status (only active when accepted): 5=AwaitingItem, 10=ItemReceived, 15=RefundIssued
-                                const rs              = existingReturn.refund_status;
-                                const isAwaiting      = rs === 5;
-                                const isItemReceived  = rs === 10;
-                                const isRefunded      = rs === 15;
+                                const rs = existingReturn.refund_status;
+                                const isAwaiting = rs === 5;
+                                const isItemReceived = rs === 10;
+                                const isRefunded = rs === 15;
 
                                 const refundAmt = existingReturn.total_return_price
                                     ? parseFloat(existingReturn.total_return_price).toFixed(2)
@@ -394,23 +381,23 @@ export default function OrderDetail() {
 
                                 // 4 pipeline steps for the progress bar
                                 const steps = [
-                                    { label: 'Request Submitted',  done: true,                                   rejected: false },
-                                    { label: 'Request Accepted',   done: isAccepted || isAwaiting || isItemReceived || isRefunded, rejected: isRejected },
-                                    { label: 'Item Received',      done: isItemReceived || isRefunded,            rejected: false, skipped: isRejected },
-                                    { label: 'Refund Issued',      done: isRefunded,                             rejected: false, skipped: isRejected },
+                                    { label: 'Request Submitted', done: true, rejected: false },
+                                    { label: 'Request Accepted', done: isAccepted || isAwaiting || isItemReceived || isRefunded, rejected: isRejected },
+                                    { label: 'Item Received', done: isItemReceived || isRefunded, rejected: false, skipped: isRejected },
+                                    { label: 'Refund Issued', done: isRefunded, rejected: false, skipped: isRejected },
                                 ];
 
                                 return (
-                                    <div className="rounded-12px mb-25px overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }}>
+                                    <div className="rounded-12px mb-25px overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', paddingTop: '30px', paddingLeft: '30px', paddingRight: '30px', paddingBottom: '30px' }}>
                                         {/* Header */}
-                                        <div className="px-25px py-18px d-flex align-items-center justify-content-between flex-wrap gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                                        <div className="px-30px py-20px d-flex align-items-center justify-content-between flex-wrap gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', marginBottom: '20px' }}>
                                             <div className="d-flex align-items-center gap-10px">
                                                 <i className="feather icon-feather-rotate-ccw fs-16 text-white opacity-7"></i>
                                                 <span className="text-white fw-600 fs-16">Return / Refund Request</span>
                                             </div>
                                             <div className="d-flex align-items-center gap-12px">
                                                 {existingReturn.created_at && (
-                                                    <span className="text-white opacity-4 fs-12">Submitted {existingReturn.created_at}</span>
+                                                    <span className="text-white opacity-4 fs-12" style={{ paddingRight: '10px' }}>Submitted {existingReturn.created_at}</span>
                                                 )}
                                                 {isRefunded && (
                                                     <span className="badge px-12px py-6px fs-12 fw-600 border-radius-20px" style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)' }}>
@@ -431,7 +418,7 @@ export default function OrderDetail() {
                                         </div>
 
                                         {/* 4-step progress tracker */}
-                                        <div className="px-25px pt-22px pb-10px" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                                        <div className="px-30px pb-35px" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                                             <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
                                                 {steps.map((step, i) => {
                                                     const isLast = i === steps.length - 1;
@@ -446,9 +433,9 @@ export default function OrderDetail() {
                                                             {/* Dot */}
                                                             <div style={{ position: 'relative', zIndex: 1, width: 26, height: 26, borderRadius: '50%', background: dotColor, border: `2px solid ${step.done || step.rejected ? 'transparent' : 'rgba(255,255,255,0.2)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                                                                 {step.rejected ? (
-                                                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12" /></svg>
                                                                 ) : step.done ? (
-                                                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M5 13l4 4L19 7"/></svg>
+                                                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M5 13l4 4L19 7" /></svg>
                                                                 ) : (
                                                                     <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>{i + 1}</span>
                                                                 )}
@@ -463,7 +450,7 @@ export default function OrderDetail() {
                                             </div>
                                         </div>
 
-                                        <div className="px-25px py-20px">
+                                        <div className="px-30px py-25px">
                                             {/* Request meta */}
                                             <div className="d-flex flex-wrap gap-20px mb-16px">
                                                 {existingReturn.return_reason?.title && (
@@ -634,15 +621,16 @@ export default function OrderDetail() {
                     </div>
 
                     {/* ── Order Actions ─────────────────────────────────────── */}
-                    {(canCancel || canReturn || returnSubmitted) && (
+                    {(canCancel || canReturn || returnSubmitted || cancellationPending) && (
                         <div className="row mt-30px">
                             <div className="col-12">
                                 <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '24px 28px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
                                     <div>
                                         <p className="text-white fw-600 fs-15 mb-4px">
-                                            {canCancel ? (order.status === 1 ? 'Need to cancel this order?' : 'Need to cancel this order?') : 'Order delivered?'}
+                                            {cancellationPending ? 'Cancellation Request Pending' : (canCancel ? 'Need to cancel this order?' : 'Order delivered?')}
                                         </p>
                                         <p className="text-white opacity-5 fs-13 mb-0">
+                                            {cancellationPending && 'We have received your cancellation request and are reviewing it.'}
                                             {canCancel && order.status === 1 && 'You can cancel this order immediately as it hasn\'t been confirmed yet.'}
                                             {canCancel && order.status === 5 && 'Your order is confirmed. Submit a cancellation request and our team will review it within 24 hours.'}
                                             {(canReturn || returnSubmitted) && 'You can request a return or refund within 7 days of delivery.'}
@@ -658,6 +646,12 @@ export default function OrderDetail() {
                                                 <i className="feather icon-feather-x me-2"></i>
                                                 {order.status === 1 ? 'Cancel Order' : 'Request Cancellation'}
                                             </button>
+                                        )}
+                                        {cancellationPending && (
+                                            <span className="badge px-15px py-10px fs-13 fw-600" style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                                <i className="feather icon-feather-clock" style={{ fontSize: 14 }}></i>
+                                                Request Pending
+                                            </span>
                                         )}
                                         {canReturn && (
                                             <button

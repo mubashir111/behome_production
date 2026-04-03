@@ -321,6 +321,16 @@ class OrderService
                         );
                     }
                 }
+
+                // Clear cancellation request if we are canceling or rejecting
+                if ($request->status == OrderStatus::CANCELED || $request->status == OrderStatus::REJECTED) {
+                    $payload = $order->reasonPayload();
+                    if (isset($payload['cancellation_requested'])) {
+                        unset($payload['cancellation_requested']);
+                        $order->reason = blank($payload) ? null : json_encode($payload, JSON_UNESCAPED_UNICODE);
+                    }
+                }
+
                 SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
                 SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                 SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);

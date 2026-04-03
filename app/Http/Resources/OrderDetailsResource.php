@@ -39,6 +39,7 @@ class OrderDetailsResource extends JsonResource
             'status_name'                    => trans('orderStatus.' . $this->status),
             'reason'                         => $this->customerNote(),
             'status_reason'                  => $this->adminStatusReason(),
+            'cancellation_requested'         => $this->reasonPayload()['cancellation_requested'] ?? false,
             'source'                         => $this->source,
             'active'                         => (int) $this->active,
             'return_and_refund'              => $this->returnAndRefund ? [

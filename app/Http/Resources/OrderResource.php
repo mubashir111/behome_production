@@ -28,6 +28,7 @@ class OrderResource extends JsonResource
             'status_name'          => trans('orderStatus.' . $this->status),
             'reason'               => $this->customerNote(),
             'status_reason'        => $this->adminStatusReason(),
+            'cancellation_requested' => $this->reasonPayload()['cancellation_requested'] ?? false,
             'order_items'          => optional($this->orderProducts)->count(),
             'order_datetime'       => AppLibrary::datetime($this->order_datetime),
             'user'                 => new UserResource($this->user),

@@ -17,7 +17,14 @@ class ContactController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        ContactMessage::create($validated);
+        $message = ContactMessage::create($validated);
+        
+        try {
+            $orderMailNotificationBuilderService = new \App\Services\OrderMailNotificationBuilder();
+            $orderMailNotificationBuilderService->adminContactMessageNotification($message);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::info($e->getMessage());
+        }
 
         return response()->json([
             'status'  => true,

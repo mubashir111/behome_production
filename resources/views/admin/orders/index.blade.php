@@ -57,6 +57,12 @@
                         <td class="admin-table-cell">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-sm font-bold text-slate-900">#{{ $order->order_serial_no }}</span>
+                                @php $payload = $order->reasonPayload(); @endphp
+                                @if(isset($payload['cancellation_requested']) && $payload['cancellation_requested'])
+                                    <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;border-radius:100px;letter-spacing:0.05em;white-space:nowrap;">
+                                        REQ. CANCEL
+                                    </span>
+                                @endif
                                 @if($isNew)
                                     <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#4f46e5;color:#fff;font-size:10px;font-weight:700;border-radius:100px;letter-spacing:0.05em;white-space:nowrap;">
                                         <span style="width:5px;height:5px;background:#a5b4fc;border-radius:50%;display:inline-block;"></span>NEW
@@ -106,14 +112,27 @@
                             </span>
                         </td>
                         <td class="admin-table-actions">
-                            <a href="{{ route('admin.orders.show', $order) }}"
-                               class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                               title="{{ $isNew ? 'View (unread)' : 'View Order' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                            </a>
+                            <div class="flex items-center gap-1">
+                                <a href="{{ route('admin.orders.show', $order) }}"
+                                   class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                   title="{{ $isNew ? 'View (unread)' : 'View Order' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                                <button type="button" 
+                                    onclick="confirmSubmit('del-order-{{ $order->id }}', { title: 'Delete Order', message: 'Are you sure you want to delete this order? This action is permanent and will remove all associated records.', confirmText: 'Yes, Delete', type: 'danger' })" 
+                                    class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" 
+                                    title="Delete Order">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                                <form id="del-order-{{ $order->id }}" action="{{ route('admin.orders.destroy', $order) }}" method="POST" style="display:none;">
+                                    @csrf @method('DELETE')
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty

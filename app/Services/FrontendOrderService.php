@@ -279,6 +279,14 @@ class FrontendOrderService
                 // Clear the user's cart after order is successfully created
                 Cart::where('user_id', Auth::user()->id)->delete();
             });
+
+            try {
+                $orderMailNotificationBuilderService = new OrderMailNotificationBuilder($this->order->id);
+                $orderMailNotificationBuilderService->adminOrderNotification();
+            } catch (Exception $e) {
+                Log::info($e->getMessage());
+            }
+
             return $this->order;
         } catch (Exception $exception) {
             DB::rollBack();
@@ -333,8 +341,18 @@ class FrontendOrderService
 
                         $oldStatus = $order->status;
                         $order->status = $request->status;
+                        if ($request->reason) {
+                            $order->setAdminStatusReason($request->reason);
+                        }
                         $order->save();
                         AuditLogger::orderStatusChanged($order, $oldStatus, $request->status);
+
+                        try {
+                            $orderMailNotificationBuilderService = new OrderMailNotificationBuilder($order->id);
+                            $orderMailNotificationBuilderService->adminOrderCancellationNotification();
+                        } catch (Exception $e) {
+                            Log::info($e->getMessage());
+                        }
                     }
                 }
             }

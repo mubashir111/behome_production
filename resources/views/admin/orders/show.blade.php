@@ -6,11 +6,28 @@
 <div class="admin-page">
     <div class="admin-page-header">
         <div>
-            <h1 class="admin-page-title">Order #{{ $order->order_serial_no }}</h1>
+            <div class="flex items-center gap-3">
+                <h1 class="admin-page-title">Order #{{ $order->order_serial_no }}</h1>
+                @php $payload = $order->reasonPayload(); @endphp
+                @if(isset($payload['cancellation_requested']) && $payload['cancellation_requested'])
+                    <span class="px-3 py-1 bg-rose-500 text-white text-[10px] font-bold rounded-full tracking-wider uppercase">Cancellation Requested</span>
+                @endif
+            </div>
             <p class="admin-page-subtitle">Placed on {{ $order->created_at->format('M d, Y \a\t H:i A') }}</p>
         </div>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('admin.orders.index') }}" class="admin-btn-secondary">
+        <div class="flex items-center gap-3">
+            <button type="button" 
+                onclick="confirmSubmit('del-order-detail', { title: 'Delete Order', message: 'Are you sure you want to delete this order? This action is permanent and will remove all associated records.', confirmText: 'Yes, Delete', type: 'danger' })" 
+                class="px-5 py-2.5 bg-white text-rose-600 border border-rose-200 text-sm font-semibold rounded-xl hover:bg-rose-50 transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Delete Order
+            </button>
+            <form id="del-order-detail" action="{{ route('admin.orders.destroy', $order) }}" method="POST" style="display:none;">
+                @csrf @method('DELETE')
+            </form>
+            <a href="{{ route('admin.orders.index') }}" class="px-5 py-2.5 bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-200 transition">
                 ← Back to Orders
             </a>
         </div>
@@ -150,6 +167,33 @@
 
         <div class="admin-card-grid-side">
             <!-- Order Status Card -->
+            @if(isset($payload['cancellation_requested']) && $payload['cancellation_requested'])
+                <div class="admin-card bg-rose-50 border-rose-200">
+                    <div class="p-1">
+                        <div class="flex items-center gap-2 text-rose-800 font-bold mb-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            Cancellation Requested
+                        </div>
+                        <p class="text-sm text-rose-600 mb-4 leading-relaxed">
+                            The customer has requested to cancel this order. You can accept the request below to automatically cancel the order and notify the customer.
+                        </p>
+                        
+                        <form action="{{ route('admin.orders.update', $order) }}" method="POST">
+                            @csrf @method('PUT')
+                            <input type="hidden" name="status" value="15"> {{-- 15 = Canceled --}}
+                            <input type="hidden" name="reason" value="Cancellation request accepted by admin.">
+                            <input type="hidden" name="send_email" value="1">
+                            
+                            <button type="submit" class="w-full py-2.5 bg-rose-600 text-white text-sm font-bold rounded-xl hover:bg-rose-700 transition shadow-sm shadow-rose-200">
+                                Accept Cancellation Request
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
             <div class="admin-card">
                 <div class="admin-card-header">
                     <h2 class="admin-card-title">Manage Order Status</h2>

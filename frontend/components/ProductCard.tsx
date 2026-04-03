@@ -25,7 +25,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, showCategory = false, onAddToCart }: ProductCardProps) {
-    const { showToast } = useToast();
+    const { showToast, showCartToast } = useToast();
 
     const handleAddToCart = async () => {
         if (onAddToCart) {
@@ -50,7 +50,11 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
             });
 
             if (response.status) {
-                showToast(`Added ${product.name} to cart!`, 'success');
+                showCartToast({
+                    name: product.name,
+                    image: product.image || product.cover,
+                    price: product.discounted_price || product.currency_price
+                });
             } else {
                 showToast(response.message || 'Failed to add to cart', 'error');
             }

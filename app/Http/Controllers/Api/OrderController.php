@@ -13,6 +13,7 @@ use App\Http\Resources\OrderResource;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\OrderStatus;
 use Exception;
 
 class OrderController extends Controller
@@ -110,6 +111,76 @@ class OrderController extends Controller
             return $this->errorResponse($e->getMessage(), 422);
         } catch (Exception $e) {
             return $this->errorResponse('Order not found', 404);
+        }
+    }
+    public function cancel(Request $request, $id)
+    {
+        try {
+            $order = Order::where('user_id', Auth::id())->findOrFail($id);
+            $reason = $request->reason ?? 'Cancelled by customer';
+
+            if ($order->status == OrderStatus::CANCELED) {
+                return $this->errorResponse('Order is already cancelled', 422);
+            }
+
+            if ($order->status == OrderStatus::DELIVERED) {
+                return $this->errorResponse('Delivered orders cannot be cancelled', 422);
+            }
+
+            if ($order->status == OrderStatus::PENDING) {
+                // Immediate cancellation for pending orders
+                $requestData = [
+                    'status' => OrderStatus::CANCELED,
+                    'reason' => $reason,
+                ];
+                $this->frontendOrderService->changeStatus($order, new \App\Http\Requests\OrderStatusRequest($requestData));
+
+                return $this->successResponse([
+                    'status' => true,
+                    'type'   => 'immediate'
+                ], 'Order cancelled successfully');
+            }
+
+            if ($order->status == OrderStatus::CONFIRMED || $order->status == OrderStatus::ON_THE_WAY) {
+                // Cancellation request for confirmed/on the way orders
+                // 1. Log a message in the order thread
+                OrderMessage::create([
+                    'order_id'    => $order->id,
+                    'user_id'     => Auth::id(),
+                    'sender_type' => 'customer',
+                    'message'     => "[CANCELLATION REQUEST] " . $reason,
+                    'is_read'     => false,
+                ]);
+
+                // 2. Mark as unviewed for admin and flag it
+                $order->admin_viewed_at = null;
+                $payload = $order->reasonPayload();
+                $payload['cancellation_requested'] = true;
+                $payload['customer_note'] = $reason;
+                $order->reason = json_encode($payload);
+                $order->save();
+
+                // 3. Log Audit
+                \App\Services\AuditLogger::cancellationRequested($order, $reason);
+
+                // 4. Notify Admin
+                try {
+                    $orderMailNotificationBuilderService = new \App\Services\OrderMailNotificationBuilder($order->id);
+                    $orderMailNotificationBuilderService->adminOrderCancellationNotification();
+                } catch (Exception $e) {
+                    \Illuminate\Support\Facades\Log::info("Cancellation Notification Error: " . $e->getMessage());
+                }
+
+                return $this->successResponse([
+                    'status' => true,
+                    'type'   => 'requested'
+                ], 'Cancellation request submitted');
+            }
+
+            return $this->errorResponse('Order cannot be cancelled at this stage', 422);
+
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage() ?: 'Order not found', 404);
         }
     }
 }
