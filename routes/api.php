@@ -267,7 +267,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:sanctum'])->group(func
             Route::get('/', [SupplierController::class, 'index']);
             Route::get('/show/{supplier}', [SupplierController::class, 'show']);
             Route::post('/', [SupplierController::class, 'store']);
-            Route::match(['post', 'put',  'patch'], '/{supplier}', [SupplierController::class, 'update']);
+            Route::match(['post', 'put', 'patch'], '/{supplier}', [SupplierController::class, 'update']);
             Route::delete('/{supplier}', [SupplierController::class, 'destroy']);
         });
 
@@ -737,6 +737,13 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
     });
 
     Route::get('/faqs', [\App\Http\Controllers\Frontend\StaticPageController::class, 'faqs'])->name('faqs.index');
+
+    Route::prefix('blog-posts')->name('blog-posts.')->group(function () {
+        Route::get('/',           [\App\Http\Controllers\Frontend\BlogController::class, 'index']);
+        Route::get('/categories', [\App\Http\Controllers\Frontend\BlogController::class, 'categories']);
+        Route::get('/{slug}',     [\App\Http\Controllers\Frontend\BlogController::class, 'show']);
+        Route::post('/{slug}/comments', [\App\Http\Controllers\Frontend\BlogController::class, 'storeComment']);
+    });
 
     Route::post('/contact', [\App\Http\Controllers\Frontend\ContactController::class, 'store'])->name('contact.store');
 

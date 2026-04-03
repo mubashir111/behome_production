@@ -63,9 +63,8 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
     useEffect(() => {
         async function fetchSettings() {
             try {
-                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
                 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
-                const res = await fetch(`${API_URL}/frontend/setting`, {
+                const res = await fetch(`/api/frontend/setting`, {
                     headers: { 'Accept': 'application/json', 'x-api-key': API_KEY },
                 });
                 if (!res.ok) return;

@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 import ProductPageClient from './ProductPageClient';
+import { SERVER_API_URL, API_KEY } from '@/lib/config';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-const API_KEY  = process.env.NEXT_PUBLIC_API_KEY  || '';
 
 export async function generateMetadata(
     { params }: { params: { slug: string } }
 ): Promise<Metadata> {
     try {
-        const res = await fetch(`${API_URL}/v1/products/${params.slug}`, {
+        const res = await fetch(`${SERVER_API_URL}/v1/products/${params.slug}`, {
             headers: { 'x-api-key': API_KEY, Accept: 'application/json' },
             next: { revalidate: 60 },
         });

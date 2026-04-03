@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
+import { SERVER_API_URL, API_KEY } from '@/lib/config';
 
 export const metadata: Metadata = {
     title: 'FAQ | Behome',
     description: 'Frequently asked questions about shopping, shipping, returns, payment, and ordering from Behome.',
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
 
 const CATEGORY_ICONS: Record<string, string> = {
     'general':        'bi-file-text',
@@ -18,7 +17,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 async function getFaqs() {
     try {
-        const res = await fetch(`${API_URL}/frontend/faqs`, {
+        const res = await fetch(`${SERVER_API_URL}/frontend/faqs`, {
             cache: 'no-store',
             headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
         });

@@ -1,5 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || 'i9u99tt4-f0w6-71w7-8394-y968t02516r11';
+import { SERVER_API_URL, API_KEY } from './config';
+
+// Server → absolute internal URL (BACKEND_URL/api). Client → /api (Next.js proxy, no CORS).
+const API_URL = typeof window === 'undefined' ? SERVER_API_URL : '/api';
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     // Get token from localStorage if available

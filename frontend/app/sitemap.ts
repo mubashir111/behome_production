@@ -1,14 +1,11 @@
 import type { MetadataRoute } from 'next';
-
-const SITE_URL  = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const API_URL   = process.env.NEXT_PUBLIC_API_URL  || 'http://localhost:8000/api';
-const API_KEY   = process.env.NEXT_PUBLIC_API_KEY  || '';
+import { SERVER_API_URL, API_KEY, SITE_URL } from '@/lib/config';
 
 const headers = { 'x-api-key': API_KEY };
 
 async function fetchProductSlugs(): Promise<string[]> {
     try {
-        const res = await fetch(`${API_URL}/v1/products?per_page=500&fields=slug`, { headers, next: { revalidate: 3600 } });
+        const res = await fetch(`${SERVER_API_URL}/v1/products?per_page=500&fields=slug`, { headers, next: { revalidate: 3600 } });
         const json = await res.json();
         return (json?.data ?? []).map((p: any) => p.slug).filter(Boolean);
     } catch {
@@ -18,7 +15,7 @@ async function fetchProductSlugs(): Promise<string[]> {
 
 async function fetchBlogSlugs(): Promise<string[]> {
     try {
-        const res = await fetch(`${API_URL}/frontend/blog-posts?per_page=500`, { headers, next: { revalidate: 3600 } });
+        const res = await fetch(`${SERVER_API_URL}/frontend/blog-posts?per_page=500`, { headers, next: { revalidate: 3600 } });
         const json = await res.json();
         return (json?.data ?? []).map((p: any) => p.slug).filter(Boolean);
     } catch {

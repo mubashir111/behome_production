@@ -2,13 +2,12 @@
 
 import Image from 'next/image';
 
-// Block images are stored on the Laravel server — prefix relative paths with its base URL
-const BACKEND_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace(/\/api$/, '');
-
+// Block images are stored on the Laravel server.
+// Relative /storage/* paths are proxied by Next.js — no hardcoded host needed.
 function getImageUrl(src?: string): string {
     if (!src) return '';
     if (src.startsWith('http')) return src;
-    return `${BACKEND_BASE}${src.startsWith('/') ? '' : '/'}${src}`;
+    return src.startsWith('/') ? src : `/${src}`;
 }
 
 interface Block {

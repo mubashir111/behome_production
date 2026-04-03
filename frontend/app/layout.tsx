@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import ToastProvider from '@/components/ToastProvider';
 import SettingsProvider from '@/components/SettingsProvider';
 import CartProvider from '@/components/CartProvider';
+import { SITE_URL } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: {
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     template: '%s | Behome',
   },
   description: 'Behome - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     type: 'website',
     siteName: 'Behome',

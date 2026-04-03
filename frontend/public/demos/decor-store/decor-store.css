@@ -3392,3 +3392,15 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
 }
 .var-pill-btn.active { border: 1.5px solid #ff7a1a; background: rgba(255,122,26,0.12); }
 .var-pill-btn:not(.active) { border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.02); }
+
+/* ── Privacy Policy page ──────────────────────────────────────── */
+.privacy-content-wrap { color: rgba(255,255,255,0.78); line-height: 1.85; font-size: 15px; }
+.privacy-content-wrap h1,
+.privacy-content-wrap h2 { color: #fff; font-weight: 700; margin-top: 40px; margin-bottom: 12px; font-size: 22px; }
+.privacy-content-wrap h3 { color: #fff; font-weight: 600; margin-top: 28px; margin-bottom: 8px; font-size: 17px; }
+.privacy-content-wrap p  { margin-bottom: 16px; }
+.privacy-content-wrap a  { color: var(--base-color, #d4b062); text-decoration: underline; }
+.privacy-content-wrap ul,
+.privacy-content-wrap ol { padding-left: 22px; margin-bottom: 16px; }
+.privacy-content-wrap li { margin-bottom: 6px; }
+.privacy-content-wrap strong { color: #fff; font-weight: 600; }

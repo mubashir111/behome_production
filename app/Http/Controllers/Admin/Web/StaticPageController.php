@@ -46,6 +46,9 @@ class StaticPageController extends Controller
 
     public function destroy(StaticPage $page)
     {
+        if ($page->is_system) {
+            return back()->with('error', 'System pages cannot be deleted.');
+        }
         $page->delete();
         return back()->with('success', 'Page deleted.');
     }

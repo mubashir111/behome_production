@@ -4,13 +4,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import AllPostsButton from '@/components/AllPostsButton';
 import BlogCommentForm from '@/components/BlogCommentForm';
+import { SERVER_API_URL, API_KEY } from '@/lib/config';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-const API_KEY  = process.env.NEXT_PUBLIC_API_KEY  || '';
 
 async function getPost(slug: string) {
     try {
-        const res = await fetch(`${API_URL}/frontend/blog-posts/${slug}`, {
+        const res = await fetch(`${SERVER_API_URL}/frontend/blog-posts/${slug}`, {
             headers: { 'x-api-key': API_KEY, Accept: 'application/json' },
             cache: 'no-store',
         });

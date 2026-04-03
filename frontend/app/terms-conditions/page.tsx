@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
+import { SERVER_API_URL, API_KEY } from '@/lib/config';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
 
 async function getPageData() {
     try {
-        const res = await fetch(`${API_URL}/frontend/static-pages/terms-conditions`, {
+        const res = await fetch(`${SERVER_API_URL}/frontend/static-pages/terms-conditions`, {
             cache: 'no-store',
             headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
         });

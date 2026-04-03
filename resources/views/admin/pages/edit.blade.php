@@ -203,12 +203,25 @@
         </div>
     </div>
 
-{{-- Generic page with rich text --}}
+{{-- Blog page: just a title + intro text --}}
+@elseif($page->slug === 'blog')
+    <div class="admin-card mb-6">
+        <div class="admin-card-header"><h3 class="admin-card-title">Blog Page</h3></div>
+        <p class="text-sm text-slate-500 mb-4">The blog post listing is managed separately. Here you can control the page heading and intro text shown above the posts.</p>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Intro / Tagline</label>
+                <textarea name="content" rows="3" placeholder="e.g. Explore interior design inspiration, home decor trends, and expert tips." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('content', $page->content) }}</textarea>
+            </div>
+        </div>
+    </div>
+
+{{-- Generic page with rich text (privacy-policy, and any custom pages) --}}
 @else
     <div class="admin-card mb-6">
         <div class="admin-card-header"><h3 class="admin-card-title">Page Content</h3></div>
-        <textarea name="content" id="content-editor" rows="20" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('content', $page->content) }}</textarea>
-        <p class="text-xs text-slate-400 mt-1">You can use HTML for formatting.</p>
+        <textarea name="content" id="content-editor" rows="24" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('content', $page->content) }}</textarea>
+        <p class="text-xs text-slate-400 mt-1">You can use HTML tags for formatting (e.g. &lt;h2&gt;, &lt;p&gt;, &lt;a&gt;, &lt;strong&gt;).</p>
     </div>
 @endif
 
