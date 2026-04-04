@@ -2881,6 +2881,48 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
     border-color: rgb(46 46 46) !important;
 }
 
+/* Fix mobile logo overlap by shrinking icons and hiding text on narrow screens */
+@media (max-width: 767px) {
+    .glass-logo-box {
+        width: 52px !important;
+        height: 52px !important;
+    }
+
+    .glass-logo-box2 {
+        width: 52px !important;
+        height: 52px !important;
+    }
+
+    .glass-logo-box img,
+    .glass-logo-box2 img {
+        max-height: 35px !important;
+    }
+
+    .logo-text {
+        font-size: 1rem !important;
+        letter-spacing: 1px !important;
+    }
+}
+
+@media (max-width: 575px) {
+
+    /* Hide the brand text on very small phones to prevent overlap with icons */
+    .logo-text {
+        display: none !important;
+    }
+
+    .glass-logo-box,
+    .glass-logo-box2 {
+        width: 52px !important;
+        height: 52px !important;
+    }
+
+    .glass-logo-box img,
+    .glass-logo-box2 img {
+        max-height: 32px !important;
+    }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    MOBILE & TABLET RESPONSIVE — decor-store specific
    ═══════════════════════════════════════════════════════════════ */
