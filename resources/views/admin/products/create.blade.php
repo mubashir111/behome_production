@@ -68,9 +68,11 @@
         </a>
     </div>
 
+    @include('admin._alerts')
+
     <!-- Form Container -->
     <div class="admin-card">
-        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+        <form id="product-form" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
             @csrf
             
             <!-- Basic Information Section -->
@@ -120,6 +122,7 @@
                                 <option value="{{ $brand->id }}" {{ old('product_brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
                             @endforeach
                         </select>
+                        @error('product_brand_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
@@ -164,6 +167,7 @@
                                 <option value="{{ $tax->id }}">{{ $tax->name }} ({{ $tax->tax_rate }}%)</option>
                             @endforeach
                         </select>
+                        @error('tax_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="space-y-2">
@@ -174,6 +178,7 @@
                                 <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
                             @endforeach
                         </select>
+                        @error('unit_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="space-y-2">
@@ -181,6 +186,7 @@
                         <input type="text" name="weight" id="weight" value="{{ old('weight') }}"
                                class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all duration-300 bg-white text-slate-900"
                                placeholder="e.g. 1.5kg">
+                        @error('weight') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -193,18 +199,21 @@
                                 <option value="{{ $barcode->id }}" {{ old('barcode_id') == $barcode->id ? 'selected' : '' }}>{{ $barcode->name }}</option>
                             @endforeach
                         </select>
+                        @error('barcode_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="space-y-2">
                         <label for="maximum_purchase_quantity" class="block text-sm font-bold text-slate-700 ml-1">Max Purchase Qty</label>
                         <input type="number" name="maximum_purchase_quantity" id="maximum_purchase_quantity" value="{{ old('maximum_purchase_quantity', 10) }}"
                                class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all duration-300 bg-white text-slate-900">
+                        @error('maximum_purchase_quantity') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="space-y-2">
                         <label for="low_stock_quantity_warning" class="block text-sm font-bold text-slate-700 ml-1">Low Stock Warning</label>
                         <input type="number" name="low_stock_quantity_warning" id="low_stock_quantity_warning" value="{{ old('low_stock_quantity_warning', 2) }}"
                                class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all duration-300 bg-white text-slate-900">
+                        @error('low_stock_quantity_warning') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
@@ -227,6 +236,7 @@
                     <textarea name="description" id="description" rows="5"
                               class="w-full px-5 py-4 rounded-3xl border border-slate-200 focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 outline-none transition-all duration-300 bg-white text-slate-900"
                               placeholder="Describe your product...">{{ old('description') }}</textarea>
+                    @error('description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="space-y-2">
@@ -234,6 +244,7 @@
                     <input type="text" name="tags" id="tags" value="{{ old('tags') }}"
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 outline-none transition-all duration-300 bg-white text-slate-900"
                            placeholder="e.g. sofa, modern, leather">
+                    @error('tags') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -270,6 +281,7 @@
                     <div id="cropped-previews" class="flex flex-wrap gap-4 mt-6">
                         <!-- Previews will appear here -->
                     </div>
+                    @error('images') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -363,13 +375,13 @@
         </div>
         <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
             <div class="flex gap-2">
-                <button onclick="cropperInstance.setAspectRatio(1)" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-indigo-500 hover:text-indigo-600 transition-all">Square (1:1)</button>
-                <button onclick="cropperInstance.setAspectRatio(4/3)" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-indigo-500 hover:text-indigo-600 transition-all">Standard (4:3)</button>
-                <button onclick="cropperInstance.setAspectRatio(NaN)" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-indigo-500 hover:text-indigo-600 transition-all">Free</button>
+                <button type="button" onclick="cropperInstance.setAspectRatio(1)" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-indigo-500 hover:text-indigo-600 transition-all">Square (1:1)</button>
+                <button type="button" onclick="cropperInstance.setAspectRatio(4/3)" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-indigo-500 hover:text-indigo-600 transition-all">Standard (4:3)</button>
+                <button type="button" onclick="cropperInstance.setAspectRatio(NaN)" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-indigo-500 hover:text-indigo-600 transition-all">Free</button>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="closeCropModal()" class="text-sm font-bold text-slate-500 hover:text-slate-700">Cancel</button>
-                <button id="save-crop-btn" class="px-8 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
+                <button type="button" onclick="closeCropModal()" class="text-sm font-bold text-slate-500 hover:text-slate-700">Cancel</button>
+                <button type="button" id="save-crop-btn" class="px-8 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
                     <span id="crop-btn-spinner" class="hidden">
                         <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -396,6 +408,23 @@
     const saveCropBtn = document.getElementById('save-crop-btn');
     const previewsContainer = document.getElementById('cropped-previews');
     const hiddenInput = document.getElementById('hidden-images-input');
+
+    function toggleSwitch(id) {
+        const cb = document.getElementById(id);
+        if (!cb) return;
+        cb.checked = !cb.checked;
+        const track = document.getElementById(id + '_track');
+        const knob  = document.getElementById(id + '_knob');
+        if (track && knob) {
+            if (cb.checked) {
+                track.style.background = '#6366f1';
+                knob.style.transform   = 'translateX(20px)';
+            } else {
+                track.style.background = '#e2e8f0';
+                knob.style.transform   = '';
+            }
+        }
+    }
 
     function handleImageSelection(input) {
         const files = Array.from(input.files);
