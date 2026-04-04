@@ -724,7 +724,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                 style={{ opacity: stockOk ? 1 : 0.5 }}
                                             >
                                                 <i className="bi bi-bag fs-18" />
-                                                <span>Add to cart</span>
+                                            <span className="d-none d-md-inline">Add to cart</span>
                                             </button>
 
                                             {/* Wishlist */}
