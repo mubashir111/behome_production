@@ -26,36 +26,46 @@ export default async function Header() {
             <nav className="navbar navbar-expand-lg header-light bg-transparent disable-fixed px-lg-0 py-lg-0">
                 <div className="container-fluid px-4 d-flex align-items-center" style={{ height: '80px' }}>
                     <div className="row w-100 align-items-center m-0">
-                        <div className="col-6 col-xl-3 col-lg-2 order-1 d-flex align-items-center">
+                        <div className="col-6 col-xl-3 col-lg-2 order-1 d-flex align-items-center gap-3">
+                            <a className="glass-logo-wrapper" href="http://blackrockarchitct.ae/" target="_blank" rel="noopener noreferrer">
+                                <div className="glass-logo-box2">
+                                    <Image alt="Blackrock Logo" src="/images/new/logo/blackrock.PNG" width={72} height={72} priority style={{ objectFit: 'contain' }} />
+                                </div>
+                            </a>
                             <a className="glass-logo-wrapper" href="/">
                                 <div className="glass-logo-box">
                                     <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
                                 </div>
                                 <span className="logo-text">BEHOME</span>
                             </a>
+
                         </div>
                         <div className="col-12 col-xl-6 col-lg-8 order-3 order-lg-2 menu-order position-static">
                             <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
                                 {/*  Mobile Navigation Header  */}
                                 <div className="mobile-nav-header d-lg-none">
                                     <div className="mobile-logo">
-                                        <a className="glass-logo-wrapper" href="/">
-                                            <div className="glass-logo-box">
-                                                <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
+                                        <div className="mobile-logo d-flex align-items-center gap-3">
+
+                                            <a className="glass-logo-wrapper" href="/">
+                                                <div className="glass-logo-box">
+                                                    <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
+                                                </div>
+                                                <span className="logo-text">BEHOME</span>
+                                            </a>
+
+                                        </div>
+                                        <div className="mobile-icons">
+                                            <a className="icon-box position-relative" href="/cart">
+                                                <i className="feather icon-feather-shopping-bag"></i>
+                                                <CartIcon />
+                                            </a>
+                                            <a className="icon-box" href="/account">
+                                                <i className="feather icon-feather-user"></i>
+                                            </a>
+                                            <div className="close-button" data-bs-target="#navbarNav" data-bs-toggle="collapse">
+                                                <i className="feather icon-feather-x"></i>
                                             </div>
-                                            <span className="logo-text">BEHOME</span>
-                                        </a>
-                                    </div>
-                                    <div className="mobile-icons">
-                                        <a className="icon-box position-relative" href="/cart">
-                                            <i className="feather icon-feather-shopping-bag"></i>
-                                            <CartIcon />
-                                        </a>
-                                        <a className="icon-box" href="/account">
-                                            <i className="feather icon-feather-user"></i>
-                                        </a>
-                                        <div className="close-button" data-bs-target="#navbarNav" data-bs-toggle="collapse">
-                                            <i className="feather icon-feather-x"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -115,11 +125,11 @@ export default async function Header() {
                                                     <div className="row row-cols-1 row-cols-md-2">
                                                         <div className="col">
                                                             <a href="/shop"><Image alt="" className="w-100"
-                                                                    src="/images/demo-decor-store-menu-banner-01.jpg" width={640} height={420} /></a>
+                                                                src="/images/demo-decor-store-menu-banner-01.jpg" width={640} height={420} /></a>
                                                         </div>
                                                         <div className="col">
                                                             <a href="/shop"><Image alt="" className="w-100"
-                                                                    src="/images/demo-decor-store-menu-banner-02.jpg" width={640} height={420} /></a>
+                                                                src="/images/demo-decor-store-menu-banner-02.jpg" width={640} height={420} /></a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -146,7 +156,7 @@ export default async function Header() {
                                                                     <span className="btn-text text-dark-gray fs-16">Designer
                                                                         stool</span>
                                                                     <span className="btn-icon"><i
-                                                                            className="fa-solid fa-arrow-right m-0"></i></span>
+                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
                                                                 </span>
                                                             </a>
                                                         </div>
@@ -161,7 +171,7 @@ export default async function Header() {
                                                                     <span className="btn-text text-dark-gray fs-16">Modern
                                                                         chair</span>
                                                                     <span className="btn-icon"><i
-                                                                            className="fa-solid fa-arrow-right m-0"></i></span>
+                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
                                                                 </span>
                                                             </a>
                                                         </div>
@@ -176,7 +186,7 @@ export default async function Header() {
                                                                     <span className="btn-text text-dark-gray fs-16">Table
                                                                         lamp</span>
                                                                     <span className="btn-icon"><i
-                                                                            className="fa-solid fa-arrow-right m-0"></i></span>
+                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
                                                                 </span>
                                                             </a>
                                                         </div>
@@ -191,7 +201,7 @@ export default async function Header() {
                                                                     <span className="btn-text text-dark-gray fs-16">Home
                                                                         decor</span>
                                                                     <span className="btn-icon"><i
-                                                                            className="fa-solid fa-arrow-right m-0"></i></span>
+                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
                                                                 </span>
                                                             </a>
                                                         </div>
@@ -206,7 +216,7 @@ export default async function Header() {
                                                                     <span className="btn-text text-dark-gray fs-16">Ceramic
                                                                         pots</span>
                                                                     <span className="btn-icon"><i
-                                                                            className="fa-solid fa-arrow-right m-0"></i></span>
+                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
                                                                 </span>
                                                             </a>
                                                         </div>
@@ -221,7 +231,7 @@ export default async function Header() {
                                                                     <span className="btn-text text-dark-gray fs-16">Wooden
                                                                         table</span>
                                                                     <span className="btn-icon"><i
-                                                                            className="fa-solid fa-arrow-right m-0"></i></span>
+                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
                                                                 </span>
                                                             </a>
                                                         </div>
@@ -229,18 +239,18 @@ export default async function Header() {
                                                     <div className="row row-cols-1 row-cols-md-2">
                                                         <div className="col">
                                                             <a href="/collections"><Image alt=""
-                                                                    src="/images/demo-decor-store-menu-banner-03.jpg" width={640} height={420} /></a>
+                                                                src="/images/demo-decor-store-menu-banner-03.jpg" width={640} height={420} /></a>
                                                         </div>
                                                         <div className="col">
                                                             <a href="/collections"><Image alt=""
-                                                                    src="/images/demo-decor-store-menu-banner-04.jpg" width={640} height={420} /></a>
+                                                                src="/images/demo-decor-store-menu-banner-04.jpg" width={640} height={420} /></a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </li>
                                         <li className="nav-item"><a className="nav-link text-white-hover"
-                                                href="/contact">Contact</a>
+                                            href="/contact">Contact</a>
                                         </li>
                                     </ul>
                                 </div>
