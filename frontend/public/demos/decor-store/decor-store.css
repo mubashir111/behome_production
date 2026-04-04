@@ -2895,12 +2895,23 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
 
     .glass-logo-box img,
     .glass-logo-box2 img {
-        max-height: 35px !important;
+        max-height: 44px !important;
     }
 
     .logo-text {
         font-size: 1rem !important;
         letter-spacing: 1px !important;
+    }
+
+    /* Column stretch and padding reset for header on mobile */
+    header .navbar [class*=col-] {
+        padding: 0 0px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-item-align: stretch;
+        -ms-grid-row-align: stretch;
+        align-self: stretch;
     }
 }
 
@@ -2919,7 +2930,7 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
 
     .glass-logo-box img,
     .glass-logo-box2 img {
-        max-height: 32px !important;
+        max-height: 44px !important;
     }
 }
 

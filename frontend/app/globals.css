@@ -10,25 +10,27 @@
 .navbar {
   opacity: 0 !important;
   visibility: hidden !important;
-  padding: 0 15px !important; /* Force symmetrical mobile padding */
+  padding: 0 15px !important;
+  /* Force symmetrical mobile padding */
 }
 
 .checkout-payment-logo {
-    max-width: 80px;
-    max-height: 40px;
-    margin-bottom: 8px;
-    background: #6772e5; /* Standard Stripe Blue */
-    object-fit: contain;
-    padding: 6px 10px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+  max-width: 80px;
+  max-height: 40px;
+  margin-bottom: 8px;
+  background: #6772e5;
+  /* Standard Stripe Blue */
+  object-fit: contain;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
 }
 
 .payment-icon-small {
-    max-height: 20px;
-    width: auto;
-    object-fit: contain;
-    display: block;
+  max-height: 20px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 /* Always show product count badge on category cards */
@@ -348,7 +350,7 @@ main.no-layout-pad .page-shell {
 
 .glass-logo-box img,
 .glass-logo-box span {
-  max-height: 52px !important;
+  max-height: 37px !important;
   max-width: 52px !important;
 }
 
@@ -1041,14 +1043,15 @@ textarea.form-control {
 }
 
 .icon-hover-push-left:hover i {
-    transform: translateX(-3px);
-    transition: transform 0.2s ease;
+  transform: translateX(-3px);
+  transition: transform 0.2s ease;
 }
 
 /* ── Premium Product Slider Modernization ────────────────────────────── */
 
 .premium-slider-container {
-  background-color: #bed9ee !important; /* Soft light blue/grey */
+  background-color: #bed9ee !important;
+  /* Soft light blue/grey */
   border-left: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -1128,6 +1131,7 @@ textarea.form-control {
   .slider-product-info {
     bottom: 25px;
   }
+
   .slider-product-name {
     font-size: 1.1rem !important;
   }
@@ -1138,10 +1142,11 @@ textarea.form-control {
 .text-clamping-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  line-clamp: 2; /* Fixed compatibility */
-  -webkit-box-orient: vertical;  
+  line-clamp: 2;
+  /* Fixed compatibility */
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 2.8em; 
+  height: 2.8em;
   line-height: 1.4em;
 }
 
@@ -1154,13 +1159,13 @@ textarea.form-control {
 }
 
 .premium-shop-card:hover {
-  border-color: rgba(205, 170, 124, 0.3); 
+  border-color: rgba(205, 170, 124, 0.3);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
   transform: translateY(-5px);
 }
 
 .shop-filter-indicator,
-.product-cb { 
+.product-cb {
   width: 16px;
   height: 16px;
   border: 1.5px solid rgba(255, 255, 255, 0.2);
@@ -1186,7 +1191,7 @@ textarea.form-control {
 }
 
 /* Active States - Robust Selectors */
-li a.is-active, 
+li a.is-active,
 li a.active,
 li a[style*="color"] {
   color: #c5a059 !important;
@@ -1215,6 +1220,7 @@ li a[style*="color"] .shop-filter-indicator::after {
     padding-right: 15px !important;
     overflow-x: hidden;
   }
+
   .shop-toolbar {
     gap: 15px !important;
     margin: 0 !important;
@@ -1223,6 +1229,7 @@ li a[style*="color"] .shop-filter-indicator::after {
     flex-direction: column !important;
     align-items: center !important;
   }
+
   .shop-search-pill-container {
     width: 100% !important;
     max-width: 100% !important;
@@ -1230,16 +1237,18 @@ li a[style*="color"] .shop-filter-indicator::after {
     margin-right: 0 !important;
     margin-bottom: 20px !important;
   }
-  .shop-toolbar > div:not(.shop-search-pill-container) {
+
+  .shop-toolbar>div:not(.shop-search-pill-container) {
     width: 100% !important;
     display: flex !important;
     justify-content: space-between !important;
     gap: 10px !important;
   }
+
   /* Ensure the two buttons (Filters/Sort) sit side by side but centered together */
   .shop-toolbar .d-flex.align-items-center {
-      width: 100% !important;
-      justify-content: center !important;
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
 
@@ -1576,73 +1585,83 @@ li:hover .item-qty {
 
 /* ── Product Share Menu ──────────────────────────────────────────────────────── */
 .share-menu-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 10px;
-    width: 200px;
-    background: rgba(15, 15, 15, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    overflow: hidden;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  width: 200px;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  overflow: hidden;
 }
 
 .share-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
-    font-weight: 600;
-    text-align: left;
-    transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  transition: all 0.2s;
 }
 
 .share-menu-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
 }
 
 .share-menu-item i {
-    font-size: 18px;
-    width: 20px;
-    text-align: center;
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
 }
 
 .share-menu-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 999;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
 }
 
 /* Animations from globals.css or tailwind */
 .animate-in {
-    animation-duration: 0.2s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    animation-fill-mode: both;
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .fade-in {
-    animation-name: fadeIn;
+  animation-name: fadeIn;
 }
 
 @keyframes slideInFromTop {
-    from { transform: translateY(-8px); }
-    to { transform: translateY(0); }
+  from {
+    transform: translateY(-8px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 .slide-in-from-top-2 {
-    animation-name: slideInFromTop;
+  animation-name: slideInFromTop;
 }
