@@ -31,7 +31,7 @@ class Stripe extends PaymentAbstract
         }
     }
 
-    public function payment($order, $request) : \Illuminate\Http\RedirectResponse
+    public function payment($order, $request)
     {
         try {
             $currencyCode = 'USD';
@@ -43,39 +43,28 @@ class Stripe extends PaymentAbstract
                 }
             }
 
-            $response = $this->gateway->charges->create([
-                'amount'      => (int) $order->total * 100,
-                'currency'    => $currencyCode,
-                'source'      => $request->stripeToken,
-                'description' => 'Food order payment',
+            // Create PaymentIntent (Modern API)
+            $intent = $this->gateway->paymentIntents->create([
+                'amount'                    => (int) round($order->total * 100),
+                'currency'                  => strtolower($currencyCode),
+                'description'               => 'Order #' . ($order->order_serial_no ?? $order->id) . ' payment',
+                'metadata'                  => [
+                    'order_id' => $order->id,
+                ],
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                ],
             ]);
 
-            if (isset($response->status) && $response->status == 'succeeded') {
-                $capturePaymentNotification = DB::table('capture_payment_notifications')->where([
-                    ['order_id', $order->id]
-                ]);
-                $capturePaymentNotification?->delete();
-                $token = $response->balance_transaction;
-                CapturePaymentNotification::create([
-                    'order_id'   => $order->id,
-                    'token'      => $token,
-                    'created_at' => now()
-                ]);
-                return redirect()->away(
-                    route('payment.success', ['paymentGateway' => 'stripe', 'order' => $order, 'token' => $token])
-                );
-            } else {
-                return redirect()->route('payment.index', ['order' => $order, 'paymentGateway' => 'stripe'])->with(
-                    'error',
-                    trans('all.message.something_wrong')
-                );
-            }
+            return [
+                'client_secret' => $intent->client_secret,
+                'paymentIntent' => $intent->id,
+                'publishableKey' => $this->paymentGatewayOption['stripe_key'] ?? '',
+            ];
+
         } catch (Exception $e) {
-            Log::info($e->getMessage());
-            return redirect()->route('payment.index', ['order' => $order, 'paymentGateway' => 'stripe'])->with(
-                'error',
-                $e->getMessage()
-            );
+            Log::error('Stripe PaymentIntent Error: ' . $e->getMessage());
+            throw new Exception($e->getMessage());
         }
     }
 

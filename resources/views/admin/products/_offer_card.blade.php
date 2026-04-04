@@ -44,6 +44,26 @@
                    oninput="updateOfferPreview()">
         </div>
 
+        {{-- Hero Slider Toggle --}}
+        <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all cursor-pointer" onclick="toggleSwitch('hero_slider_toggle')">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shadow-sm">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                </div>
+                <div>
+                    <div class="text-sm font-bold text-slate-800">Featured on Hero Slider</div>
+                    <div class="text-[11px] text-slate-400 font-medium">Show this product in the home promotion slides</div>
+                </div>
+            </div>
+            <div class="relative pointer-events-none">
+                <input type="hidden" name="is_hero_slider" value="10">
+                <input type="checkbox" name="is_hero_slider" value="5" {{ (isset($product->is_hero_slider) && $product->is_hero_slider == 5) ? 'checked' : '' }} class="sr-only" id="hero_slider_toggle">
+                <div id="hero_slider_toggle_track" style="display:block;width:44px;height:24px;{{ (isset($product->is_hero_slider) && $product->is_hero_slider == 5) ? 'background:#6366f1;' : 'background:#e2e8f0;' }}border-radius:12px;position:relative;transition:background 0.2s;">
+                    <span id="hero_slider_toggle_knob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:10px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);{{ (isset($product->is_hero_slider) && $product->is_hero_slider == 5) ? 'transform:translateX(20px);' : '' }}"></span>
+                </div>
+            </div>
+        </div>
+
         {{-- Live Preview --}}
         <div id="offer-preview" class="rounded-lg border border-slate-100 bg-slate-50 p-4 text-center" style="display:none;">
             <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Offer Price Preview</p>

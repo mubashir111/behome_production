@@ -13,6 +13,24 @@
   padding: 0 15px !important; /* Force symmetrical mobile padding */
 }
 
+.checkout-payment-logo {
+    max-width: 80px;
+    max-height: 40px;
+    margin-bottom: 8px;
+    background: #6772e5; /* Standard Stripe Blue */
+    object-fit: contain;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.payment-icon-small {
+    max-height: 20px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
 /* Always show product count badge on category cards */
 .categories-style-01 .count-circle {
   opacity: 1 !important;

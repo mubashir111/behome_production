@@ -47,12 +47,18 @@ class ProductController extends Controller
             if ($request->get('sort') === 'popular') {
                 $query->orderBy('order', 'asc');
             } elseif ($request->get('sort') === 'offer') {
-                $query->whereNotNull('offer_start_date')
-                      ->whereNotNull('offer_end_date')
-                      ->where('offer_start_date', '<=', now())
-                      ->where('offer_end_date', '>=', now())
-                      ->where('discount', '>', 0)
-                      ->orderBy('discount', 'desc');
+                $query->where(function ($q) {
+                    $q->where('is_hero_slider', 5)
+                      ->orWhere(function ($sq) {
+                          $sq->whereNotNull('offer_start_date')
+                             ->whereNotNull('offer_end_date')
+                             ->where('offer_start_date', '<=', now())
+                             ->where('offer_end_date', '>=', now())
+                             ->where('discount', '>', 0);
+                      });
+                })
+                ->orderBy('is_hero_slider', 'asc')
+                ->orderBy('discount', 'desc');
             } else {
                 $query->latest();
             }

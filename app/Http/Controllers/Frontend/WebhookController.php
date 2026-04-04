@@ -49,50 +49,53 @@ class WebhookController extends Controller
             }
         }
 
-        // ── 2. Only act on charge.succeeded ─────────────────────────────────
-        if ($event->type !== 'charge.succeeded') {
-            return response()->json(['received' => true]);
-        }
+        // ── 2. Handle events ───────────────────────────────────────────────
+        if ($event->type === 'payment_intent.succeeded') {
+            $paymentIntent = $event->data->object;
+            $orderId = $paymentIntent->metadata->order_id ?? null;
 
-        $charge             = $event->data->object;
-        $balanceTransaction = $charge->balance_transaction ?? null;
+            if (!$orderId) {
+                Log::warning('Stripe webhook: payment_intent.succeeded missing order_id in metadata');
+                return response()->json(['received' => true]);
+            }
 
-        if (!$balanceTransaction) {
-            // balance_transaction is occasionally null on very first settlement tick;
-            // Stripe will retry — return 200 to avoid retry noise, log for visibility.
-            Log::info("Stripe webhook: charge.succeeded for {$charge->id} has no balance_transaction yet");
-            return response()->json(['received' => true]);
-        }
+            try {
+                DB::transaction(function () use ($orderId, $paymentIntent) {
+                    $order = Order::find($orderId);
 
-        // ── 3. Idempotent order update ───────────────────────────────────────
-        try {
-            DB::transaction(function () use ($charge, $balanceTransaction) {
-                $capture = CapturePaymentNotification::where('token', $balanceTransaction)->first();
+                    if (!$order || $order->payment_status === PaymentStatus::PAID) {
+                        return;
+                    }
 
-                if (!$capture) {
-                    // Either the redirect handler already processed it (and deleted the record),
-                    // or this charge belongs to a different integration. Both are fine.
-                    return;
-                }
-
-                $order = Order::find($capture->order_id);
-
-                if (!$order || $order->payment_status === PaymentStatus::PAID) {
-                    // Already paid (redirect beat the webhook). Clean up and return.
-                    $capture->delete();
-                    return;
-                }
-
-                // Payment not yet recorded — process it now.
-                (new PaymentService())->payment($order, 'stripe', $balanceTransaction);
-                $capture->delete();
-
-                Log::info("Stripe webhook: order #{$order->id} marked PAID via charge {$charge->id}");
-            });
-        } catch (Exception $e) {
-            Log::error('Stripe webhook: processing error — ' . $e->getMessage());
-            // Return 500 so Stripe retries the event (up to 3 days).
-            return response()->json(['error' => 'Processing failed'], 500);
+                    // Mark as PAID
+                    (new PaymentService())->payment($order, 'stripe', $paymentIntent->id);
+                    Log::info("Stripe webhook: order #{$order->id} marked PAID via PaymentIntent {$paymentIntent->id}");
+                });
+            } catch (Exception $e) {
+                Log::error('Stripe webhook error: ' . $e->getMessage());
+                return response()->json(['error' => 'Processing failed'], 500);
+            }
+        } elseif ($event->type === 'charge.succeeded') {
+            // Legacy/Fallback support
+            $charge = $event->data->object;
+            if ($charge->payment_intent) {
+                 // Already handled by payment_intent.succeeded if it's modern
+                 return response()->json(['received' => true]);
+            }
+            
+            $balanceTransaction = $charge->balance_transaction ?? null;
+            if ($balanceTransaction) {
+                DB::transaction(function () use ($charge, $balanceTransaction) {
+                    $capture = CapturePaymentNotification::where('token', $balanceTransaction)->first();
+                    if ($capture) {
+                        $order = Order::find($capture->order_id);
+                        if ($order && $order->payment_status !== PaymentStatus::PAID) {
+                            (new PaymentService())->payment($order, 'stripe', $balanceTransaction);
+                            $capture->delete();
+                        }
+                    }
+                });
+            }
         }
 
         return response()->json(['received' => true]);

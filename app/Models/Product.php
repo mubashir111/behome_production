@@ -47,6 +47,7 @@ class Product extends Model implements HasMedia
         'shipping_cost',
         'additional_info',
         'is_product_quantity_multiply',
+        'is_hero_slider',
 
     ];
     protected array $dates = ['deleted_at'];
@@ -82,6 +83,7 @@ class Product extends Model implements HasMedia
         'shipping_cost'                => 'string',
         'additional_info'               => 'array',
         'is_product_quantity_multiply' => 'integer',
+        'is_hero_slider'               => 'integer',
 
     ];
 

@@ -6,6 +6,9 @@ import { apiFetch } from '@/lib/api';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/components/ToastProvider';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import StripePaymentForm from '@/components/StripePaymentForm';
 
 const STATUS_COLORS: Record<number, string> = {
     1: '#f59e0b',
@@ -60,6 +63,21 @@ export default function OrderDetail() {
     const [sendingMsg, setSendingMsg] = useState(false);
     const [showMessages, setShowMessages] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Stripe
+    const [stripePromise, setStripePromise] = useState<any>(null);
+    const [stripeOptions, setStripeOptions] = useState<any>(null);
+    const [initiatingPayment, setInitiatingPayment] = useState(false);
+    const paymentSectionRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll to inline payment section
+    useEffect(() => {
+        if (stripeOptions) {
+            setTimeout(() => {
+                paymentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+    }, [stripeOptions]);
 
     const fetchOrder = useCallback(async () => {
         try {
@@ -205,6 +223,33 @@ export default function OrderDetail() {
             }
         } catch { }
         setSendingMsg(false);
+    };
+
+    const initiateOnlinePayment = async () => {
+        setInitiatingPayment(true);
+        try {
+            const res = await apiFetch('/payment/initiate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    order_id: parseInt(id),
+                    payment_gateway: 'stripe',
+                }),
+            });
+
+            if (res.status && res.data?.client_secret) {
+                setStripePromise(loadStripe(res.data.publishableKey));
+                setStripeOptions({
+                    clientSecret: res.data.client_secret,
+                    appearance: { theme: 'night', labels: 'floating' },
+                });
+            } else {
+                showToast(res.message || 'Failed to initiate payment. Please try again.', 'error');
+            }
+        } catch (e: any) {
+            showToast(e.message || 'An unexpected error occurred.', 'error');
+        } finally {
+            setInitiatingPayment(false);
+        }
     };
 
     if (loading) return (
@@ -548,6 +593,34 @@ export default function OrderDetail() {
                                     </div>
                                 );
                             })()}
+
+                            {/* Wide Inline Stripe Payment Section below Shipping Address */}
+                            <div ref={paymentSectionRef} className={`transition-all duration-700 ease-in-out overflow-hidden ${stripeOptions ? 'max-h-[1000px] opacity-100 mt-25px mb-25px' : 'max-h-0 opacity-0'}`}>
+                                <div className="bg-[#111111] border border-white/10 p-40px md-p-20px border-radius-12px shadow-2xl relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 w-100 h-4px opacity-70" style={{ backgroundColor: '#6772e5' }}></div>
+                                        <div className="text-center mb-30px">
+                                            <img src="/images/stripe_fallback.svg" alt="Stripe" className="checkout-payment-logo mx-auto" />
+                                            <h4 className="text-white alt-font fw-600 mb-5px w-100 text-center">Order Checkout</h4>
+                                            <p className="text-white/50 fs-14 w-100 text-center">Securely pay Order #{order.order_serial_no}</p>
+                                        </div>
+
+                                        {stripePromise && stripeOptions && (
+                                            <div className="animate__animated animate__fadeIn">
+                                                <Elements stripe={stripePromise} options={stripeOptions}>
+                                                    <StripePaymentForm 
+                                                        orderId={parseInt(id)} 
+                                                        onSuccess={() => {
+                                                            setStripeOptions(null);
+                                                            fetchOrder();
+                                                            showToast('Payment successful!', 'success');
+                                                        }}
+                                                        onCancel={() => setStripeOptions(null)}
+                                                    />
+                                                </Elements>
+                                            </div>
+                                        )}
+                                </div>
+                            </div>
                         </div>
 
                         {/* Summary */}
@@ -589,9 +662,43 @@ export default function OrderDetail() {
                                     </div>
                                 )}
                                 <div className="ui-note-block">
-                                    <span className="text-white-light fs-12 d-block mb-5px">Payment Status</span>
-                                    <span className="text-white fs-14 fw-600">{order.payment_status_name || (order.payment_status === 5 ? 'Paid' : 'Unpaid')}</span>
+                                    <span className="text-white-light fs-12 d-block mb-10px">Payment Status</span>
+                                    <span className="badge px-12px py-6px fs-11 fw-700 border-radius-4px" style={{ background: order.payment_status === 10 ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)', color: order.payment_status === 10 ? '#ef4444' : '#10b981', border: `1px solid ${order.payment_status === 10 ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}` }}>
+                                        {order.payment_status_name || (order.payment_status === 5 ? 'Paid' : 'Unpaid')}
+                                    </span>
                                 </div>
+
+                                {order.payment_status === 10 && order.status < 10 && (
+                                    <div className="mt-25px p-20px border-radius-10px shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(201,154,92,0.12) 0%, rgba(201,154,92,0.04) 100%)', border: '1px solid rgba(201,154,92,0.25)' }}>
+                                        <div className="d-flex flex-column align-items-center text-center gap-15px mb-20px">
+                                            <div className="flex-shrink-0 w-45px h-45px border-radius-50 d-flex align-items-center justify-content-center" style={{ background: 'rgba(201,154,92,0.12)', border: '1px solid rgba(201,154,92,0.2)' }}>
+                                                <img src="/images/stripe_fallback.svg" alt="Stripe" className="payment-icon-small" />
+                                            </div>
+                                            <div>
+                                                <p className="text-white fw-600 fs-15 mb-2px">Secure Online Payment</p>
+                                                <p className="opacity-5 fs-12 mb-0 text-white">Fast and encrypted via Stripe</p>
+                                            </div>
+                                        </div>
+                                        {!stripeOptions ? (
+                                            <button 
+                                                onClick={initiateOnlinePayment}
+                                                disabled={initiatingPayment}
+                                                className="btn btn-small btn-round-edge w-100 btn-base-color btn-box-shadow"
+                                                style={{ height: '46px' }}
+                                            >
+                                                <span>
+                                                    <span className="btn-double-text" data-text={initiatingPayment ? 'Initiating...' : 'Pay with Stripe'}>
+                                                        {initiatingPayment ? 'Initiating...' : 'Pay with Stripe'}
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        ) : (
+                                            <div className="text-center">
+                                                <p className="text-white opacity-5 fs-12 mb-0">Form expanded below <i className="feather icon-feather-arrow-down ms-1"></i></p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
                                 {/* Return Policy Info */}
                                 {canReturn && (
@@ -757,6 +864,7 @@ export default function OrderDetail() {
                     </div>
                 </div>
             )}
+
         </main>
     );
 }

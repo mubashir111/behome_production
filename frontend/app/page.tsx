@@ -34,7 +34,7 @@ export default async function Home() {
         apiFetch('/frontend/promotion', { cache: 'no-store' }).catch(() => ({ data: [] })),
         apiFetch('/frontend/benefit', { cache: 'no-store' }).catch(() => ({ data: [] })),
         apiFetch('/frontend/product-brand', { cache: 'no-store' }).catch(() => ({ data: [] })),
-        apiFetch('/products?per_page=1&sort=offer', { cache: 'no-store' }).catch(() => ({ data: { data: [] } })),
+        apiFetch('/products?per_page=10&sort=offer', { cache: 'no-store' }).catch(() => ({ data: { data: [] } })),
     ]);
 
     const sliders = (slidersData.data || []).map((s: any) => ({ ...s, image: s.image || '' }));
@@ -57,27 +57,27 @@ export default async function Home() {
     // Map Dynamic Promotions Grid (declared first so featuredOffer can reference it)
     const bigPromotion = promotions.find((p: any) => p.type === 10);
 
-    // Best active-offer product for the hero card
-    const topOfferProduct = (offerData.data?.data || [])[0] as any | undefined;
-    const topOfferCard = topOfferProduct ? {
-        name: topOfferProduct.name,
-        subtitle: topOfferProduct.discounted_price
-            ? `Was ${topOfferProduct.currency_price}`
+    // Map all active-offer or flagged products for the hero card
+    const offerProducts = (offerData.data?.data || []) as any[];
+    const offerCards = offerProducts.map((p: any) => ({
+        name: p.name,
+        subtitle: p.discounted_price
+            ? `Was ${p.currency_price}`
             : 'Limited Time Offer',
         badge_text: 'Sale',
-        description: topOfferProduct.category_name || null,
-        link: `/product/${topOfferProduct.slug}`,
-        image: topOfferProduct.cover || null,
-        discount_pct: topOfferProduct.discount
-            ? Math.round((Number(topOfferProduct.discount) / Number(Number(topOfferProduct.price) + Number(topOfferProduct.discount))) * 100)
+        description: p.category_name || null,
+        link: `/product/${p.slug}`,
+        image: p.cover || null,
+        discount_pct: p.discount
+            ? Math.round((Number(p.discount) / Number(Number(p.price || 0) + Number(p.discount))) * 100)
             : null,
-        discounted_price: topOfferProduct.discounted_price || null,
-        currency_price: topOfferProduct.currency_price || null,
-    } : null;
+        discounted_price: p.discounted_price || null,
+        currency_price: p.currency_price || null,
+    }));
 
-    // Build ordered promotion cards array: sale product first, then type=1 (Hero Slider Card) promotions only
+    // Build ordered promotion cards array: offer products first, then type=1 (Hero Slider Card) promotions
     const promotionCards = [
-        ...(topOfferCard ? [topOfferCard] : []),
+        ...offerCards,
         ...promotions.filter((p: any) => p.type === 1).map((p: any) => ({
             name: p.name,
             subtitle: p.subtitle || null,

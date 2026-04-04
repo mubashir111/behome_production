@@ -56,6 +56,15 @@ class PaymentService
                 SendOrderGotMail::dispatch(['order_id' => $order->id]);
                 SendOrderGotSms::dispatch(['order_id' => $order->id]);
                 SendOrderGotPush::dispatch(['order_id' => $order->id]);
+                // Selective cart clearing for online payments
+                $order->load('orderProducts');
+                foreach ($order->orderProducts as $item) {
+                    \App\Models\Cart::where([
+                        'user_id'      => $order->user_id,
+                        'product_id'   => $item->product_id,
+                        'variation_id' => $item->variation_id > 0 ? $item->variation_id : 0
+                    ])->delete();
+                }
             });
             return $this->transaction;
         } catch (Exception $exception) {

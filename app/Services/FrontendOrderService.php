@@ -276,8 +276,20 @@ class FrontendOrderService
                     ]);
                 }
 
-                // Clear the user's cart after order is successfully created
-                Cart::where('user_id', Auth::user()->id)->delete();
+                // Selective cart clearing: Only for COD. Others clear on payment confirmation.
+                $paymentGateway = \App\Models\PaymentGateway::find($request->payment_method);
+                if ($paymentGateway && $paymentGateway->slug === 'cashondelivery') {
+                    $orderProducts = json_decode($request->products);
+                    if (!blank($orderProducts)) {
+                        foreach ($orderProducts as $p) {
+                            Cart::where([
+                                'user_id'      => Auth::user()->id,
+                                'product_id'   => $p->product_id,
+                                'variation_id' => $p->variation_id ?? 0
+                            ])->delete();
+                        }
+                    }
+                }
             });
 
             try {

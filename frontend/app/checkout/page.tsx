@@ -1,12 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import { extractCurrencySymbol, readStoredCoupon, storeCoupon } from '@/lib/checkout';
 import { useCurrency } from '@/components/SettingsProvider';
 import { useToast } from '@/components/ToastProvider';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import StripePaymentForm from '@/components/StripePaymentForm';
 
 export default function Checkout() {
     const router = useRouter();
@@ -42,6 +45,20 @@ export default function Checkout() {
         order_note: '',
         payment_method: '2', // Default to E-wallet (Stripe)
     });
+
+    const [stripePromise, setStripePromise] = useState<any>(null);
+    const [stripeOptions, setStripeOptions] = useState<any>(null);
+    const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
+    const paymentSectionRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll to payment section when it appears
+    useEffect(() => {
+        if (stripeOptions) {
+            setTimeout(() => {
+                paymentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+    }, [stripeOptions]);
 
     const totalAmount = Math.max(subtotal + tax + shippingCost - couponDiscount, 0);
     const selectedGateway = paymentGateways.find(g => String(g.id) === formData.payment_method) ?? null;
@@ -338,10 +355,8 @@ export default function Checkout() {
             if (orderResponse.status) {
                 const orderId = orderResponse.data.id;
 
-                // 4. Clear cart (backend already cleared it, but also fire client-side event)
-                try { await apiFetch('/cart/clear', { method: 'DELETE' }); } catch { /* non-critical */ }
+                // Removed client-side cart clearing. Success is handled by backend + landing page.
                 storeCoupon(null);
-                window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
 
                 // 5. Initiate Payment
                 const paymentResponse = await apiFetch('/payment/initiate', {
@@ -353,7 +368,15 @@ export default function Checkout() {
                 });
 
                 if (paymentResponse.status) {
-                    if (paymentResponse.data?.redirect_url) {
+                    if (paymentGateway === 'stripe' && paymentResponse.data?.client_secret) {
+                        // Modern Stripe flow (Inline)
+                        setStripePromise(loadStripe(paymentResponse.data.publishableKey));
+                        setStripeOptions({
+                            clientSecret: paymentResponse.data.client_secret,
+                            appearance: { theme: 'night', labels: 'floating' },
+                        });
+                        setCurrentOrderId(orderId);
+                    } else if (paymentResponse.data?.redirect_url) {
                         window.location.href = paymentResponse.data.redirect_url;
                     } else {
                         // COD or gateways that confirm inline — go straight to success
@@ -455,15 +478,15 @@ export default function Checkout() {
     return (
         <main className="no-layout-pad page-top-100">
             <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
-            <div className="container-fluid">
-                <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
-                    <ul>
-                        <li><a href="/" className="breadcrumb-link">Home</a></li>
-                        <li><a href="/cart" className="breadcrumb-link">Cart</a></li>
-                        <li>Checkout</li>
-                    </ul>
+                <div className="container-fluid">
+                    <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+                        <ul>
+                            <li><a href="/" className="breadcrumb-link">Home</a></li>
+                            <li><a href="/cart" className="breadcrumb-link">Cart</a></li>
+                            <li>Checkout</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
             </section>
             <section className="page-shell page-shell-tight">
                 <div className="container">
@@ -682,6 +705,33 @@ export default function Checkout() {
                     </form>
                 </div>
             </section>
+
+            {/* Inline Stripe Payment Section */}
+            <div ref={paymentSectionRef} className={`transition-all duration-700 ease-in-out overflow-hidden ${stripeOptions ? 'max-h-[1000px] opacity-100 mb-60px' : 'max-h-0 opacity-0'}`}>
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <div className="col-12 col-lg-8">
+                            <div className="bg-[#111111] border border-white/10 p-40px md-p-20px border-radius-12px shadow-2xl relative">
+                                <div className="text-center mb-30px">
+                                    <img src="/images/stripe_fallback.svg" alt="Stripe" className="checkout-payment-logo mx-auto" />
+                                    <h4 className="text-white alt-font fw-600 mb-5px">Secure Checkout</h4>
+                                    <p className="text-white/50 fs-14">Complete your payment of {formatAmount(totalAmount)}</p>
+                                </div>
+
+                                {stripePromise && stripeOptions && (
+                                    <Elements stripe={stripePromise} options={stripeOptions}>
+                                        <StripePaymentForm 
+                                            orderId={currentOrderId!} 
+                                            onSuccess={() => router.push(`/payment/success?order_id=${currentOrderId}`)}
+                                            onCancel={() => setStripeOptions(null)}
+                                        />
+                                    </Elements>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     );
 }
