@@ -67,6 +67,24 @@ class OrderMailNotificationBuilder
         }
     }
 
+    public function adminPaymentReceivedNotification(): void
+    {
+        if (!blank($this->order)) {
+            $adminEmail = Settings::group('company')->get('company_email');
+            if ($adminEmail) {
+                $notificationAlert = NotificationAlert::where(['language' => 'admin_payment_received_message'])->first();
+                
+                // If specific template doesn't exist, we can use a default or reuse new order if appropriate, 
+                // but usually, it's better to log it and provide a default string.
+                $message = $notificationAlert->mail_message ?? "Payment has been successfully received for Order #" . ($this->order->order_serial_no ?? $this->order->id) . ".";
+                
+                if ($this->force || ($notificationAlert && $notificationAlert->mail == SwitchBox::ON) || !$notificationAlert) {
+                    $this->mail('Admin', $adminEmail, $this->order->order_serial_no, $message, $this->order);
+                }
+            }
+        }
+    }
+
     public function adminContactMessageNotification($contactMessage): void
     {
         $adminEmail = Settings::group('company')->get('company_email');

@@ -17,7 +17,12 @@ use App\Http\Requests\ThemeRequest;
 use App\Http\Requests\ShippingSetupRequest;
 use App\Http\Requests\NotificationRequest;
 use App\Http\Requests\MailRequest;
+use App\Http\Requests\OtpRequest;
 use App\Models\NotificationAlert;
+use App\Models\SmsGateway;
+use App\Models\GatewayOption;
+use App\Services\OtpService;
+use App\Services\SmsGatewayService;
 use App\Enums\SwitchBox;
 use Smartisan\Settings\Facades\Settings;
 
@@ -213,6 +218,51 @@ class SettingsController extends Controller
                 ]);
             }
             return back()->with('success', 'Notification alerts updated.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function otp(OtpService $service)
+    {
+        $settings = $service->list();
+        return view('admin.settings.otp', compact('settings'));
+    }
+
+    public function updateOtp(OtpRequest $request, OtpService $service)
+    {
+        try {
+            // Update OTP group settings
+            $service->update($request);
+            
+            // Update Site group settings (Registration rules)
+            $siteData = $request->only(['site_phone_verification', 'site_email_verification']);
+            if (!empty($siteData)) {
+                Settings::group('site')->set(array_filter($siteData, fn($v) => !is_null($v)));
+            }
+
+            return back()->with('success', 'Verification & OTP settings updated.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function smsGateway(SmsGatewayService $service)
+    {
+        $gateways = SmsGateway::with('gatewayOptions')->get();
+        return view('admin.settings.sms_gateway', compact('gateways'));
+    }
+
+    public function updateSmsGateway(Request $request, SmsGatewayService $service)
+    {
+        try {
+            $gateway = SmsGateway::where('slug', $request->sms_type)->firstOrFail();
+            $className = 'App\\Http\\SmsGateways\\Requests\\' . ucfirst($gateway->slug);
+            $gatewayRequest = new $className;
+            $validationRequests = $request->validate($gatewayRequest->rules());
+            
+            $service->update($validationRequests);
+            return back()->with('success', 'SMS gateway settings updated.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }

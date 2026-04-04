@@ -712,6 +712,22 @@
                     Integrations
                 </a>
 
+                <a href="{{ route('admin.settings.otp') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.settings.otp*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/>
+                    </svg>
+                    Verification & OTP
+                </a>
+
+                <a href="{{ route('admin.settings.sms-gateway') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.settings.sms-gateway*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    SMS Gateway
+                </a>
+
                 <a href="{{ route('admin.payment-gateways.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.payment-gateways.*') ? 'active' : '' }}">
                     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

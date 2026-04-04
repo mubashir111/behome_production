@@ -203,7 +203,20 @@ class SignupController extends Controller
                 ]);
                 $user->assignRole(EnumRole::CUSTOMER);
                 $pendingUser->delete();
-                return response(['status' => true, 'message' => trans('all.message.register_successfully')]);
+
+                Auth::guard('web')->loginUsingId($user->id);
+                $this->token = $user->createToken('auth_token')->plainTextToken;
+                $permission        = PermissionResource::collection($this->permissionService->permission($user->roles[0]));
+                $defaultPermission = AppLibrary::defaultPermission($permission);
+                return new JsonResponse([
+                    'status'            => true,
+                    'message'           => trans("all.message.register_successfully"),
+                    'token'             => $this->token,
+                    'user'              => new UserResource($user),
+                    'menu'              => MenuResource::collection(collect($this->menuService->menu($user->roles[0]))),
+                    'permission'        => $permission,
+                    'defaultPermission' => $defaultPermission,
+                ], 201);
             }
         } else {
             return response(['status' => false, 'message' => trans('all.message.register_not_completed')], 422);

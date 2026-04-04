@@ -101,6 +101,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('settings/smtp/test', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'testSmtp'])->name('settings.smtp.test');
         Route::get('settings/integrations', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'integrations'])->name('settings.integrations');
         Route::post('settings/integrations', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateIntegrations'])->name('settings.integrations.update');
+        Route::get('settings/otp', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'otp'])->name('settings.otp');
+        Route::post('settings/otp', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateOtp'])->name('settings.otp.update');
+        Route::get('settings/sms-gateway', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'smsGateway'])->name('settings.sms-gateway');
+        Route::post('settings/sms-gateway', [\App\Http\Controllers\Admin\Web\SettingsController::class, 'updateSmsGateway'])->name('settings.sms-gateway.update');
 
         Route::get('shipping/order-areas', [\App\Http\Controllers\Admin\Web\ShippingController::class, 'orderAreas'])->name('shipping.order-areas');
         Route::post('shipping/order-areas', [\App\Http\Controllers\Admin\Web\ShippingController::class, 'storeOrderArea'])->name('shipping.order-areas.store');

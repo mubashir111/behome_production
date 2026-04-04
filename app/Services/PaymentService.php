@@ -56,6 +56,14 @@ class PaymentService
                 SendOrderGotMail::dispatch(['order_id' => $order->id]);
                 SendOrderGotSms::dispatch(['order_id' => $order->id]);
                 SendOrderGotPush::dispatch(['order_id' => $order->id]);
+
+                // Specifically notify Admin about Payment Received
+                try {
+                    $orderMailNotificationBuilderService = new OrderMailNotificationBuilder($order->id);
+                    $orderMailNotificationBuilderService->adminPaymentReceivedNotification();
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::info($e->getMessage());
+                }
                 // Selective cart clearing for online payments
                 $order->load('orderProducts');
                 foreach ($order->orderProducts as $item) {

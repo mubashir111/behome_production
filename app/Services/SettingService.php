@@ -14,6 +14,7 @@ class SettingService
         $array = array_merge($array, Settings::group('shipping_setup')->all());
         $array = array_merge($array, Settings::group('theme')->all());
         $array = array_merge($array, Settings::group('otp')->all());
+        $array = array_merge($array, Settings::group('integrations')->all());
         $array = array_merge($array, Settings::group('social_media')->all());
         $array = array_merge($array, Settings::group('notification')->all());
         return array_merge($array, Settings::group('cookies')->all());

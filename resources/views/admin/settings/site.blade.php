@@ -113,23 +113,14 @@
             </div>
         </div>
 
-        <!-- Section 03: Apps & Links -->
+        <!-- Section 03: Mobile App Store Links -->
         <div class="admin-card">
             <h3 class="admin-section-title">
                 <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">03</span>
-                Verification & Apps
+                Mobile App Store Links
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Email Verification</label>
-                    <select name="site_email_verification" required
-                            class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-blue-600 outline-none transition-all bg-white text-slate-900">
-                        <option value="5" {{ $site_email_verify == 5 ? 'selected' : '' }}>Enabled</option>
-                        <option value="10" {{ $site_email_verify == 10 ? 'selected' : '' }}>Disabled</option>
-                    </select>
-                </div>
-
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Android App Link</label>
                     <input type="text" name="site_android_app_link" value="{{ $site_android }}"
@@ -172,7 +163,6 @@
         <!-- Hidden Requirements -->
         <input type="hidden" name="site_language_switch" value="{{ data_get($settings, 'site_language_switch', 10) }}">
         <input type="hidden" name="site_auto_update" value="{{ data_get($settings, 'site_auto_update', 10) }}">
-        <input type="hidden" name="site_phone_verification" value="{{ data_get($settings, 'site_phone_verification', 10) }}">
         <input type="hidden" name="site_online_payment_gateway" value="{{ data_get($settings, 'site_online_payment_gateway', 10) }}">
         <input type="hidden" name="site_cash_on_delivery" value="{{ data_get($settings, 'site_cash_on_delivery', 5) }}">
         <input type="hidden" name="site_is_return_product_price_add_to_credit" value="{{ data_get($settings, 'site_is_return_product_price_add_to_credit', 10) }}">

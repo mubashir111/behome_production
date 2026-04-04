@@ -24,9 +24,11 @@ class OtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'otp_type'        => 'required|string',
-            'otp_digit_limit' => 'required|numeric',
-            'otp_expire_time' => 'required|numeric|min:1|max:60',
+            'otp_type'                    => 'required|string',
+            'otp_digit_limit'             => 'required|numeric',
+            'otp_expire_time'             => 'required|numeric|min:1|max:60',
+            'site_phone_verification'     => 'nullable|numeric',
+            'site_email_verification'     => 'nullable|numeric',
         ];
     }
 }

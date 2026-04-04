@@ -25,6 +25,7 @@ function AccountContent() {
     const [otpStep, setOtpStep] = useState(false);
     const [otpToken, setOtpToken] = useState('');
     const [otpEmail, setOtpEmail] = useState('');
+    const [siteSettings, setSiteSettings] = useState<any>(null);
 
     // Dashboard Data
     const [orders, setOrders] = useState<any[]>([]);
@@ -96,13 +97,31 @@ function AccountContent() {
         }
     }, [fetchTabData]);
 
+    // Load General Settings (for Google Client ID, etc.)
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await apiFetch('/frontend/setting');
+                if (response.data) setSiteSettings(response.data);
+            } catch (err) {
+                console.error('Failed to fetch site settings:', err);
+            }
+        };
+        fetchSettings();
+    }, []);
+
     // Load Google GSI script and render button when on login screen
     useEffect(() => {
         if (isLoggedIn) return;
-        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        
+        // Priority: Settings from API (dynamic) > process.env (static/build-time)
+        const clientId = siteSettings?.google_client_id || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
         if (!clientId) return;
 
         const initGoogle = () => {
+            console.log("Initializing Google Sign-In with ID:", clientId);
+            if (!(window as any).google?.accounts) return;
+            
             (window as any).google?.accounts.id.initialize({
                 client_id: clientId,
                 callback: (res: any) => {
@@ -116,7 +135,7 @@ function AccountContent() {
         };
 
         if ((window as any).google?.accounts) {
-            initGoogle();
+            setTimeout(initGoogle, 500);
         } else {
             const script = document.createElement('script');
             script.src = 'https://accounts.google.com/gsi/client';
@@ -126,7 +145,7 @@ function AccountContent() {
             document.head.appendChild(script);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isLoggedIn]);
+    }, [isLoggedIn, siteSettings]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -190,10 +209,18 @@ function AccountContent() {
                 }),
             });
             if (response.status) {
-                // OTP sent to email — move to OTP step
-                setOtpEmail(registerData.email);
-                setOtpStep(true);
-                showToast('A verification code has been sent to your email.', 'success');
+                if (response.token) {
+                    // Verification was skipped — log in directly
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('user', JSON.stringify(response.user?.data ?? response.user));
+                    showToast('Registration successful! Logging you in...', 'success');
+                    window.location.reload();
+                } else {
+                    // OTP sent — move to OTP step
+                    setOtpEmail(registerData.email);
+                    setOtpStep(true);
+                    showToast('A verification code has been sent to your email.', 'success');
+                }
             } else {
                 showToast(response.message || 'Registration failed', 'error');
             }
