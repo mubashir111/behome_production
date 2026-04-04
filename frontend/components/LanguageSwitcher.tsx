@@ -83,7 +83,7 @@ export default function LanguageSwitcher() {
             </Script>
 
             {/* Language Switcher UI - 'notranslate' prevents GT from translating the names themselves */}
-            <div className="position-relative d-none d-lg-flex align-items-center notranslate" ref={ref}>
+            <div className="position-relative d-flex align-items-center notranslate" ref={ref}>
                 <button
                     onClick={() => setOpen(o => !o)}
                     className="glass-icon-box d-flex align-items-center gap-1 border-0 bg-transparent"
