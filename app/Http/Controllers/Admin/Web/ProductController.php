@@ -54,6 +54,10 @@ class ProductController extends Controller
 
     public function store(\App\Http\Requests\ProductRequest $request)
     {
+        $validatedData = $request->validate([
+            'discount' => 'nullable|numeric|min:0',
+        ]);
+
         try {
             $this->productService->store($request);
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');

@@ -42,6 +42,7 @@ class ProductService
         'status',
         'can_purchasable',
         'refundable',
+        'is_hero_slider',
         'weight',
         'order',
         'except'
