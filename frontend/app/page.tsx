@@ -410,16 +410,24 @@ export default async function Home() {
                                     </span>
                                     <a className="card-title fw-600 fs-17 lh-26 text-white d-inline-block mb-10px"
                                         href={`/product/${product.slug}`}>{product.name}</a>
-                                    <div className="d-flex align-items-center justify-content-between">
-                                        <div className="fw-600 fs-16" style={{ color: 'var(--base-color)' }}>
-                                            {product.is_offer
-                                                ? <><del className="opacity-5 me-8px fs-14 text-white">{product.currency_price}</del>{product.discounted_price}</>
-                                                : product.currency_price}
+                                    <div className="d-flex align-items-center" style={{ gap: '10px' }}>
+                                        <div className="fw-600 fs-16" style={{ color: 'var(--base-color)', flex: '1', minWidth: 0 }}>
+                                            {product.is_offer ? (
+                                                <div className="d-flex flex-column">
+                                                    <del className="opacity-5 fs-12 text-white" style={{ lineHeight: 1 }}>{product.currency_price}</del>
+                                                    <span style={{ whiteSpace: 'nowrap' }}>{product.discounted_price}</span>
+                                                </div>
+                                            ) : (
+                                                <span style={{ whiteSpace: 'nowrap' }}>{product.currency_price}</span>
+                                            )}
                                         </div>
-                                        <a href={`/product/${product.slug}`}
-                                            className="btn btn-very-small btn-transparent-white border-1 border-color-transparent-white-light btn-round-edge">
-                                            View
-                                        </a>
+                                        <div style={{ flex: '1', textAlign: 'right' }}>
+                                            <a href={`/product/${product.slug}`}
+                                                className="btn btn-very-small btn-transparent-white border-1 border-color-transparent-white-light btn-round-edge w-100 px-0"
+                                                style={{ maxWidth: '100px', display: 'inline-block' }}>
+                                                View
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

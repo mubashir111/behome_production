@@ -221,10 +221,14 @@ class AppLibrary
 
     public static function currencyAmountFormat($amount): string
     {
+        // Round the amount to the nearest whole number for a cleaner look
+        $roundedAmount = round($amount);
+        $decimalPoint  = 0; // Force 0 decimals for rounding
+
         if (env('CURRENCY_POSITION') == CurrencyPosition::LEFT) {
-            return env('CURRENCY_SYMBOL') . number_format($amount, env('CURRENCY_DECIMAL_POINT'), '.', '');
+            return env('CURRENCY_SYMBOL') . number_format($roundedAmount, $decimalPoint, '.', '');
         }
-        return number_format($amount, env('CURRENCY_DECIMAL_POINT'), '.', '') . env('CURRENCY_SYMBOL');
+        return number_format($roundedAmount, $decimalPoint, '.', '') . env('CURRENCY_SYMBOL');
     }
 
     public static function flatAmountFormat($amount): string
