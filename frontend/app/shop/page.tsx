@@ -8,14 +8,8 @@ import WishlistButton from '@/components/WishlistButton';
 import PageLoadingShell from '@/components/PageLoadingShell';
 import { useToast } from '@/components/ToastProvider';
 import { useCart } from '@/components/CartProvider';
+import { useSettings } from '@/components/SettingsProvider';
 
-const PRICE_RANGES = [
-    { label: 'Under $25', min: 0, max: 25 },
-    { label: '$25 to $50', min: 25, max: 50 },
-    { label: '$50 to $100', min: 50, max: 100 },
-    { label: '$100 to $200', min: 100, max: 200 },
-    { label: '$200 & Above', min: 200, max: Infinity },
-];
 
 function ShopContent() {
     const router = useRouter();
@@ -27,6 +21,33 @@ function ShopContent() {
     const initialPage = Number.parseInt(searchParams.get('page') || '1', 10);
 
     const [products, setProducts] = useState<any[]>([]);
+    const { settings, formatAmount } = useSettings();
+
+    const PRICE_RANGES = (() => {
+        const filterStr = settings?.site_price_filters || '25, 50, 100, 200';
+        const points = filterStr.split(',')
+            .map((s: string) => parseFloat(s.trim()))
+            .filter((n: number) => !isNaN(n))
+            .sort((a: number, b: number) => a - b);
+
+        if (points.length === 0) return [];
+        const ranges = [];
+        
+        // Return rounded number as string, no currency formatting
+        const f = (n: number) => Math.round(n).toString();
+
+        ranges.push({ min: 0, max: points[0], label: `Under ${f(points[0])}` });
+        for (let i = 0; i < points.length - 1; i++) {
+            ranges.push({
+                min: points[i],
+                max: points[i + 1],
+                label: `${f(points[i])} to ${f(points[i + 1])}`
+            });
+        }
+        const lastPoint = points[points.length - 1];
+        ranges.push({ min: lastPoint, max: Infinity, label: `${f(lastPoint)} & Above` });
+        return ranges;
+    })();
     const [categories, setCategories] = useState<any[]>([]);
     const [brands, setBrands] = useState<any[]>([]);
     const [latestProducts, setLatestProducts] = useState<any[]>([]);
@@ -37,7 +58,7 @@ function ShopContent() {
     const [sortBy, setSortBy] = useState('default');
     const [viewMode, setViewMode] = useState<'2' | '3' | '4' | 'list'>('4');
     const { showToast } = useToast();
-    const [priceRange, setPriceRange] = useState<typeof PRICE_RANGES[0] | null>(null);
+    const [priceRange, setPriceRange] = useState<any | null>(null);
     const [searchInput, setSearchInput] = useState(searchQuery);
     const [naIndex, setNaIndex] = useState(0);
     const lastFetchedUrl = useRef<string | null>(null);

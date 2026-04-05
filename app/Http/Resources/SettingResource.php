@@ -36,7 +36,6 @@ class SettingResource extends JsonResource
             'site_phone_verification' => $this->info['site_phone_verification'] ?? '0',
             'site_email_verification' => $this->info['site_email_verification'] ?? '0',
             'site_language_switch' => $this->info['site_language_switch'] ?? '0',
-            'site_online_payment_gateway' => $this->info['site_online_payment_gateway'] ?? '0',
             'site_cash_on_delivery' => $this->info['site_cash_on_delivery'] ?? '0',
             'shipping_setup_method' => $this->info['shipping_setup_method'] ?? '',
             'shipping_setup_flat_rate_wise_cost' => $this->info['shipping_setup_flat_rate_wise_cost'] ?? '0',
@@ -71,6 +70,7 @@ class SettingResource extends JsonResource
             'image_403' => asset('/images/required/403.png'),
             'image_404' => asset('/images/required/404.png'),
             'site_free_delivery_threshold' => $this->info['site_free_delivery_threshold'] ?? '120',
+            'site_price_filters' => $this->info['site_price_filters'] ?? '25, 50, 100, 200',
         ];
     }
 

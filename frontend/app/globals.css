@@ -204,10 +204,15 @@
 }
 
 .ui-sidebar-card {
-  background: rgba(26, 26, 26, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 22px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Sidebar filter item alignment fix */
+.shop-sidebar .shop-filter li {
+  padding: 0px 20px !important;
 }
 
 .ui-sidebar-title {
@@ -1272,12 +1277,6 @@ li:hover .item-qty {
   background: rgba(205, 170, 124, 0.05);
 }
 
-.ui-sidebar-card {
-  padding: 25px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
 
 .ui-sidebar-title {
   font-family: var(--alt-font);

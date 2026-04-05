@@ -118,6 +118,15 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Price Filter Ranges</label>
+                        <input type="text" name="site_price_filters"
+                            value="{{ old('site_price_filters', data_get($settings, 'site_price_filters', '25, 50, 100, 200')) }}"
+                            placeholder="e.g. 25, 50, 100, 200"
+                            class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600 outline-none transition-all bg-white text-slate-900">
+                        <p class="mt-1 text-[10px] text-slate-500 font-medium font-bold">Comma separated values. e.g. 25, 50, 100, 200 (auto-builds Under 25, 25-50, etc.)</p>
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Copyright Text</label>
                         <input type="text" name="site_copyright" value="{{ $site_copyright }}" required
                             class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600 outline-none transition-all bg-white text-slate-900">

@@ -43,25 +43,23 @@ function buildFormat(symbol: string, position: 'left' | 'right', decimals: numbe
 }
 
 export default function SettingsProvider({ children }: { children: React.ReactNode }) {
-    const [state, setState] = useState<SettingsContextValue>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const cached = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-                if (cached.currency) {
-                    return {
-                        ...defaults,
-                        currency: cached.currency,
-                        settings: cached.settings,
-                        loading: false,
-                        formatAmount: buildFormat(cached.currency.symbol, cached.currency.position, cached.currency.decimals),
-                    };
-                }
-            } catch {}
-        }
-        return defaults;
-    });
+    const [state, setState] = useState<SettingsContextValue>(defaults);
 
     useEffect(() => {
+        // Hydrate from localStorage once we are on the client
+        try {
+            const cached = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            if (cached.currency && cached.settings) {
+                setState({
+                    ...defaults,
+                    currency: cached.currency,
+                    settings: cached.settings,
+                    loading: false,
+                    formatAmount: buildFormat(cached.currency.symbol, cached.currency.position, cached.currency.decimals),
+                });
+            }
+        } catch {}
+
         async function fetchSettings() {
             try {
                 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
