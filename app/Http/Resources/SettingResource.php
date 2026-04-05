@@ -69,6 +69,7 @@ class SettingResource extends JsonResource
             'image_confirm' => asset('/images/required/confirm.gif'),
             'image_403' => asset('/images/required/403.png'),
             'image_404' => asset('/images/required/404.png'),
+            'site_free_delivery_threshold' => $this->info['site_free_delivery_threshold'] ?? '120',
         ];
     }
 

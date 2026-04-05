@@ -26,6 +26,7 @@ export default async function Home() {
         benefitsData,
         brandsData,
         offerData,
+        settingsData,
     ] = await Promise.all([
         apiFetch('/frontend/slider', { cache: 'no-store' }).catch(() => ({ data: [] })),
         apiFetch('/frontend/product-category', { cache: 'no-store' }).catch(() => ({ data: [] })),
@@ -35,6 +36,7 @@ export default async function Home() {
         apiFetch('/frontend/benefit', { cache: 'no-store' }).catch(() => ({ data: [] })),
         apiFetch('/frontend/product-brand', { cache: 'no-store' }).catch(() => ({ data: [] })),
         apiFetch('/products?per_page=10&sort=offer', { cache: 'no-store' }).catch(() => ({ data: { data: [] } })),
+        apiFetch('/frontend/setting', { cache: 'no-store' }).catch(() => ({ data: {} })),
     ]);
 
     const sliders = (slidersData.data || []).map((s: any) => ({ ...s, image: s.image || '' }));
@@ -93,11 +95,14 @@ export default async function Home() {
 
     const smallPromotions = promotions.filter((p: any) => p.type === 5).slice(0, 2);
 
+    const settings = settingsData?.data || settingsData || {};
+    const symbol = settings?.site_default_currency_symbol || '£';
+
     const benefits = (benefitsData.data || [] as any[]).filter((b: any) => b.status === 5) as any[];
     const tickerItems = benefits.length > 0
         ? [...benefits, ...benefits, ...benefits]
-        : ['Premium Furniture', 'Free Delivery Over £120', 'Secure Checkout', 'Expert Support',
-           'Premium Furniture', 'Free Delivery Over £120', 'Secure Checkout', 'Expert Support'].map((t, i) => ({ id: i, title: t }));
+        : ['Premium Furniture', `Free Delivery Over ${symbol}${settings?.site_free_delivery_threshold || '120'}`, 'Secure Checkout', 'Expert Support',
+           'Premium Furniture', `Free Delivery Over ${symbol}${settings?.site_free_delivery_threshold || '120'}`, 'Secure Checkout', 'Expert Support'].map((t, i) => ({ id: i, title: t }));
 
     const brands = (brandsData.data || [] as any[]).map((b: any) => ({
         ...b, image: b.cover || b.thumb || '',

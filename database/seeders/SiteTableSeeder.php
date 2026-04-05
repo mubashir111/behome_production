@@ -37,6 +37,7 @@ class SiteTableSeeder extends Seeder
             'site_cash_on_delivery'                      => Activity::ENABLE,
             'site_non_purchase_product_maximum_quantity' => '100',
             'site_is_return_product_price_add_to_credit' => Ask::YES,
+            'site_free_delivery_threshold'               => '120',
         ]);
 
         Artisan::call('optimize:clear');

@@ -8,11 +8,17 @@ import TopBar from './TopBar';
 
 export default async function Header() {
     let categories = [];
+    let settings: any = null;
+
     try {
-        const categoriesResponse = await apiFetch('/frontend/product-category');
+        const [categoriesResponse, settingsResponse] = await Promise.all([
+            apiFetch('/frontend/product-category'),
+            apiFetch('/frontend/setting')
+        ]);
         categories = categoriesResponse?.data || [];
+        settings = settingsResponse?.data || settingsResponse;
     } catch (error) {
-        console.error('[HEADER_ERROR] Failed to fetch categories:', error);
+        console.error('[HEADER_ERROR] Failed to fetch data:', error);
     }
 
     // Group categories if needed, or just list them. 
@@ -291,7 +297,7 @@ export default async function Header() {
                                     {/* Free delivery banner */}
                                     <div className="mobile-nav-promo">
                                         <i className="feather icon-feather-truck"></i>
-                                        Free delivery on orders over £120
+                                        Free delivery on orders over {settings?.site_default_currency_symbol || '£'}{settings?.site_free_delivery_threshold || '120'}
                                     </div>
                                 </div>
                             </div>
