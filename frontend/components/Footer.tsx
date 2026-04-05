@@ -2,11 +2,15 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
+import { useSettings } from '@/components/SettingsProvider';
 
 export default function Footer() {
+    const { settings } = useSettings();
     const [pages, setPages] = useState<any[]>([]);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         const fetchPages = async () => {
             try {
                 const response = await apiFetch('/frontend/static-pages');
@@ -98,11 +102,15 @@ export default function Footer() {
                         </div>
                         <div className="col-6 col-md-4 text-center">
                             <span className="d-block fs-12 opacity-5 mb-3px">Need support?</span>
-                            <a className="fs-14 text-white fw-500" href="tel:+442071234567">+44 207 123 4567</a>
+                            <a className="fs-14 text-white fw-500" href={`tel:${(mounted && settings?.company_phone) ? settings.company_phone.replace(/\s+/g, '') : '+442071234567'}`}>
+                                {(mounted && settings?.company_phone) ? settings.company_phone : '+44 207 123 4567'}
+                            </a>
                         </div>
                         <div className="col-6 col-md-3 text-center text-md-end">
                             <span className="d-block fs-12 opacity-5 mb-3px">Customer care</span>
-                            <a className="fs-14 text-white fw-500" href="mailto:hello@behome.co.uk">hello@behome.co.uk</a>
+                            <a className="fs-14 text-white fw-500" href={`mailto:${(mounted && settings?.company_email) ? settings.company_email : 'hello@behome.co.uk'}`}>
+                                {(mounted && settings?.company_email) ? settings.company_email : 'hello@behome.co.uk'}
+                            </a>
                         </div>
                     </div>
                 </div>
