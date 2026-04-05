@@ -276,28 +276,46 @@ export default async function Header() {
 
                                     {/* Contact + social row */}
                                     <div className="mobile-nav-contact-row">
-                                        <a href="mailto:hello@behome.co.uk" className="mobile-nav-contact-item">
+                                        <a href={`mailto:${settings?.company_email || 'hello@behome.co.uk'}`} className="mobile-nav-contact-item">
                                             <i className="feather icon-feather-mail"></i>
-                                            hello@behome.co.uk
+                                            {settings?.company_email || 'hello@behome.co.uk'}
                                         </a>
-                                        <a href="tel:+442071234567" className="mobile-nav-contact-item">
+                                        <a href={`tel:${settings?.company_phone || '+442071234567'}`} className="mobile-nav-contact-item">
                                             <i className="feather icon-feather-phone"></i>
-                                            +44 207 123 4567
+                                            {settings?.company_calling_code} {settings?.company_phone}
                                         </a>
                                     </div>
 
                                     {/* Social icons */}
                                     <div className="mobile-nav-social">
-                                        <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>
-                                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i className="fa-brands fa-facebook-f"></i></a>
-                                        <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i className="fa-brands fa-twitter"></i></a>
-                                        <a href="https://www.pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i className="fa-brands fa-pinterest-p"></i></a>
+                                        {settings?.social_media_instagram && (
+                                            <a href={settings.social_media_instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>
+                                        )}
+                                        {settings?.social_media_facebook && (
+                                            <a href={settings.social_media_facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i className="fa-brands fa-facebook-f"></i></a>
+                                        )}
+                                        {settings?.social_media_twitter && (
+                                            <a href={settings.social_media_twitter} target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i className="fa-brands fa-x-twitter"></i></a>
+                                        )}
+                                        {settings?.social_media_youtube && (
+                                            <a href={settings.social_media_youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i className="fa-brands fa-youtube"></i></a>
+                                        )}
+                                        {settings?.social_media_linkedin && (
+                                            <a href={settings.social_media_linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i className="fa-brands fa-linkedin-in"></i></a>
+                                        )}
                                     </div>
 
                                     {/* Free delivery banner */}
                                     <div className="mobile-nav-promo">
                                         <i className="feather icon-feather-truck"></i>
-                                        Free delivery on orders over {settings?.site_default_currency_symbol || '£'}{settings?.site_free_delivery_threshold || '120'}
+                                        Free delivery on orders over {(() => {
+                                            const symbol = settings?.site_default_currency_symbol || '£';
+                                            const position = settings?.site_currency_position == 10 ? 'right' : 'left';
+                                            const decimals = Number(settings?.site_digit_after_decimal_point) || 2;
+                                            const threshold = Number(settings?.site_free_delivery_threshold) || 120;
+                                            const formatted = threshold.toFixed(decimals);
+                                            return position === 'left' ? `${symbol}${formatted}` : `${formatted}${symbol}`;
+                                        })()}
                                     </div>
                                 </div>
                             </div>

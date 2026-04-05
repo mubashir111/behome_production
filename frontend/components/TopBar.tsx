@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSettings } from './SettingsProvider';
 
 export default function TopBar() {
-    const { settings } = useSettings();
+    const { settings, formatAmount } = useSettings();
     const [visible, setVisible] = useState(false);
     const [closing, setClosing] = useState(false);
 
@@ -47,7 +47,7 @@ export default function TopBar() {
                 <div className="row h-45px align-items-center m-0">
                     <div className="col-lg-7 col-md-8 text-center text-md-start">
                         <div className="fs-13 text-white fw-600">
-                            Free Delivery on orders over {settings?.site_default_currency_symbol || '£'}{settings?.site_free_delivery_threshold || '120'}. Don&apos;t miss discount.{' '}
+                            Free Delivery on orders over {formatAmount(Number(settings?.site_free_delivery_threshold) || 120)}. Don&apos;t miss discount.{' '}
                             <a className="text-white fw-700 text-decoration-line-bottom" href="/shop">Shop now</a>
                         </div>
                     </div>

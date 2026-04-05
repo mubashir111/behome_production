@@ -18,10 +18,10 @@ interface SettingsContextValue {
 const STORAGE_KEY = 'site_settings_cache';
 
 const defaults: SettingsContextValue = {
-    currency: { symbol: '£', position: 'left', decimals: 2 },
+    currency: { symbol: '', position: 'left', decimals: 2 },
     settings: null,
     loading: true,
-    formatAmount: (n) => `£${n.toFixed(2)}`,
+    formatAmount: (n) => `${n?.toFixed(2) || '0.00'}`,
 };
 
 const SettingsContext = createContext<SettingsContextValue>(defaults);
@@ -36,6 +36,7 @@ export function useCurrency() {
 
 function buildFormat(symbol: string, position: 'left' | 'right', decimals: number) {
     return (amount: number) => {
+        if (typeof amount !== 'number') return '';
         const formatted = amount.toFixed(decimals);
         return position === 'left' ? `${symbol}${formatted}` : `${formatted}${symbol}`;
     };
@@ -72,8 +73,8 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
                 const data = json?.data ?? json;
 
                 const currency: CurrencyConfig = {
-                    symbol: data.site_default_currency_symbol || '£',
-                    position: data.site_currency_position == 5 ? 'right' : 'left',
+                    symbol: data.site_default_currency_symbol || '',
+                    position: data.site_currency_position == 10 ? 'right' : 'left',
                     decimals: data.site_digit_after_decimal_point ?? 2,
                 };
 

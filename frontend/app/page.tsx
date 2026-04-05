@@ -98,11 +98,22 @@ export default async function Home() {
     const settings = settingsData?.data || settingsData || {};
     const symbol = settings?.site_default_currency_symbol || '£';
 
+    const formatAmount = (amount: number) => {
+        const sym = settings?.site_default_currency_symbol || '£';
+        const pos = settings?.site_currency_position == 10 ? 'right' : 'left';
+        const dec = Number(settings?.site_digit_after_decimal_point) || 2;
+        const formatted = amount.toFixed(dec);
+        return pos === 'left' ? `${sym}${formatted}` : `${formatted}${sym}`;
+    };
+
+    const threshold = Number(settings?.site_free_delivery_threshold) || 120;
+    const formattedThreshold = formatAmount(threshold);
+
     const benefits = (benefitsData.data || [] as any[]).filter((b: any) => b.status === 5) as any[];
     const tickerItems = benefits.length > 0
         ? [...benefits, ...benefits, ...benefits]
-        : ['Premium Furniture', `Free Delivery Over ${symbol}${settings?.site_free_delivery_threshold || '120'}`, 'Secure Checkout', 'Expert Support',
-           'Premium Furniture', `Free Delivery Over ${symbol}${settings?.site_free_delivery_threshold || '120'}`, 'Secure Checkout', 'Expert Support'].map((t, i) => ({ id: i, title: t }));
+        : ['Premium Furniture', `Free Delivery Over ${formattedThreshold}`, 'Secure Checkout', 'Expert Support',
+           'Premium Furniture', `Free Delivery Over ${formattedThreshold}`, 'Secure Checkout', 'Expert Support'].map((t, i) => ({ id: i, title: t }));
 
     const brands = (brandsData.data || [] as any[]).map((b: any) => ({
         ...b, image: b.cover || b.thumb || '',
