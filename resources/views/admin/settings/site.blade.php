@@ -125,11 +125,57 @@
                 </div>
             </div>
 
-            <!-- Section 03: Mobile App Store Links -->
+            <!-- Section 03: Social Media Links -->
             <div class="admin-card">
                 <h3 class="admin-section-title">
                     <span
-                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">03</span>
+                        class="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center text-sm font-bold">03</span>
+                    Social Media Links
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Facebook URL</label>
+                        <input type="url" name="social_media_facebook" value="{{ old('social_media_facebook', data_get($settings, 'social_media_facebook')) }}"
+                               class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-pink-600 outline-none transition-all bg-white text-slate-900"
+                               placeholder="https://facebook.com/yourpage">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Instagram URL</label>
+                        <input type="url" name="social_media_instagram" value="{{ old('social_media_instagram', data_get($settings, 'social_media_instagram')) }}"
+                               class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-pink-600 outline-none transition-all bg-white text-slate-900"
+                               placeholder="https://instagram.com/yourprofile">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Twitter (X) URL</label>
+                        <input type="url" name="social_media_twitter" value="{{ old('social_media_twitter', data_get($settings, 'social_media_twitter')) }}"
+                               class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-pink-600 outline-none transition-all bg-white text-slate-900"
+                               placeholder="https://twitter.com/yourhandle">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">YouTube URL</label>
+                        <input type="url" name="social_media_youtube" value="{{ old('social_media_youtube', data_get($settings, 'social_media_youtube')) }}"
+                               class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-pink-600 outline-none transition-all bg-white text-slate-900"
+                               placeholder="https://youtube.com/@yourchannel">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">LinkedIn URL</label>
+                        <input type="url" name="social_media_linkedin" value="{{ old('social_media_linkedin', data_get($settings, 'social_media_linkedin')) }}"
+                               class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-pink-600 outline-none transition-all bg-white text-slate-900"
+                               placeholder="https://linkedin.com/in/yourprofile">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 04: Mobile App Store Links -->
+            <div class="admin-card">
+                <h3 class="admin-section-title">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">04</span>
                     Mobile App Store Links
                 </h3>
 
@@ -148,11 +194,11 @@
                 </div>
             </div>
 
-            <!-- Section 04: System -->
+            <!-- Section 05: System -->
             <div class="admin-card">
                 <h3 class="admin-section-title">
                     <span
-                        class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">04</span>
+                        class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">05</span>
                     System & Debug
                 </h3>
 

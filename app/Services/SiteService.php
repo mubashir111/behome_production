@@ -43,6 +43,18 @@ class SiteService
             $currency = Currency::find($request->site_default_currency);
             Settings::group('site')->set($request->validated() + ['site_default_currency_symbol' => $currency->symbol]);
 
+            // Ensure social media links are also saved to the 'social_media' group for the frontend
+            $socialData = array_intersect_key($request->validated(), array_flip([
+                'social_media_facebook',
+                'social_media_instagram',
+                'social_media_twitter',
+                'social_media_youtube',
+                'social_media_linkedin'
+            ]));
+            if (!empty($socialData)) {
+                Settings::group('social_media')->set($socialData);
+            }
+
             $this->envService->addData([
                 'APP_DEBUG'              => $request->site_app_debug == Activity::ENABLE ? 'true' : 'false',
                 'TIMEZONE'               => $request->site_default_timezone,

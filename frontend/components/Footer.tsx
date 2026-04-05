@@ -38,10 +38,21 @@ export default function Footer() {
                         </p>
                         <div className="elements-social social-icon-style-02">
                             <ul className="small-icon light">
-                                <li><a className="facebook" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-facebook-f"></i></a></li>
-                                <li><a className="dribbble" href="http://www.dribbble.com" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-dribbble"></i></a></li>
-                                <li><a className="twitter" href="https://www.twitter.com" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-twitter"></i></a></li>
-                                <li><a className="instagram" href="https://www.instagram.com" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-instagram"></i></a></li>
+                                {mounted && settings?.social_media_facebook && (
+                                    <li><a className="facebook" href={settings.social_media_facebook} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-facebook-f"></i></a></li>
+                                )}
+                                {mounted && settings?.social_media_instagram && (
+                                    <li><a className="instagram" href={settings.social_media_instagram} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-instagram"></i></a></li>
+                                )}
+                                {mounted && settings?.social_media_twitter && (
+                                    <li><a className="twitter" href={settings.social_media_twitter} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-x-twitter"></i></a></li>
+                                )}
+                                {mounted && settings?.social_media_youtube && (
+                                    <li><a className="youtube" href={settings.social_media_youtube} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-youtube"></i></a></li>
+                                )}
+                                {mounted && settings?.social_media_linkedin && (
+                                    <li><a className="linkedin" href={settings.social_media_linkedin} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in"></i></a></li>
+                                )}
                             </ul>
                         </div>
                     </div>

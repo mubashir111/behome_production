@@ -47,6 +47,11 @@ class SiteResource extends JsonResource
             "site_non_purchase_product_maximum_quantity" => $this->info['site_non_purchase_product_maximum_quantity'],
             "site_is_return_product_price_add_to_credit" => $this->info['site_is_return_product_price_add_to_credit'],
             "site_free_delivery_threshold"               => $this->info['site_free_delivery_threshold'] ?? '120',
+            "social_media_facebook"                      => $this->info['social_media_facebook'] ?? '',
+            "social_media_instagram"                     => $this->info['social_media_instagram'] ?? '',
+            "social_media_twitter"                       => $this->info['social_media_twitter'] ?? '',
+            "social_media_youtube"                       => $this->info['social_media_youtube'] ?? '',
+            "social_media_linkedin"                      => $this->info['social_media_linkedin'] ?? '',
         ];
     }
 }

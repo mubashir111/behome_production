@@ -45,6 +45,11 @@ class SiteRequest extends FormRequest
             'site_non_purchase_product_maximum_quantity'  => ['required', 'numeric'],
             'site_is_return_product_price_add_to_credit' => ['required', 'numeric'],
             'site_free_delivery_threshold'               => ['required', 'numeric'],
+            'social_media_facebook'                      => ['nullable', 'url', 'max:190'],
+            'social_media_instagram'                     => ['nullable', 'url', 'max:190'],
+            'social_media_twitter'                       => ['nullable', 'url', 'max:190'],
+            'social_media_youtube'                       => ['nullable', 'url', 'max:190'],
+            'social_media_linkedin'                      => ['nullable', 'url', 'max:190'],
         ];
     }
 }

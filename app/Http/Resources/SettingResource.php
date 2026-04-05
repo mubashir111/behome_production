@@ -51,6 +51,7 @@ class SettingResource extends JsonResource
             'social_media_instagram' => $this->info['social_media_instagram'] ?? '',
             'social_media_twitter' => $this->info['social_media_twitter'] ?? '',
             'social_media_youtube' => $this->info['social_media_youtube'] ?? '',
+            'social_media_linkedin' => $this->info['social_media_linkedin'] ?? '',
             'cookies_details_page_id' => $this->info['cookies_details_page_id'] ?? '',
             'cookies_summary' => $this->info['cookies_summary'] ?? '',
             'notification_fcm_api_key' => $this->info['notification_fcm_api_key'] ?? '',
