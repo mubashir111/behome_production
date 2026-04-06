@@ -35,8 +35,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
             title,
             description,
             type: 'article',
-            ...(p.cover_image && { images: [{ url: p.cover_image, width: 1200, height: 630 }] }),
+            images: p.cover_image 
+                ? [{ url: p.cover_image, width: 1200, height: 630 }] 
+                : [{ url: '/images/og-default.png', width: 1200, height: 630 }],
             ...(p.published_at && { publishedTime: p.published_at }),
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: p.cover_image ? [p.cover_image] : ['/images/og-default.png'],
         },
     };
 }

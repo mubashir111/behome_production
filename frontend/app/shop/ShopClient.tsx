@@ -32,7 +32,7 @@ function ShopContent() {
 
         if (points.length === 0) return [];
         const ranges = [];
-        
+
         // Return rounded number as string, no currency formatting
         const f = (n: number) => Math.round(n).toString();
 
@@ -229,7 +229,7 @@ function ShopContent() {
                                     onChange={e => setSearchInput(e.target.value)}
                                     style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.14)' }}
                                 />
-                                <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap' }}>Search</button>
+                                <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Search</button>
                             </form>
 
                             {/* ── Mobile filter + sort bar ── */}
@@ -283,7 +283,7 @@ function ShopContent() {
                                         className="form-control form-control-sm"
                                         style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)' }}
                                     />
-                                    <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray">Search</button>
+                                    <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Search</button>
                                 </form>
                                 <div className="ms-auto d-flex align-items-center gap-3">
                                     {!loading && totalProducts > 0 && <span className="text-white opacity-6 fs-13">{products.length} of {totalProducts} results</span>}
@@ -360,7 +360,7 @@ function ShopContent() {
                                                             </div>
                                                             <div className="d-flex gap-2">
                                                                 <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)}>Add to Cart</button>
-                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-35px h-35px text-white d-flex align-items-center justify-content-center rounded-circle border-0" onMessage={(m,t) => showToast(m,t)} />
+                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-35px h-35px text-white d-flex align-items-center justify-content-center rounded-circle border-0" onMessage={(m, t) => showToast(m, t)} />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -373,7 +373,7 @@ function ShopContent() {
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
                                                             <div className="shop-hover d-flex justify-content-center">
-                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onMessage={(m,t) => showToast(m,t)} />
+                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onMessage={(m, t) => showToast(m, t)} />
                                                                 <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)}>
                                                                     <i className="feather icon-feather-shopping-bag fs-15"></i>
                                                                 </button>
