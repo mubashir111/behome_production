@@ -388,25 +388,27 @@ class PaymentGatewayDataTableSeeder extends Seeder
     {
         if (env('DEMO', false)) {
             foreach ($this->gateways as $gateway) {
-                $payment = PaymentGateway::where(['slug' => $gateway['slug']])->first();
-                if ($payment) {
-                    $payment->status = $gateway['status'];
-                    $payment->save();
-                }
-                $this->gatewayOption($gateway['options']);
+                $payment = PaymentGateway::updateOrCreate(
+                    ['slug' => $gateway['slug']],
+                    ['status' => $gateway['status']]
+                );
+                $this->gatewayOption($payment->id, $gateway['options']);
             }
         }
     }
 
-    public function gatewayOption($options): void
+    public function gatewayOption($id, $options): void
     {
         if (!blank($options)) {
             foreach ($options as $option) {
-                $gatewayOption = GatewayOption::where(['option' => $option['option']])->first();
-                if ($gatewayOption) {
-                    $gatewayOption->value = $option['value'];
-                    $gatewayOption->save();
-                }
+                GatewayOption::updateOrCreate(
+                    [
+                        'model_id'   => $id,
+                        'model_type' => PaymentGateway::class,
+                        'option'     => $option['option']
+                    ],
+                    ['value' => $option['value']]
+                );
             }
         }
     }

@@ -260,12 +260,14 @@ class SmsGatewayTableSeeder extends Seeder
     public function run(): void
     {
         foreach ($this->gateways as $gateway) {
-            $sms = SmsGateway::create([
-                'name'   => $gateway['name'],
-                'slug'   => $gateway['slug'],
-                'misc'   => json_encode($gateway['misc']),
-                'status' => Status::ACTIVE,
-            ]);
+            $sms = SmsGateway::updateOrCreate(
+                ['slug' => $gateway['slug']],
+                [
+                    'name'   => $gateway['name'],
+                    'misc'   => json_encode($gateway['misc']),
+                    'status' => Status::ACTIVE,
+                ]
+            );
             $this->gatewayOption($sms->id, $gateway['options']);
         }
     }
@@ -273,14 +275,18 @@ class SmsGatewayTableSeeder extends Seeder
     public function gatewayOption($id, $options): void
     {
         foreach ($options as $option) {
-            GatewayOption::create([
-                'model_id'   => $id,
-                'model_type' => 'App\Models\SmsGateway',
-                'option'     => $option['option'],
-                'value'      => $option['value'] ?? "",
-                'type'       => $option['type'],
-                'activities' => json_encode($option['activities'])
-            ]);
+            GatewayOption::updateOrCreate(
+                [
+                    'model_id'   => $id,
+                    'model_type' => 'App\Models\SmsGateway',
+                    'option'     => $option['option'],
+                ],
+                [
+                    'value'      => $option['value'] ?? "",
+                    'type'       => $option['type'],
+                    'activities' => json_encode($option['activities'])
+                ]
+            );
         }
     }
 }

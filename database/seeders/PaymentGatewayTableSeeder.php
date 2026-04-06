@@ -621,15 +621,19 @@ class PaymentGatewayTableSeeder extends Seeder
     public function run(): void
     {
         foreach ($this->gateways as $gateway) {
-            $payment = PaymentGateway::create([
-                'name'   => $gateway['name'],
-                'slug'   => $gateway['slug'],
-                'misc'   => json_encode($gateway['misc']),
-                'status' => $gateway['status']
-            ]);
+            $payment = PaymentGateway::updateOrCreate(
+                ['slug' => $gateway['slug']],
+                [
+                    'name'   => $gateway['name'],
+                    'misc'   => json_encode($gateway['misc']),
+                    'status' => $gateway['status']
+                ]
+            );
 
             if (file_exists(public_path('/images/seeder/payment-gateway/' . strtolower(str_replace(' ', '_', $gateway['slug'])) . '.png'))) {
-                $payment->addMedia(public_path('/images/seeder/payment-gateway/' . strtolower(str_replace(' ', '_', $gateway['slug'])) . '.png'))->preservingOriginal()->toMediaCollection('payment-gateway');
+                if ($payment->getMedia('payment-gateway')->isEmpty()) {
+                    $payment->addMedia(public_path('/images/seeder/payment-gateway/' . strtolower(str_replace(' ', '_', $gateway['slug'])) . '.png'))->preservingOriginal()->toMediaCollection('payment-gateway');
+                }
             }
             $this->gatewayOption($payment->id, $gateway['options']);
         }
@@ -639,14 +643,18 @@ class PaymentGatewayTableSeeder extends Seeder
     {
         if (!blank($options)) {
             foreach ($options as $option) {
-                GatewayOption::create([
-                    'model_id'   => $id,
-                    'model_type' => PaymentGateway::class,
-                    'option'     => $option['option'],
-                    'value'      => $option['value'] ?? "",
-                    'type'       => $option['type'],
-                    'activities' => json_encode($option['activities']),
-                ]);
+                GatewayOption::updateOrCreate(
+                    [
+                        'model_id'   => $id,
+                        'model_type' => PaymentGateway::class,
+                        'option'     => $option['option'],
+                    ],
+                    [
+                        'value'      => $option['value'] ?? "",
+                        'type'       => $option['type'],
+                        'activities' => json_encode($option['activities']),
+                    ]
+                );
             }
         }
     }
