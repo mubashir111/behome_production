@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     siteName: 'Behome',
     title: 'Behome - Premium Architectural Decor & Luxury Furniture',
     description: 'Behome - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
-    images: [{ url: '/images/og-default.jpg', width: 1200, height: 630 }],
+    images: [{ url: '/images/og-default.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Behome - Premium Architectural Decor & Luxury Furniture',
     description: 'Behome - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
-    images: ['/images/og-default.jpg'],
+    images: ['/images/og-default.png'],
   },
   robots: { index: true, follow: true },
 };

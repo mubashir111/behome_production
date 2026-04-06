@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ProductPageClient from './ProductPageClient';
-import { SERVER_API_URL, API_KEY } from '@/lib/config';
+import { SERVER_API_URL, API_KEY, SITE_URL } from '@/lib/config';
 
 
 export async function generateMetadata(
@@ -26,14 +26,15 @@ export async function generateMetadata(
             openGraph: {
                 title,
                 description,
-                type: 'website',
-                ...(image && { images: [{ url: image, width: 800, height: 900 }] }),
+                type: 'article',
+                url: `${SITE_URL}/product/${params.slug}`,
+                images: image ? [{ url: image, width: 800, height: 900 }] : [{ url: '/images/og-default.png', width: 1200, height: 630 }],
             },
             twitter: {
                 card: 'summary_large_image',
                 title,
                 description,
-                ...(image && { images: [image] }),
+                images: image ? [image] : ['/images/og-default.png'],
             },
         };
     } catch {
