@@ -110,8 +110,8 @@ class CurrencyService
                 'site_default_currency_symbol' => $currency->symbol,
             ]));
 
-            $currencyPosition = $siteSettings['site_currency_position'] ?? env('CURRENCY_POSITION', 5);
-            $decimalPoint     = $siteSettings['site_digit_after_decimal_point'] ?? env('CURRENCY_DECIMAL_POINT', 2);
+            $currencyPosition = $siteSettings['site_currency_position'] ?? config('app.currency_position');
+            $decimalPoint     = $siteSettings['site_digit_after_decimal_point'] ?? config('app.currency_decimal_point');
 
             $this->envEditor->addData([
                 'CURRENCY'               => $currency->code,

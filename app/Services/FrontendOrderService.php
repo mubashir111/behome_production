@@ -164,7 +164,7 @@ class FrontendOrderService
                             'price'           => $price,
                             'quantity'        => -$p->quantity,
                             'discount'        => 0, // In this system discount seems handled differently or not yet implement for direct item
-                            'tax'             => number_format($itemTotalTax, (int)env('CURRENCY_DECIMAL_POINT', 2), '.', ''),
+                            'tax'             => number_format($itemTotalTax, (int)config('app.currency_decimal_point'), '.', ''),
                             'subtotal'        => $itemSubtotal,
                             'total'           => $itemTotal,
                             'status'          => Status::INACTIVE,

@@ -125,7 +125,7 @@
                         <span class="text-sm font-mono text-slate-500">{{ $product->sku }}</span>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="text-sm font-bold text-slate-900">${{ number_format($product->selling_price, 2) }}</span>
+                        <span class="text-sm font-bold text-slate-900">{{ config('app.currency_symbol') }}{{ number_format($product->selling_price, 2) }}</span>
                     </td>
                     <td class="px-6 py-4">
                         @if($product->status == 5)

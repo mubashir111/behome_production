@@ -32,7 +32,7 @@ class CartController extends Controller
                         }
                     }
                 }
-                $taxPerUnit = round(($item->price * $taxRate) / 100, (int) env('CURRENCY_DECIMAL_POINT', 2));
+                $taxPerUnit = round(($item->price * $taxRate) / 100, (int) config('app.currency_decimal_point'));
                 $subtotal   = $item->price * $item->quantity;
                 $tax        = $taxPerUnit * $item->quantity;
                 $total      = $subtotal + $tax;
@@ -82,7 +82,7 @@ class CartController extends Controller
                 }
             }
             $subtotal = $price * $request->quantity;
-            $tax = round(($subtotal * $taxRate) / 100, (int) env('CURRENCY_DECIMAL_POINT', 2));
+            $tax = round(($subtotal * $taxRate) / 100, (int) config('app.currency_decimal_point'));
             $total = $subtotal + $tax;
 
             $cartItem = Cart::where([
@@ -103,7 +103,7 @@ class CartController extends Controller
                 }
                 
                 $cartItem->subtotal = $cartItem->price * $cartItem->quantity;
-                $cartItem->tax      = round(($cartItem->subtotal * $taxRate) / 100, (int) env('CURRENCY_DECIMAL_POINT', 2));
+                $cartItem->tax      = round(($cartItem->subtotal * $taxRate) / 100, (int) config('app.currency_decimal_point'));
                 $cartItem->total    = $cartItem->subtotal + $cartItem->tax;
                 $cartItem->save();
             } else {
@@ -148,7 +148,7 @@ class CartController extends Controller
             }
             
             $cartItem->subtotal = $cartItem->price * $cartItem->quantity;
-            $cartItem->tax      = round(($cartItem->subtotal * $taxRate) / 100, (int) env('CURRENCY_DECIMAL_POINT', 2));
+            $cartItem->tax      = round(($cartItem->subtotal * $taxRate) / 100, (int) config('app.currency_decimal_point'));
             $cartItem->total    = $cartItem->subtotal + $cartItem->tax;
             $cartItem->save();
             $cartItem->load(['product', 'variation']);

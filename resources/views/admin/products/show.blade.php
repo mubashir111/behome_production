@@ -100,18 +100,18 @@
                 <div class="space-y-4">
                     <div>
                         <p class="text-xs text-slate-500 font-semibold uppercase">Selling Price</p>
-                        <p class="text-3xl font-bold text-indigo-600 mt-1">${{ number_format($product->selling_price, 2) }}</p>
+                        <p class="text-3xl font-bold text-indigo-600 mt-1">{{ config('app.currency_symbol') }}{{ number_format($product->selling_price, 2) }}</p>
                     </div>
                     <hr class="border-slate-200">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <p class="text-xs text-slate-500 font-semibold uppercase">Cost Price</p>
-                            <p class="font-semibold text-slate-900 mt-1">${{ number_format($product->buying_price, 2) }}</p>
+                            <p class="font-semibold text-slate-900 mt-1">{{ config('app.currency_symbol') }}{{ number_format($product->buying_price, 2) }}</p>
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 font-semibold uppercase">Profit</p>
                             @php $profit = $product->selling_price - $product->buying_price; @endphp
-                            <p class="font-semibold text-emerald-600 mt-1">+${{ number_format($profit, 2) }}</p>
+                            <p class="font-semibold text-emerald-600 mt-1">+{{ config('app.currency_symbol') }}{{ number_format($profit, 2) }}</p>
                         </div>
                     </div>
                 </div>

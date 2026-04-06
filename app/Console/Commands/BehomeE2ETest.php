@@ -406,7 +406,7 @@ class BehomeE2ETest extends Command
         $this->section('STEP 5 · Currency');
 
         $currencyCode   = env('CURRENCY', 'USD');
-        $currencySymbol = env('CURRENCY_SYMBOL', '$');
+        $currencySymbol = config('app.currency_symbol');
         $decimalPoint   = (int) env('CURRENCY_DECIMAL_POINT', 2);
         $position       = env('CURRENCY_POSITION', 'left');
 

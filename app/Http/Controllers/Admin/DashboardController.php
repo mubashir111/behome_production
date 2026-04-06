@@ -36,7 +36,7 @@ final class DashboardController extends Controller
             ->whereHas('messages', fn($q) => $q->where('sender_type', 'customer')->where('is_read', false))
             ->latest()->take(5)->get();
 
-        $currencySymbol = env('CURRENCY_SYMBOL', '₹');
+        $currencySymbol = config('app.currency_symbol');
 
         return view('admin.dashboard', [
             'favicon'               => ThemeSetting::where(['key' => 'theme_favicon_logo'])->first()?->faviconLogo,

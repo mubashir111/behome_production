@@ -24,7 +24,7 @@ class OrderController extends Controller
     {
         $request->merge(['paginate' => 1]);
         $orders = $this->orderService->list($request);
-        $currencySymbol = env('CURRENCY_SYMBOL', '₹');
+        $currencySymbol = config('app.currency_symbol');
         $search = $request->get('search', '');
         if ($search) {
             $orders = \App\Models\Order::with(['user', 'transaction', 'orderProducts'])
@@ -59,7 +59,7 @@ class OrderController extends Controller
         // Mark customer messages on this order as read
         $order->messages()->where('sender_type', 'customer')->where('is_read', false)->update(['is_read' => true]);
 
-        $currencySymbol = env('CURRENCY_SYMBOL', '₹');
+        $currencySymbol = config('app.currency_symbol');
         return view('admin.orders.show', compact('order', 'currencySymbol'));
     }
 

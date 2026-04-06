@@ -57,9 +57,15 @@ return [
 
     'url'          => env('APP_URL', 'http://localhost'),
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
-    'mix_api_key'  => env('MIX_API_KEY'),
+    'mix_api_key'  => env('MIX_API_KEY', ''),
+    'currency'        => env('CURRENCY', 'USD'),
 
     'asset_url' => env('ASSET_URL'),
+    'currency_symbol'        => env('CURRENCY_SYMBOL', '$'),
+    'currency_position'      => env('CURRENCY_POSITION', 10),
+    'currency_decimal_point' => env('CURRENCY_DECIMAL_POINT', 2),
+    'date_format'            => env('DATE_FORMAT', 'd-m-Y'),
+    'time_format'            => env('TIME_FORMAT', 'h:i A'),
 
     /*
     |--------------------------------------------------------------------------

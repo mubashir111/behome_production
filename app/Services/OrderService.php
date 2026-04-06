@@ -198,7 +198,7 @@ class OrderService
                             'price'           => $product->price,
                             'quantity'        => -$product->quantity,
                             'discount'        => $product->discount,
-                            'tax'             => number_format($product->total_tax, env('CURRENCY_DECIMAL_POINT'), '.', ''),
+                            'tax'             => number_format($product->total_tax, config('app.currency_decimal_point'), '.', ''),
                             'subtotal'        => $product->subtotal,
                             'total'           => $product->total,
                             'status'          => Status::ACTIVE,

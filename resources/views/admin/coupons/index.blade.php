@@ -52,9 +52,9 @@
                             <td class="px-6 py-6 font-medium text-slate-600">
                                 <div class="flex flex-col">
                                     <span class="text-lg font-bold text-indigo-600">
-                                        {{ $coupon->discount_type == 5 ? $coupon->discount . '%' : '$' . $coupon->discount }}
+                                        {{ $coupon->discount_type == 5 ? $coupon->discount . '%' : config('app.currency_symbol') . $coupon->discount }}
                                     </span>
-                                    <span class="text-[10px] text-slate-400">Min Order: ${{ $coupon->minimum_order }}</span>
+                                    <span class="text-[10px] text-slate-400">Min Order: {{ config('app.currency_symbol') }}{{ $coupon->minimum_order }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-6">
