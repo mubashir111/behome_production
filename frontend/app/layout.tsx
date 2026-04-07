@@ -30,8 +30,12 @@ export default function RootLayout({
         <link href="/images/apple-touch-icon-72x72.png" rel="apple-touch-icon" sizes="72x72" />
         <link href="/images/apple-touch-icon-114x114.png" rel="apple-touch-icon" sizes="114x114" />
 
-        {/* Single combined CSS — 1 request instead of 9, Cloudflare caches at edge */}
-        <link rel="stylesheet" href="/css/all.min.css?v=1" />
+        {/* Main bundle — vendors + icons + style + responsive + decor-store (purged) */}
+        <link rel="stylesheet" href="/css/all.min.css?v=2" />
+        {/* Revolution slider CSS — separate (third-party, Cloudflare cached) */}
+        <link rel="stylesheet" href="/revolution/css/settings.css" />
+        <link rel="stylesheet" href="/revolution/css/layers.css" />
+        <link rel="stylesheet" href="/revolution/css/navigation.css" />
       </head>
       <body className={`bg-dark-gray ${marcellus.variable} ${outfit.variable}`} data-mobile-nav-style="classic">
         <SettingsProvider>

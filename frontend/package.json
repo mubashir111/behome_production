@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "purge": "purgecss --config purgecss.config.js",
+    "build:css": "cat public/css/vendors.min.css public/css/icon.min.css public/css/style.min.css public/css/responsive.min.css public/demos/decor-store/decor-store.css > public/css/all.min.css && npm run purge"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.1.0",
@@ -22,6 +24,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "purgecss": "^8.0.0",
     "typescript": "^5"
   }
 }
