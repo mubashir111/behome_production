@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import BlogListClient from './BlogListClient';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
+import { constructMetadata } from '@/lib/metadata';
 
 async function getBlogPageData() {
     try {
@@ -33,22 +34,10 @@ async function getInitialPosts() {
 
 export async function generateMetadata(): Promise<Metadata> {
     const data = await getBlogPageData();
-    return {
+    return constructMetadata({
         title: data?.meta_title || 'Blog | Behome',
         description: data?.meta_description || 'Explore interior design inspiration, home decor trends, styling guides, and expert tips from the Behome team.',
-        openGraph: {
-            title: data?.meta_title || 'Blog | Behome',
-            description: data?.meta_description || 'Explore interior design inspiration, home decor trends, styling guides, and expert tips from the Behome team.',
-            type: 'website',
-            images: [{ url: '/images/og-default.png', width: 1200, height: 630 }],
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title: data?.meta_title || 'Blog | Behome',
-            description: data?.meta_description || 'Explore interior design inspiration, home decor trends, styling guides, and expert tips from the Behome team.',
-            images: ['/images/og-default.png'],
-        },
-    };
+    });
 }
 
 export default async function Blog() {

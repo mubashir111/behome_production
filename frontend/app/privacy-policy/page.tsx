@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
+import { constructMetadata } from '@/lib/metadata';
 
 
 async function getPageData() {
@@ -18,10 +19,10 @@ async function getPageData() {
 
 export async function generateMetadata(): Promise<Metadata> {
     const data = await getPageData();
-    return {
+    return constructMetadata({
         title: data?.meta_title || 'Privacy Policy | Behome',
         description: data?.meta_description || 'Read the Behome Privacy Policy.',
-    };
+    });
 }
 
 const DEFAULT_CONTENT = `

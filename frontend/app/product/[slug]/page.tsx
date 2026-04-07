@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import ProductPageClient from './ProductPageClient';
 import { SERVER_API_URL, API_KEY, SITE_URL } from '@/lib/config';
+import { constructMetadata } from '@/lib/metadata';
 
 
 export async function generateMetadata(
@@ -18,27 +19,15 @@ export async function generateMetadata(
 
         const title       = p.name ?? 'Product';
         const description = (p.details ?? p.description ?? '').replace(/<[^>]*>/g, '').slice(0, 160);
-        const image       = p.cover ?? undefined;
+        const image       = p.cover ?? '/images/og-default.png';
 
-        return {
+        return constructMetadata({
             title,
             description,
-            openGraph: {
-                title,
-                description,
-                type: 'article',
-                url: `${SITE_URL}/product/${params.slug}`,
-                images: image ? [{ url: image, width: 800, height: 900 }] : [{ url: '/images/og-default.png', width: 1200, height: 630 }],
-            },
-            twitter: {
-                card: 'summary_large_image',
-                title,
-                description,
-                images: image ? [image] : ['/images/og-default.png'],
-            },
-        };
+            image,
+        });
     } catch {
-        return { title: 'Product' };
+        return constructMetadata({ title: 'Product' });
     }
 }
 

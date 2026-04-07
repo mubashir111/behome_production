@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import HTMLReactParser from 'html-react-parser';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
+import { constructMetadata } from '@/lib/metadata';
 
 
 async function getPageData(slug: string) {
@@ -20,11 +21,11 @@ async function getPageData(slug: string) {
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
     const data = await getPageData(params.slug);
-    if (!data) return { title: 'Page Not Found' };
-    return {
+    if (!data) return constructMetadata({ title: 'Page Not Found' });
+    return constructMetadata({
         title: data.meta_title || `${data.title} | Behome`,
         description: data.meta_description || '',
-    };
+    });
 }
 
 export default async function DynamicPage({ params }: { params: { slug: string } }) {
@@ -39,7 +40,7 @@ export default async function DynamicPage({ params }: { params: { slug: string }
             {/* Start Page Title */}
             <section className="page-title-center-alignment cover-background bg-dark-gray" 
                 style={{ 
-                    backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.7)), url(\'/images/new/bg/bg1.png\')', 
+                    backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.7)), url(\'/images/new/bg/bg1.webp\')', 
                     paddingBottom: '70px' 
                 }}>
                 <div className="container">

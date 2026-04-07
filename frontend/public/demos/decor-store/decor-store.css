@@ -2,7 +2,7 @@
     Crafto - Decor store
 ====================================== */
 /* font */
-@import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Outfit:wght@300;400;500;600;700&display=swap');
+/* Google Fonts loaded via next/font in layout.tsx for better performance */
 
 /* variable */
 :root {

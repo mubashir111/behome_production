@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import ContactForm from '@/components/ContactForm';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
+import { constructMetadata } from '@/lib/metadata';
 
 
 async function getContactData() {
@@ -20,10 +21,10 @@ async function getContactData() {
 
 export async function generateMetadata(): Promise<Metadata> {
     const data = await getContactData();
-    return {
+    return constructMetadata({
         title: data?.meta_title || 'Contact Us | Behome',
         description: data?.meta_description || 'Get in touch with the Behome team.',
-    };
+    });
 }
 
 export default async function Contact() {

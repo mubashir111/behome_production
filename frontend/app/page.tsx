@@ -4,23 +4,9 @@ import HeroSlider from '@/components/HeroSliderAlt';
 import { apiFetch } from '@/lib/api';
 import WishlistButton from '@/components/WishlistButton';
 import HomeProductTabs from '@/components/HomeProductTabs';
+import { constructMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-    title: 'Behome - Premium Architectural Decor & Luxury Furniture',
-    description: 'Discover premium architectural decor, luxury furniture and high-end interior design pieces at Behome.',
-    openGraph: {
-        title: 'Behome - Premium Architectural Decor & Luxury Furniture',
-        description: 'Discover premium architectural decor, luxury furniture and high-end interior design pieces at Behome.',
-        type: 'website',
-        images: [{ url: '/images/og-default.png', width: 1200, height: 630 }],
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title: 'Behome - Premium Architectural Decor & Luxury Furniture',
-        description: 'Discover premium architectural decor, luxury furniture and high-end interior design pieces at Behome.',
-        images: ['/images/og-default.png'],
-    },
-};
+export const metadata: Metadata = constructMetadata();
 
 
 export default async function Home() {
@@ -35,15 +21,15 @@ export default async function Home() {
         offerData,
         settingsData,
     ] = await Promise.all([
-        apiFetch('/frontend/slider', { cache: 'no-store' }).catch(() => ({ data: [] })),
-        apiFetch('/frontend/product-category', { cache: 'no-store' }).catch(() => ({ data: [] })),
-        apiFetch('/products?per_page=8&sort=popular', { cache: 'no-store' }).catch(() => ({ data: { data: [] } })),
-        apiFetch('/products?per_page=8', { cache: 'no-store' }).catch(() => ({ data: { data: [] } })),
-        apiFetch('/frontend/promotion', { cache: 'no-store' }).catch(() => ({ data: [] })),
-        apiFetch('/frontend/benefit', { cache: 'no-store' }).catch(() => ({ data: [] })),
-        apiFetch('/frontend/product-brand', { cache: 'no-store' }).catch(() => ({ data: [] })),
-        apiFetch('/products?per_page=10&sort=offer', { cache: 'no-store' }).catch(() => ({ data: { data: [] } })),
-        apiFetch('/frontend/setting', { cache: 'no-store' }).catch(() => ({ data: {} })),
+        apiFetch('/frontend/slider', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
+        apiFetch('/frontend/product-category', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
+        apiFetch('/products?per_page=8&sort=popular', { next: { revalidate: 3600 } }).catch(() => ({ data: { data: [] } })),
+        apiFetch('/products?per_page=8', { next: { revalidate: 3600 } }).catch(() => ({ data: { data: [] } })),
+        apiFetch('/frontend/promotion', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
+        apiFetch('/frontend/benefit', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
+        apiFetch('/frontend/product-brand', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
+        apiFetch('/products?per_page=10&sort=offer', { next: { revalidate: 3600 } }).catch(() => ({ data: { data: [] } })),
+        apiFetch('/frontend/setting', { next: { revalidate: 3600 } }).catch(() => ({ data: {} })),
     ]);
 
     const sliders = (slidersData.data || []).map((s: any) => ({ ...s, image: s.image || '' }));

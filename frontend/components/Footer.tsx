@@ -24,7 +24,7 @@ export default function Footer() {
 
     return (
         <footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background"
-            style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'/images/new/bg/bg1.png\')' }}>
+            style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'/images/new/bg/bg1.webp\')' }}>
             <div className="container pt-60px pb-60px md-pt-45px md-pb-45px sm-pt-40px sm-pb-40px">
                 <div className="row g-4 g-lg-0">
 

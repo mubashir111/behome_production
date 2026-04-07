@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Marcellus, Outfit } from 'next/font/google';
 import NavbarRevealer from '@/components/NavbarRevealer';
+
+const marcellus = Marcellus({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--font-marcellus' });
+const outfit = Outfit({ weight: ['300','400','500','600','700'], subsets: ['latin'], display: 'swap', variable: '--font-outfit' });
 import './globals.css';
 
 import Header from '@/components/Header';
@@ -9,29 +13,9 @@ import ToastProvider from '@/components/ToastProvider';
 import SettingsProvider from '@/components/SettingsProvider';
 import CartProvider from '@/components/CartProvider';
 import { SITE_URL } from '@/lib/config';
+import { constructMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Behome - Premium Architectural Decor & Luxury Furniture',
-    template: '%s | Behome',
-  },
-  description: 'Behome - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
-  metadataBase: new URL(SITE_URL),
-  openGraph: {
-    type: 'website',
-    siteName: 'Behome',
-    title: 'Behome - Premium Architectural Decor & Luxury Furniture',
-    description: 'Behome - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
-    images: [{ url: '/images/og-default.png', width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Behome - Premium Architectural Decor & Luxury Furniture',
-    description: 'Behome - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
-    images: ['/images/og-default.png'],
-  },
-  robots: { index: true, follow: true },
-};
+export const metadata: Metadata = constructMetadata();
 
 export default function RootLayout({
   children,
@@ -46,10 +30,8 @@ export default function RootLayout({
         <link href="/images/apple-touch-icon-72x72.png" rel="apple-touch-icon" sizes="72x72" />
         <link href="/images/apple-touch-icon-114x114.png" rel="apple-touch-icon" sizes="114x114" />
         
-        <link crossOrigin="anonymous" href="https://fonts.googleapis.com" rel="preconnect" />
-        <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
       </head>
-      <body className="bg-dark-gray" data-mobile-nav-style="classic">
+      <body className={`bg-dark-gray ${marcellus.variable} ${outfit.variable}`} data-mobile-nav-style="classic">
         <SettingsProvider>
           <CartProvider>
             <ToastProvider>
@@ -62,10 +44,10 @@ export default function RootLayout({
         </SettingsProvider>
 
         <Script src="/js/jquery.js" strategy="beforeInteractive" />
-        <Script src="/js/vendors.min.js" strategy="beforeInteractive" />
-        
-        <Script src="/revolution/js/jquery.themepunch.tools.min.js" strategy="beforeInteractive" />
-        <Script src="/revolution/js/jquery.themepunch.revolution.min.js" strategy="beforeInteractive" />
+        <Script src="/js/vendors.min.js" strategy="afterInteractive" />
+
+        <Script src="/revolution/js/jquery.themepunch.tools.min.js" strategy="afterInteractive" />
+        <Script src="/revolution/js/jquery.themepunch.revolution.min.js" strategy="afterInteractive" />
         <Script src="/revolution/js/extensions/revolution.extension.actions.min.js" strategy="afterInteractive" />
         <Script src="/revolution/js/extensions/revolution.extension.carousel.min.js" strategy="afterInteractive" />
         <Script src="/revolution/js/extensions/revolution.extension.kenburn.min.js" strategy="afterInteractive" />

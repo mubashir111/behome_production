@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import AllPostsButton from '@/components/AllPostsButton';
 import BlogCommentForm from '@/components/BlogCommentForm';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
+import { constructMetadata } from '@/lib/metadata';
 
 
 async function getPost(slug: string) {
@@ -24,29 +25,15 @@ async function getPost(slug: string) {
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
     const json = await getPost(params.slug);
-    if (!json?.data) return { title: 'Blog Post' };
+    if (!json?.data) return constructMetadata({ title: 'Blog Post' });
     const p = json.data;
     const title       = p.meta_title || p.title;
     const description = p.meta_description || p.excerpt || '';
-    return {
+    return constructMetadata({
         title,
         description,
-        openGraph: {
-            title,
-            description,
-            type: 'article',
-            images: p.cover_image 
-                ? [{ url: p.cover_image, width: 1200, height: 630 }] 
-                : [{ url: '/images/og-default.png', width: 1200, height: 630 }],
-            ...(p.published_at && { publishedTime: p.published_at }),
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title,
-            description,
-            images: p.cover_image ? [p.cover_image] : ['/images/og-default.png'],
-        },
-    };
+        image: p.cover_image || '/images/og-default.png',
+    });
 }
 
 function formatDate(dateStr: string) {

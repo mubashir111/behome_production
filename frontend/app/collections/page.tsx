@@ -78,7 +78,7 @@ export default function Collections() {
         <main className="no-layout-pad" style={{ paddingTop: '50px' }}>
 
             {/*  start page title  */}
-            <section className="page-title-center-alignment cover-background bg-dark-gray" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.7)), url(\'images/new/bg/bg1.png\')', paddingBottom: '70px' }}>
+            <section className="page-title-center-alignment cover-background bg-dark-gray" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.7)), url(\'images/new/bg/bg1.webp\')', paddingBottom: '70px' }}>
                 <div className="container">
                     <div className="row">
                         <div className="col-12 text-center position-relative page-title-extra-large">
