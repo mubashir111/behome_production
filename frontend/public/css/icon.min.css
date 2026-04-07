@@ -10263,7 +10263,8 @@
     src: url(../fonts/icomoon.eot%3F-rdmvgc);
     src: url(../fonts/icomoon.eot%3F) format("embedded-opentype"), url(../fonts/icomoon.woff%3F-rdmvgc) format("woff"), url(../fonts/icomoon.ttf%3F-rdmvgc) format("truetype"), url(../fonts/icomoon.svg%3F-rdmvgc) format("svg");
     font-weight: 400;
-    font-style: normal
+    font-style: normal;
+    font-display: swap
 }
 
 [class*=" line-icon-"],
@@ -18630,7 +18631,8 @@
 @font-face {
     font-family: feather;
     src: url(../fonts/feather.eot%3Ft=1525787366991);
-    src: url(../fonts/feather.eot%3Ft=1525787366991) format("embedded-opentype"), url(../fonts/feather.woff%3Ft=1525787366991) format("woff"), url(../fonts/feather.ttf%3Ft=1525787366991) format("truetype"), url(../fonts/feather.svg%3Ft=1525787366991) format("svg")
+    src: url(../fonts/feather.eot%3Ft=1525787366991) format("embedded-opentype"), url(../fonts/feather.woff%3Ft=1525787366991) format("woff"), url(../fonts/feather.ttf%3Ft=1525787366991) format("truetype"), url(../fonts/feather.svg%3Ft=1525787366991) format("svg");
+    font-display: swap
 }
 
 .feather {
