@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "purge": "purgecss --config purgecss.config.js",
-    "build:css": "cat public/css/vendors.min.css public/css/icon.min.css public/css/style.min.css public/css/responsive.min.css public/demos/decor-store/decor-store.css > public/css/all.min.css && npm run purge"
+    "build:css": "cat public/css/vendors.min.css public/css/icon.min.css public/css/style.min.css public/css/responsive.min.css public/demos/decor-store/decor-store.css public/revolution/css/settings.css public/revolution/css/layers.css public/revolution/css/navigation.css > public/css/all.min.css && npm run purge"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.1.0",
