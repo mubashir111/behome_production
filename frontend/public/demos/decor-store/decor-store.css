@@ -2207,7 +2207,7 @@ section .breadcrumb.breadcrumb-style-01 ul li:after,
 /* Glassy Footer Override */
 footer.footer-dark.bg-dark-gray.cover-background {
     /* Override the 85% dark gradient inline style so we can see the image clearly to blur it */
-    background-image: url('../../images/new/bg/bg1.png') !important;
+    background-image: url('../../images/new/bg/bg1.webp') !important;
     position: relative !important;
     z-index: 1 !important;
 }
