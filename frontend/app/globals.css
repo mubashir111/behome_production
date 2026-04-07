@@ -1,11 +1,4 @@
-@import url("/revolution/css/settings.css");
-@import url("/revolution/css/layers.css");
-@import url("/revolution/css/navigation.css");
-@import url("/css/vendors.min.css");
-@import url("/css/icon.min.css");
-@import url("/css/style.min.css");
-@import url("/css/responsive.min.css");
-@import url("/demos/decor-store/decor-store.css?v=6");
+/* CSS files are loaded via <link> tags in layout.tsx for parallel loading */
 
 .navbar {
   opacity: 0 !important;
