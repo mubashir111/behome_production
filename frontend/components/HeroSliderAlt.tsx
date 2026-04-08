@@ -106,9 +106,10 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                     }}
                 >
                     {/* BG image */}
-                    <Image src={slide.image} alt={slide.title} fill unoptimized
+                    <Image src={slide.image} alt={slide.title} fill
                         style={{ objectFit: 'cover', objectPosition: 'center' }}
                         priority={index === 0}
+                        sizes="100vw"
                     />
 
                     {/* Gradient — heavier on left, clears on right */}

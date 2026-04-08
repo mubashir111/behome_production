@@ -1,5 +1,10 @@
 /* CSS files are loaded via <link> tags in layout.tsx for parallel loading */
 
+/* Hide cookie popup until JS initializes — prevents LCP interference */
+#cookies-model {
+  display: none !important;
+}
+
 .navbar {
   opacity: 0 !important;
   visibility: hidden !important;
