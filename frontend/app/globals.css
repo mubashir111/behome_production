@@ -874,6 +874,7 @@ main.no-layout-pad .page-shell {
 
   .qty-text {
     min-height: 44px !important;
+    height: 50px !important;
   }
 }
 

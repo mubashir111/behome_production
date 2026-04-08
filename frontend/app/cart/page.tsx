@@ -232,15 +232,15 @@ export default function Cart() {
     return (
         <main className="no-layout-pad page-top-100">
             <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
-            <div className="container-fluid">
-                <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
-                    <ul>
-                        <li><a href="/" className="breadcrumb-link">Home</a></li>
-                        <li><a href="/shop" className="breadcrumb-link">Shop</a></li>
-                        <li>Cart</li>
-                    </ul>
+                <div className="container-fluid">
+                    <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
+                        <ul>
+                            <li><a href="/" className="breadcrumb-link">Home</a></li>
+                            <li><a href="/shop" className="breadcrumb-link">Shop</a></li>
+                            <li>Cart</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
             </section>
             <section className="page-shell page-shell-tight min-h-600px d-flex align-items-center">
                 <div className="container-fluid">
@@ -338,12 +338,12 @@ export default function Cart() {
 
                                                     {/* Qty controls + line total */}
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
-                                                        <div className="quantity" style={{ transform: 'scale(0.88)', transformOrigin: 'left center' }}>
-                                                            <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
-                                                            <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} />
-                                                            <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)}>+</button>
+                                                        <div className="quantity" style={{ transform: 'scale(0.88)', transformOrigin: 'left center', display: 'flex', alignItems: 'center', alignContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                            <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)} style={{ display: 'flex', justifyContent: 'flex-start' }}>-</button>
+                                                            <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} style={{ textAlign: 'center' }} />
+                                                            <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)} style={{ display: 'flex', justifyContent: 'flex-end' }}>+</button>
                                                         </div>
-                                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>
+                                                        <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
                                                             {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
                                                         </span>
                                                     </div>
