@@ -376,20 +376,70 @@ class OrderService
     }
 
     /**
+     * Soft-delete an order. All child records (addresses, transactions, messages, etc.)
+     * are preserved for reference. Use restore() to undo. Use forceDestroy() to permanently remove.
+     *
      * @throws Exception
      */
     public function destroy(Order $order): void
     {
         try {
+            $order->delete(); // sets deleted_at — child records untouched
+        } catch (Exception $exception) {
+            Log::info($exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
+        }
+    }
+
+    /**
+     * Restore a soft-deleted order.
+     *
+     * @throws Exception
+     */
+    public function restore(Order $order): void
+    {
+        try {
+            $order->restore();
+        } catch (Exception $exception) {
+            Log::info($exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
+        }
+    }
+
+    /**
+     * Permanently delete a soft-deleted order and all its child records.
+     *
+     * @throws Exception
+     */
+    public function forceDestroy(Order $order): void
+    {
+        try {
             DB::transaction(function () use ($order) {
-                if ($order?->orderProducts) {
-                    $stockIds = $order?->orderProducts->pluck('id');
-                    if (!blank($stockIds)) {
+                if ($order->orderProducts) {
+                    $stockIds = $order->orderProducts->pluck('id');
+                    if ($stockIds->isNotEmpty()) {
                         StockTax::whereIn('stock_id', $stockIds)->delete();
                     }
-                    $order?->orderProducts()->delete();
+                    $order->orderProducts()->delete();
                 }
-                $order->delete();
+
+                $order->address()->delete();
+                $order->outletAddress()->delete();
+
+                \App\Models\Transaction::where('order_id', $order->id)->delete();
+                \App\Models\CapturePaymentNotification::where('order_id', $order->id)->delete();
+                \App\Models\OrderCoupon::where('order_id', $order->id)->delete();
+
+                $return = \App\Models\ReturnAndRefund::where('order_id', $order->id)->first();
+                if ($return) {
+                    \App\Models\ReturnAndRefundProduct::where('return_and_refund_id', $return->id)->delete();
+                    $return->delete();
+                }
+
+                $order->messages()->delete();
+                $order->audits()->delete();
+
+                $order->forceDelete();
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());

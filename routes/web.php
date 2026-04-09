@@ -58,6 +58,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('products/{product}/replace-gallery-image/{index}', [\App\Http\Controllers\Admin\Web\ProductController::class, 'replaceGalleryImageAjax'])->name('products.replace-gallery-image');
         Route::resource('products', \App\Http\Controllers\Admin\Web\ProductController::class);
         Route::resource('categories', \App\Http\Controllers\Admin\Web\CategoryController::class);
+        // Custom order routes must come BEFORE the resource to avoid {order} catching them
+        Route::get('orders/archived', [\App\Http\Controllers\Admin\Web\OrderController::class, 'archived'])->name('orders.archived');
+        Route::post('orders/{id}/restore', [\App\Http\Controllers\Admin\Web\OrderController::class, 'restore'])->name('orders.restore');
+        Route::delete('orders/{id}/force-delete', [\App\Http\Controllers\Admin\Web\OrderController::class, 'forceDelete'])->name('orders.force-delete');
         Route::resource('orders', \App\Http\Controllers\Admin\Web\OrderController::class)->only(['index', 'show', 'update', 'destroy']);
         Route::get('payments', [\App\Http\Controllers\Admin\Web\PaymentWebController::class, 'index'])->name('payments.index');
         

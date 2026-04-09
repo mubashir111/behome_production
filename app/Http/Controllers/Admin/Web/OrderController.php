@@ -78,7 +78,39 @@ class OrderController extends Controller
     {
         try {
             $this->orderService->destroy($order);
-            return redirect()->route('admin.orders.index')->with('success', 'Order deleted successfully.');
+            return redirect()->route('admin.orders.index')->with('success', 'Order archived successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function archived()
+    {
+        $orders = Order::onlyTrashed()
+            ->with(['user', 'transaction'])
+            ->latest('deleted_at')
+            ->paginate(20);
+        $currencySymbol = config('app.currency_symbol');
+        return view('admin.orders.archived', compact('orders', 'currencySymbol'));
+    }
+
+    public function restore($id)
+    {
+        try {
+            $order = Order::onlyTrashed()->findOrFail($id);
+            $this->orderService->restore($order);
+            return redirect()->route('admin.orders.archived')->with('success', 'Order #' . $order->order_serial_no . ' restored successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $order = Order::onlyTrashed()->findOrFail($id);
+            $this->orderService->forceDestroy($order);
+            return redirect()->route('admin.orders.archived')->with('success', 'Order permanently deleted.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
