@@ -21,11 +21,13 @@ const BACKEND_URL    = process.env.BACKEND_URL    || 'http://localhost:8000'; //
 const IMAGE_HOSTNAME = process.env.IMAGE_HOSTNAME || 'localhost';             // dev fallback only
 
 const securityHeaders = [
-  { key: 'X-Frame-Options',        value: 'SAMEORIGIN' },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'X-XSS-Protection',       value: '1; mode=block' },
-  { key: 'Referrer-Policy',        value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy',     value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+  { key: 'X-Frame-Options',               value: 'SAMEORIGIN' },
+  { key: 'X-Content-Type-Options',        value: 'nosniff' },
+  { key: 'X-XSS-Protection',             value: '1; mode=block' },
+  { key: 'Referrer-Policy',              value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy',           value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+  // allow-popups is required for Google Sign-In popup → postMessage flow
+  { key: 'Cross-Origin-Opener-Policy',   value: 'same-origin-allow-popups' },
   {
     key: 'Content-Security-Policy',
     value: [
