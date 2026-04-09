@@ -875,3 +875,8 @@ Route::prefix('v1')->group(function () {
 
     });
 });
+
+// ── Stripe Webhook ──────────────────────────────────────────────────────────
+// Must be outside auth:sanctum — Stripe sends its own signature, not a Bearer token.
+// CSRF is excluded via VerifyCsrfToken $except list.
+Route::post('/webhooks/stripe', [\App\Http\Controllers\Frontend\WebhookController::class, 'stripe'])->middleware(['installed']);

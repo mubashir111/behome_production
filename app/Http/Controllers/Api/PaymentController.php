@@ -52,28 +52,36 @@ class PaymentController extends Controller
     }
 
     /**
-     * Verify payment status.
+     * Verify payment status after Stripe Elements redirect.
+     * Called by the Next.js success page with payment_intent + payment_gateway in the body.
      */
     public function verify(Request $request, $order_id)
     {
-        try {
-            $order = Order::findOrFail($order_id);
-            $gateway = $request->get('payment_gateway');
-            
-            $response = $this->paymentManagerService->gateway($gateway)->success($order, $request);
+        $request->validate([
+            'payment_gateway' => 'required|string',
+        ]);
 
-            if ($response instanceof \Illuminate\Http\RedirectResponse) {
-                $targetUrl = $response->getTargetUrl();
-                $status = str_contains($targetUrl, 'success') ? 'success' : 'failed';
-                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
-                $redirectUrl = "{$frontendUrl}/payment/{$status}?order_id={$order->id}";
-                
-                return $this->successResponse(['redirect_url' => $redirectUrl, 'status' => $status], 'Payment verification complete');
+        try {
+            $order   = Order::findOrFail($order_id);
+            $gateway = $request->get('payment_gateway');
+
+            // If already paid (webhook beat us to it) — return success immediately.
+            if ($order->payment_status === \App\Enums\PaymentStatus::PAID) {
+                return $this->successResponse(['order_id' => $order->id, 'status' => 'paid'], 'Payment already confirmed');
             }
 
-            return $this->successResponse($response, 'Payment verification response');
+            $result = $this->paymentManagerService->gateway($gateway)->success($order, $request);
 
-            return $this->successResponse($response, 'Payment verification response');
+            // success() returns a RedirectResponse — inspect the target URL to determine outcome.
+            if ($result instanceof \Illuminate\Http\RedirectResponse) {
+                $targetUrl = $result->getTargetUrl();
+                if (str_contains($targetUrl, 'successful') || str_contains($targetUrl, 'success')) {
+                    return $this->successResponse(['order_id' => $order->id, 'status' => 'paid'], 'Payment confirmed');
+                }
+                return $this->errorResponse('Payment could not be confirmed', 422);
+            }
+
+            return $this->successResponse($result, 'Payment verification complete');
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage());
         }

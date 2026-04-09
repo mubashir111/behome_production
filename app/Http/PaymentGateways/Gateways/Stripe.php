@@ -87,6 +87,23 @@ class Stripe extends PaymentAbstract
                     return;
                 }
 
+                // ── New Stripe Elements flow ──────────────────────────────
+                // Stripe appends ?payment_intent=pi_xxx to the return_url.
+                // Retrieve the PaymentIntent from Stripe and verify it succeeded.
+                if ($request->payment_intent) {
+                    try {
+                        $paymentIntent = $this->gateway->paymentIntents->retrieve($request->payment_intent);
+                        if ($paymentIntent->status === 'succeeded' && (string)($paymentIntent->metadata->order_id ?? '') === (string)$order->id) {
+                            $this->paymentService->payment($order, 'stripe', $paymentIntent->id);
+                            $this->response = true;
+                            return;
+                        }
+                    } catch (Exception $e) {
+                        Log::error('Stripe success: PaymentIntent retrieve failed — ' . $e->getMessage());
+                    }
+                }
+
+                // ── Legacy token flow ─────────────────────────────────────
                 if ($request->token) {
                     $capturePaymentNotification = DB::table('capture_payment_notifications')->where([
                         ['token', $request->token]

@@ -127,7 +127,7 @@
 
                 <div class="admin-card">
                     <div class="admin-card-header">
-                        <h2 class="admin-card-title">{{ $order->order_type == 1 ? 'Shipping Address' : 'Pickup Address' }}</h2>
+                        <h2 class="admin-card-title">{{ $order->order_type == 10 ? 'Pickup Address' : 'Shipping Address' }}</h2>
                     </div>
                     @php
                         $deliveryAddress = $order->address->first();
@@ -248,7 +248,23 @@
                     </form>
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-slate-600">Order Type</span>
-                        <span class="font-semibold text-slate-900">{{ $order->order_type == 1 ? 'Home Delivery' : 'POS' }}</span>
+                        <span class="font-semibold text-slate-900">
+                            @if($order->order_type == 5) Delivery
+                            @elseif($order->order_type == 10) Pick Up
+                            @elseif($order->order_type == 15) POS
+                            @else Delivery
+                            @endif
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-600">Source</span>
+                        <span class="font-semibold text-slate-900">
+                            @if($order->source == 5) Web
+                            @elseif($order->source == 10) App
+                            @elseif($order->source == 15) POS
+                            @else Web
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>

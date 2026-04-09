@@ -504,6 +504,14 @@
                     <span id="sidebar-new-orders-badge" class="sidebar-badge" style="background:#ef4444;{{ $unviewedOrders > 0 ? '' : 'display:none;' }}">{{ $unviewedOrders ?: '' }}</span>
                 </a>
 
+                <a href="{{ route('admin.payments.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    Payments
+                </a>
+
                 <a href="{{ route('admin.customers.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
                     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

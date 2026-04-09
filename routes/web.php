@@ -59,6 +59,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', \App\Http\Controllers\Admin\Web\ProductController::class);
         Route::resource('categories', \App\Http\Controllers\Admin\Web\CategoryController::class);
         Route::resource('orders', \App\Http\Controllers\Admin\Web\OrderController::class)->only(['index', 'show', 'update', 'destroy']);
+        Route::get('payments', [\App\Http\Controllers\Admin\Web\PaymentWebController::class, 'index'])->name('payments.index');
         
         // Product Variations (Web UI)
         Route::prefix('products/{product}/variations')->name('products.variations.')->group(function () {
