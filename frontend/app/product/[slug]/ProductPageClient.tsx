@@ -472,7 +472,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                 <div className="container-fluid">
                     <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
                         <ul>
-                            <li><Link href="/" className="breadcrumb-link">Home</Link></li>
+                            <li><a href="/" className="breadcrumb-link">Home</a></li>
                             <li><Link href="/shop" className="breadcrumb-link">Shop</Link></li>
                             {product.category?.name && <li><Link href={`/shop?category=${product.category.slug}`} className="breadcrumb-link">{product.category.name}</Link></li>}
                             <li>{product.name}</li>

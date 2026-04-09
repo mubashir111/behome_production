@@ -4,6 +4,7 @@ import HeroSlider from '@/components/HeroSliderAlt';
 import { apiFetch } from '@/lib/api';
 import WishlistButton from '@/components/WishlistButton';
 import HomeProductTabs from '@/components/HomeProductTabs';
+import HomeInit from '@/components/HomeInit';
 import { constructMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = constructMetadata();
@@ -114,6 +115,8 @@ export default async function Home() {
 
     return (
         <main className="no-layout-pad">
+
+        <HomeInit />
 
         {/* ── Hero Slider ─────────────────────────────────────────── */}
         <HeroSlider slides={sliders} featuredPromotions={promotionCards} />

@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="no-js">
+    <html lang="en" className="no-js" suppressHydrationWarning>
       <head>
         <link href="/images/favicon.png" rel="shortcut icon" />
         <link href="/images/apple-touch-icon-57x57.png" rel="apple-touch-icon" />
@@ -60,7 +60,7 @@ export default function RootLayout({
         <Script src="/revolution/js/extensions/revolution.extension.slideanims.min.js" strategy="afterInteractive" />
         <Script src="/revolution/js/extensions/revolution.extension.video.min.js" strategy="afterInteractive" />
 
-        <Script src="/js/main.js" strategy="lazyOnload" />
+        <Script src="/js/main.js?v=2" strategy="lazyOnload" />
       </body>
     </html>
   );
