@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
 
 function formatDate(dateStr: string) {
     try {
@@ -42,7 +41,7 @@ export default function BlogListClient({ initialPosts, initialMeta }: Props) {
         if (category) params.set('category', category);
 
         fetch(`/api/frontend/blog-posts?${params}`, {
-            headers: { 'x-api-key': API_KEY, Accept: 'application/json' },
+            headers: { Accept: 'application/json' },
         })
             .then(r => r.json())
             .then(json => {

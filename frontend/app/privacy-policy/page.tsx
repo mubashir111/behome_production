@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
 import { constructMetadata } from '@/lib/metadata';
+import DOMPurify from 'isomorphic-dompurify';
 
 
 async function getPageData() {
@@ -62,7 +63,7 @@ export default async function PrivacyPolicy() {
                         <div className="col-lg-8">
                             <div
                                 className="privacy-content-wrap"
-                                dangerouslySetInnerHTML={{ __html: content }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
                             />
                         </div>
                     </div>

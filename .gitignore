@@ -31,3 +31,4 @@ frontend/node_modules/
 .env.*.local
 .env2
 frontend/.env.local
+frontend/.env

@@ -28,7 +28,9 @@
       "Bash(find /Applications/XAMPP/xamppfiles/htdocs/behome -name *ReturnAndRefundWebController* -o -name *ReturnAndRefund*Controller*)",
       "Bash(find /Applications/XAMPP/xamppfiles/htdocs/behome/app/Http/PaymentGateways -name Credit*)",
       "Bash(grep -En '\"Roboto Slab\"[[:space:]]*$' /Applications/XAMPP/xamppfiles/htdocs/behome/frontend/public/revolution/css/layers.css)",
-      "Bash(npx purgecss:*)"
+      "Bash(npx purgecss:*)",
+      "Bash(npm install:*)",
+      "Bash(npm list:*)"
     ]
   }
 }

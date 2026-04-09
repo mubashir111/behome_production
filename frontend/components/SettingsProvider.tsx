@@ -62,9 +62,8 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
 
         async function fetchSettings() {
             try {
-                const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
                 const res = await fetch(`/api/frontend/setting`, {
-                    headers: { 'Accept': 'application/json', 'x-api-key': API_KEY },
+                    headers: { 'Accept': 'application/json' },
                 });
                 if (!res.ok) return;
                 const json = await res.json();

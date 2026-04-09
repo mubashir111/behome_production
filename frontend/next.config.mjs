@@ -1,7 +1,24 @@
 /** @type {import('next').NextConfig} */
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
-const IMAGE_HOSTNAME = process.env.IMAGE_HOSTNAME || 'localhost';
+const isProd = process.env.NODE_ENV === 'production';
+
+// Fail fast: these must be set on the production server.
+// Local dev falls back to localhost — production never should.
+if (isProd && !process.env.BACKEND_URL) {
+  throw new Error(
+    '[next.config] BACKEND_URL env var is not set. ' +
+    'Add BACKEND_URL=https://api.behom.ae to your production environment.'
+  );
+}
+if (isProd && !process.env.IMAGE_HOSTNAME) {
+  throw new Error(
+    '[next.config] IMAGE_HOSTNAME env var is not set. ' +
+    'Add IMAGE_HOSTNAME=api.behom.ae to your production environment.'
+  );
+}
+
+const BACKEND_URL    = process.env.BACKEND_URL    || 'http://localhost:8000'; // dev fallback only
+const IMAGE_HOSTNAME = process.env.IMAGE_HOSTNAME || 'localhost';             // dev fallback only
 
 const securityHeaders = [
   { key: 'X-Frame-Options',        value: 'SAMEORIGIN' },
@@ -9,6 +26,28 @@ const securityHeaders = [
   { key: 'X-XSS-Protection',       value: '1; mode=block' },
   { key: 'Referrer-Policy',        value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy',     value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+  {
+    key: 'Content-Security-Policy',
+    value: [
+      "default-src 'self'",
+      // Scripts: self + inline scripts (Next.js requires unsafe-inline/eval in dev; tighten for prod)
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.gstatic.com https://translate.googleapis.com https://translate.google.com https://translate-pa.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com",
+      // Styles: self + inline styles used by template/Google fonts/Translate
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://translate.googleapis.com https://translate.google.com https://www.gstatic.com",
+      // Fonts
+      "font-src 'self' data: https://fonts.gstatic.com",
+      // Images: self + backend storage + data URIs + Google (fonts.gstatic.com for Translate icon)
+      `img-src 'self' data: blob: http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://www.gstatic.com https://fonts.gstatic.com https://translate.google.com https://translate.googleapis.com`,
+      // Fetch/XHR: self + backend API + Google APIs
+      `connect-src 'self' http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://analytics.google.com https://translate.googleapis.com`,
+      // Frames: Google Sign-In, Translate
+      "frame-src 'self' https://accounts.google.com https://translate.google.com",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "upgrade-insecure-requests",
+    ].join('; '),
+  },
 ];
 
 const nextConfig = {

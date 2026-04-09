@@ -7,10 +7,12 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     // Get token from localStorage if available
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
+    const isServer = typeof window === 'undefined';
     const headers: Record<string, string> = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
+        // Server-side: attach key directly. Client-side: middleware injects it.
+        ...(isServer ? { 'x-api-key': API_KEY } : {}),
         ...(options.headers as Record<string, string>),
     };
 

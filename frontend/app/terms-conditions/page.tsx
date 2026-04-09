@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
 import { constructMetadata } from '@/lib/metadata';
+import DOMPurify from 'isomorphic-dompurify';
 
 
 async function getPageData() {
@@ -39,7 +40,7 @@ export default async function TermsConditions() {
                             <div
                                 className="text-white opacity-8 lh-30"
                                 style={{ fontSize: '15px' }}
-                                dangerouslySetInnerHTML={{ __html: content }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
                             />
                         </div>
                     </div>

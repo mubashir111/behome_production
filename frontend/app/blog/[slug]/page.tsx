@@ -6,6 +6,7 @@ import AllPostsButton from '@/components/AllPostsButton';
 import BlogCommentForm from '@/components/BlogCommentForm';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
 import { constructMetadata } from '@/lib/metadata';
+import DOMPurify from 'isomorphic-dompurify';
 
 
 async function getPost(slug: string) {
@@ -97,7 +98,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                             {post.content ? (
                                 <div
                                     className="blog-content text-white opacity-8 fs-16 lh-32"
-                                    dangerouslySetInnerHTML={{ __html: post.content }}
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
                                 />
                             ) : (
                                 <p className="text-white opacity-5 text-center py-40px fs-15">No content yet.</p>

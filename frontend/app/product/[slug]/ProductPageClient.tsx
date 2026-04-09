@@ -8,6 +8,7 @@ import ProductGrid from '@/components/ProductGrid';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import ProductDescriptionBlocks from '@/components/ProductDescriptionBlocks';
 import { useToast } from '@/components/ToastProvider';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCurrency } from '@/components/SettingsProvider';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -830,7 +831,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                     {activeTab === 'description' && (
                         <div
                             className="fs-15 lh-28 text-white opacity-8 product-tab-desc"
-                            dangerouslySetInnerHTML={{ __html: product.description || '<p>No description available.</p>' }}
+                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description || '<p>No description available.</p>') }}
                         />
                     )}
 
@@ -860,7 +861,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                     {activeTab === 'shipping' && (
                         <div className="fs-15 lh-28 text-white opacity-8 product-tab-desc">
                             {product.shipping_and_return ? (
-                                <div dangerouslySetInnerHTML={{ __html: product.shipping_and_return.replace(/\n/g, '<br />') }} />
+                                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.shipping_and_return.replace(/\n/g, '<br />')) }} />
                             ) : (
                                 <p>No shipping and return information available.</p>
                             )}
