@@ -123,7 +123,7 @@ Route::match(['get', 'post'], '/login', function () {
 
 Route::match(['get', 'post'], '/refresh-token', [RefreshTokenController::class, 'refreshToken'])->middleware(['installed']);
 
-Route::prefix('auth')->middleware(['installed', 'apiKey', 'localization'])->name('auth.')->namespace('Auth')->group(function () {
+Route::prefix('auth')->middleware(['installed', 'apiKey', 'throttle:20,1', 'localization'])->name('auth.')->namespace('Auth')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'handleToken']);
 
@@ -151,7 +151,7 @@ Route::prefix('auth')->middleware(['installed', 'apiKey', 'localization'])->name
 });
 
 /* all routes must be singular word*/
-Route::prefix('profile')->name('profile.')->middleware(['installed', 'apiKey', 'auth:sanctum', 'localization'])->group(function () {
+Route::prefix('profile')->name('profile.')->middleware(['installed', 'apiKey', 'throttle:300,1', 'auth:sanctum', 'localization'])->group(function () {
     Route::get('/', [ProfileController::class, 'profile']);
     Route::match(['post', 'put', 'patch'], '/', [ProfileController::class, 'update']);
     Route::match(['put', 'patch'], '/change-password', [ProfileController::class, 'changePassword']);
@@ -669,7 +669,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:sanctum'])->group(func
     });
 });
 
-Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey', 'localization'])->group(function () {
+Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey', 'throttle:120,1', 'localization'])->group(function () {
     Route::prefix('setting')->name('setting.')->group(function () {
         Route::get('/', [FrontendSettingController::class, 'index']);
     });
@@ -838,16 +838,20 @@ use App\Http\Controllers\Api\PaymentController as ApiPaymentController;
 use App\Http\Controllers\Api\AddressController as ApiAddressController;
 
 
-Route::prefix('v1')->group(function () {
-    Route::post('/auth/register', [ApiAuthController::class, 'register']);
-    Route::post('/auth/login', [ApiAuthController::class, 'login']);
+Route::prefix('v1')->middleware(['installed', 'apiKey'])->group(function () {
+    Route::middleware('throttle:20,1')->group(function () {
+        Route::post('/auth/register', [ApiAuthController::class, 'register']);
+        Route::post('/auth/login', [ApiAuthController::class, 'login']);
+    });
 
-    Route::get('/products', [ApiProductController::class, 'index']);
-    Route::get('/products/{slug}', [ApiProductController::class, 'show']);
-    Route::get('/categories', [ApiCategoryController::class, 'index']);
-    Route::get('/categories/{slug}', [ApiCategoryController::class, 'show']);
+    Route::middleware('throttle:120,1')->group(function () {
+        Route::get('/products', [ApiProductController::class, 'index']);
+        Route::get('/products/{slug}', [ApiProductController::class, 'show']);
+        Route::get('/categories', [ApiCategoryController::class, 'index']);
+        Route::get('/categories/{slug}', [ApiCategoryController::class, 'show']);
+    });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'throttle:300,1'])->group(function () {
         Route::post('/auth/logout', [ApiAuthController::class, 'logout']);
         Route::get('/auth/me', [ApiAuthController::class, 'me']);
 
