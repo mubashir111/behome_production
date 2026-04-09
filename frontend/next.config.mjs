@@ -33,17 +33,17 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Scripts: self + inline scripts (Next.js requires unsafe-inline/eval in dev; tighten for prod)
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.gstatic.com https://translate.googleapis.com https://translate.google.com https://translate-pa.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.gstatic.com https://translate.googleapis.com https://translate.google.com https://translate-pa.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com https://js.stripe.com",
       // Styles: self + inline styles used by template/Google fonts/Translate
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://translate.googleapis.com https://translate.google.com https://www.gstatic.com",
       // Fonts
       "font-src 'self' data: https://fonts.gstatic.com",
       // Images: self + backend storage + data URIs + Google (fonts.gstatic.com for Translate icon)
-      `img-src 'self' data: blob: http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://www.gstatic.com https://fonts.gstatic.com https://translate.google.com https://translate.googleapis.com`,
-      // Fetch/XHR: self + backend API + Google APIs
-      `connect-src 'self' http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://analytics.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://translate.google.com`,
-      // Frames: Google Sign-In, Translate
-      "frame-src 'self' https://accounts.google.com https://translate.google.com",
+      `img-src 'self' data: blob: http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://www.gstatic.com https://fonts.gstatic.com https://translate.google.com https://translate.googleapis.com https://*.stripe.com`,
+      // Fetch/XHR: self + backend API + Google APIs + Stripe
+      `connect-src 'self' http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://analytics.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://translate.google.com https://api.stripe.com https://hooks.stripe.com https://q.stripe.com`,
+      // Frames: Google Sign-In, Translate, Stripe Elements
+      "frame-src 'self' https://accounts.google.com https://translate.google.com https://js.stripe.com https://hooks.stripe.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
