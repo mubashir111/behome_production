@@ -39,7 +39,7 @@ const securityHeaders = [
       // Images: self + backend storage + data URIs + Google (fonts.gstatic.com for Translate icon)
       `img-src 'self' data: blob: http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://www.gstatic.com https://fonts.gstatic.com https://translate.google.com https://translate.googleapis.com`,
       // Fetch/XHR: self + backend API + Google APIs
-      `connect-src 'self' http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://analytics.google.com https://translate.googleapis.com`,
+      `connect-src 'self' http://localhost:8000 https://${IMAGE_HOSTNAME} https://behom.ae https://www.behom.ae https://www.google-analytics.com https://analytics.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://translate.google.com`,
       // Frames: Google Sign-In, Translate
       "frame-src 'self' https://accounts.google.com https://translate.google.com",
       "object-src 'none'",

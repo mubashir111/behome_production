@@ -48,14 +48,17 @@ export default function LanguageSwitcher() {
         document.documentElement.lang = lang.code;
         document.documentElement.dir = lang.code === 'ar' ? 'rtl' : 'ltr';
             
+            // Cookie domain must be hostname only — no port number
+            const cookieDomain = window.location.hostname;
+
             if (lang.code === 'en') {
                 // Clear the cookie to revert to English (original DOM)
                 document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${window.location.host}; path=/;`;
+                document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${cookieDomain}; path=/;`;
             } else {
                 // Set Google Translate cookie (format: /source_lang/target_lang)
                 document.cookie = `googtrans=/en/${lang.code}; path=/`;
-                document.cookie = `googtrans=/en/${lang.code}; domain=.${window.location.host}; path=/`;
+                document.cookie = `googtrans=/en/${lang.code}; domain=.${cookieDomain}; path=/`;
             }
 
             // Reload to let Google Translate script apply the translation natively
@@ -87,7 +90,7 @@ export default function LanguageSwitcher() {
                 <button
                     onClick={() => setOpen(o => !o)}
                     className="glass-icon-box d-flex align-items-center gap-1 border-0 bg-transparent"
-                    style={{ cursor: 'pointer', padding: '0 8px' }}
+                    style={{ cursor: 'pointer', padding: '0 7px' }}
                     aria-label="Select language"
                     type="button"
                 >
