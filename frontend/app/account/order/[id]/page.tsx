@@ -146,7 +146,7 @@ export default function OrderDetail() {
             if (res.status) {
                 setShowCancelModal(false);
                 if (res.data?.type === 'requested') {
-                    showToast('Cancellation request submitted. Our team will review and respond within 24 hours.', 'success');
+                    showToast('Cancellation request submitted. Our team will review and respond within 6–7 working days.', 'success');
                     // Refresh messages so the request shows in the thread
                     if (showMessages) fetchMessages();
                 } else {
@@ -268,7 +268,12 @@ export default function OrderDetail() {
     );
 
     const statusColor = STATUS_COLORS[order.status as number] || '#888';
-    const canCancel = (order.status === 1 || order.status === 5) && !order.cancellation_requested;
+    // Instant cancel: only COD/credit, pending, and not yet paid
+    const isOnlinePayment = order.payment_status === 5; // payment_status 5 = Paid (always online)
+    const canInstantCancel = order.status === 1 && !isOnlinePayment && !order.cancellation_requested;
+    // Request only: online-paid orders (any status 1 or 5), or confirmed COD
+    const canRequestCancel = !canInstantCancel && (order.status === 1 || order.status === 5) && !order.cancellation_requested;
+    const canCancel = canInstantCancel || canRequestCancel;
     const canReturn = order.status === 10 && !existingReturn && order.order_products?.some((item: any) => item.is_refundable);
     const returnSubmitted = !!existingReturn;
     const cancellationPending = !!order.cancellation_requested;
@@ -668,6 +673,37 @@ export default function OrderDetail() {
                                     </span>
                                 </div>
 
+                                {/* Refund Completed — shown when admin has issued the refund */}
+                                {order.refund_transaction && (
+                                    <div className="mt-20px p-20px border-radius-10px" style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.25)' }}>
+                                        <div className="d-flex align-items-center gap-10px mb-10px">
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                                <i className="feather icon-feather-check-circle fs-15" style={{ color: '#10b981' }}></i>
+                                            </div>
+                                            <span className="fw-700 fs-14" style={{ color: '#10b981' }}>Refund Completed</span>
+                                        </div>
+                                        <p className="text-white opacity-6 fs-13 mb-10px lh-20">
+                                            <strong style={{ color: '#34d399' }}>{order.refund_transaction.amount}</strong> has been refunded to your original payment method.
+                                        </p>
+                                        <div className="d-flex flex-column gap-5px">
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-white opacity-4 fs-11" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Refunded via</span>
+                                                <span className="text-white fs-12 fw-600 text-capitalize">{order.refund_transaction.payment_method === 'stripe' ? 'Stripe → Card' : 'Store Wallet'}</span>
+                                            </div>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-white opacity-4 fs-11" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</span>
+                                                <span className="text-white fs-12 fw-600">{order.refund_transaction.created_at}</span>
+                                            </div>
+                                            {order.refund_transaction.transaction_no && (
+                                                <div className="mt-5px pt-8px" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                                                    <span className="text-white opacity-4 fs-11 d-block mb-3px" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reference</span>
+                                                    <span className="text-white opacity-6 fs-11 fw-500" style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{order.refund_transaction.transaction_no}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {order.payment_status === 10 && order.status < 10 && (
                                     <div className="mt-25px p-20px border-radius-10px shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(201,154,92,0.12) 0%, rgba(201,154,92,0.04) 100%)', border: '1px solid rgba(201,154,92,0.25)' }}>
                                         <div className="d-flex flex-column align-items-center text-center gap-15px mb-20px">
@@ -738,8 +774,8 @@ export default function OrderDetail() {
                                         </p>
                                         <p className="text-white opacity-5 fs-13 mb-0">
                                             {cancellationPending && 'We have received your cancellation request and are reviewing it.'}
-                                            {canCancel && order.status === 1 && 'You can cancel this order immediately as it hasn\'t been confirmed yet.'}
-                                            {canCancel && order.status === 5 && 'Your order is confirmed. Submit a cancellation request and our team will review it within 24 hours.'}
+                                            {canInstantCancel && 'You can cancel this order immediately as it hasn\'t been confirmed yet.'}
+                                            {canRequestCancel && 'Submit a cancellation request and our team will review it within 6–7 working days.'}
                                             {(canReturn || returnSubmitted) && 'You can request a return or refund within 7 days of delivery.'}
                                         </p>
                                     </div>
@@ -751,7 +787,7 @@ export default function OrderDetail() {
                                                 style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', fontSize: 14 }}
                                             >
                                                 <i className="feather icon-feather-x me-2"></i>
-                                                {order.status === 1 ? 'Cancel Order' : 'Request Cancellation'}
+                                                {canInstantCancel ? 'Cancel Order' : 'Request Cancellation'}
                                             </button>
                                         )}
                                         {cancellationPending && (
@@ -781,12 +817,12 @@ export default function OrderDetail() {
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
                     <div className="bg-dark-gray border-radius-6px p-35px" style={{ width: '100%', maxWidth: 460, border: '1px solid rgba(255,255,255,0.1)' }}>
                         <h5 className="text-white alt-font fw-600 mb-10px">
-                            {order.status === 1 ? 'Cancel Order' : 'Request Cancellation'}
+                            {canInstantCancel ? 'Cancel Order' : 'Request Cancellation'}
                         </h5>
                         <p className="text-white opacity-6 fs-14 mb-20px">
-                            {order.status === 1
+                            {canInstantCancel
                                 ? 'Your order will be cancelled immediately. Please let us know why (optional).'
-                                : 'Your order is already confirmed and may be in preparation. We will review your request and respond within 24 hours.'}
+                                : 'We will review your request and respond within 6–7 working days. If a refund is applicable, it will be returned to your original payment method.'}
                         </p>
                         <textarea
                             value={cancelReason}
@@ -798,7 +834,7 @@ export default function OrderDetail() {
                         />
                         <div className="d-flex gap-3">
                             <button onClick={cancelOrder} disabled={cancelling} className="btn btn-medium btn-round-edge flex-grow-1" style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444' }}>
-                                {cancelling ? 'Submitting…' : order.status === 1 ? 'Yes, Cancel Order' : 'Submit Request'}
+                                {cancelling ? 'Submitting…' : canInstantCancel ? 'Yes, Cancel Order' : 'Submit Request'}
                             </button>
                             <button onClick={() => setShowCancelModal(false)} className="btn btn-medium btn-round-edge btn-transparent-white">
                                 Keep Order

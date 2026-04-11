@@ -730,7 +730,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                             >
                                                 {addingToCart
                                                     ? <><span className="spinner-border spinner-border-sm" role="status" /><span>Adding…</span></>
-                                                    : <><i className="bi bi-bag fs-18" /><span>Add to cart</span></>
+                                                    : <><i className="bi bi-bag fs-18" /><span className="d-none d-md-inline">Add to cart</span></>
                                                 }
                                             </button>
 

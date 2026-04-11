@@ -49,6 +49,7 @@ export default function Checkout() {
     const [stripePromise, setStripePromise] = useState<any>(null);
     const [stripeOptions, setStripeOptions] = useState<any>(null);
     const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
+    const [paymentCancelled, setPaymentCancelled] = useState(false);
     const paymentSectionRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to payment section when it appears
@@ -501,6 +502,22 @@ export default function Checkout() {
             </section>
             <section className="page-shell page-shell-tight">
                 <div className="container">
+                    {paymentCancelled && (
+                        <div style={{
+                            display: 'flex', alignItems: 'flex-start', gap: 12,
+                            background: 'rgba(234,179,8,0.12)', border: '1px solid rgba(234,179,8,0.35)',
+                            borderRadius: 10, padding: '14px 18px', marginBottom: 28,
+                        }}>
+                            <i className="bi bi-info-circle-fill" style={{ color: '#eab308', fontSize: 18, marginTop: 2, flexShrink: 0 }}></i>
+                            <div style={{ flex: 1 }}>
+                                <p style={{ color: '#fef08a', fontWeight: 600, margin: '0 0 2px' }}>Payment cancelled — you were not charged.</p>
+                                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: 0 }}>
+                                    Your order details are still saved below. Review them and click <strong style={{ color: '#fff' }}>Place Order</strong> to try again, or choose a different payment method.
+                                </p>
+                            </div>
+                            <button onClick={() => setPaymentCancelled(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 18, cursor: 'pointer', padding: 0, lineHeight: 1 }}>×</button>
+                        </div>
+                    )}
                     <form onSubmit={placeOrder}>
                         <div className="row align-items-start">
                             <div className="col-lg-7 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
@@ -734,7 +751,7 @@ export default function Checkout() {
                                         <StripePaymentForm 
                                             orderId={currentOrderId!} 
                                             onSuccess={() => router.push(`/payment/success?order_id=${currentOrderId}`)}
-                                            onCancel={() => setStripeOptions(null)}
+                                            onCancel={() => { setStripeOptions(null); setPaymentCancelled(true); }}
                                         />
                                     </Elements>
                                 )}

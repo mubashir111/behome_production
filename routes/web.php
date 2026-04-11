@@ -73,6 +73,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/destroy/{productVariation}', [\App\Http\Controllers\Admin\ProductVariationController::class, 'destroy'])->name('destroy');
         });
         Route::put('orders/{order}/payment-status', [\App\Http\Controllers\Admin\Web\OrderController::class, 'updatePaymentStatus'])->name('orders.payment-status.update');
+        Route::post('orders/{order}/issue-refund', [\App\Http\Controllers\Admin\Web\OrderController::class, 'issueRefund'])->name('orders.issue-refund');
         Route::post('orders/{order}/reply', [\App\Http\Controllers\Admin\Web\OrderController::class, 'reply'])->name('orders.reply');
         Route::get('order-messages', [\App\Http\Controllers\Admin\Web\OrderMessageWebController::class, 'index'])->name('order-messages.index');
         Route::post('order-messages/{order}/reply', [\App\Http\Controllers\Admin\Web\OrderMessageWebController::class, 'reply'])->name('order-messages.reply');

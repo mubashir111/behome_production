@@ -34,8 +34,14 @@ class OrderActionController extends Controller
 
         $reason = $request->input('reason', 'Cancellation requested by customer.');
 
-        // PENDING → instant cancel (order not yet processed)
-        if ($order->status === OrderStatus::PENDING) {
+        // PENDING + COD/offline → instant cancel (no money involved)
+        // PENDING + Stripe/online paid → must go through admin approval (refund required)
+        $gateway   = \App\Models\PaymentGateway::find($order->payment_method);
+        $gwSlug    = $gateway?->slug ?? '';
+        $isOffline = in_array($gwSlug, ['cashondelivery', 'credit']);
+        $isPaid    = $order->payment_status == \App\Enums\PaymentStatus::PAID;
+
+        if ($order->status === OrderStatus::PENDING && $isOffline && !$isPaid) {
             try {
                 $statusRequest = OrderStatusRequest::create('', 'POST', [
                     'status' => OrderStatus::CANCELED,
@@ -50,7 +56,7 @@ class OrderActionController extends Controller
             }
         }
 
-        // CONFIRMED → send cancellation request to admin (requires approval)
+        // All other cases (Stripe paid, confirmed orders) → send request to admin for approval
         $existing = $order->messages()
             ->where('sender_type', 'customer')
             ->where('message', 'like', '[CANCELLATION REQUEST]%')
@@ -67,10 +73,20 @@ class OrderActionController extends Controller
             'is_read'     => false,
         ]);
 
+        // Mark the flag so the frontend can hide the cancel button immediately
+        $payload = $order->reasonPayload();
+        $payload['cancellation_requested'] = true;
+        $order->reason = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $order->save();
+
+        $refundNote = $isPaid
+            ? ' If a refund is due, our team will process it back to your original payment method after review.'
+            : '';
+
         return response([
             'status'  => true,
             'type'    => 'requested',
-            'message' => 'Cancellation request submitted. Our team will review and respond within 24 hours.',
+            'message' => 'Cancellation request submitted. Our team will review and respond within 6–7 working days.' . $refundNote,
         ], 200);
     }
 

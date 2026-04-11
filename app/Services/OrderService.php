@@ -285,16 +285,6 @@ class OrderService
                     if ($request->reason) {
                         $order->setAdminStatusReason($request->reason);
                     }
-
-                    if ($request->status == OrderStatus::REJECTED || $request->status == OrderStatus::CANCELED) {
-                        if ($order->transaction) {
-                            app(PaymentService::class)->cashBack(
-                                $order,
-                                'credit',
-                                rand(111111111111111, 99999999999999)
-                            );
-                        }
-                    }
                     SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
                     SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                     SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
@@ -312,14 +302,8 @@ class OrderService
                     if ($request->reason) {
                         $order->setAdminStatusReason($request->reason);
                     }
-
-                    if ($order->transaction) {
-                        app(PaymentService::class)->cashBack(
-                            $order,
-                            'credit',
-                            rand(111111111111111, 99999999999999)
-                        );
-                    }
+                    // NOTE: Refund is NOT issued automatically here.
+                    // Admin must explicitly click "Issue Refund" on the order page.
                 }
 
                 // Clear cancellation request if we are canceling or rejecting

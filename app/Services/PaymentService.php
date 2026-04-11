@@ -101,27 +101,57 @@ class PaymentService
 
         // Only refund if a payment transaction exists for this order
         $paymentTransaction = Transaction::where(['order_id' => $order->id, 'type' => 'payment'])->first();
-        if ($paymentTransaction) {
-            $refundTxNo = $paymentTransaction->transaction_no . '_refund';
+        if (!$paymentTransaction) {
+            return null;
+        }
 
+        $refundTxNo      = $paymentTransaction->transaction_no . '_refund';
+        $originalGateway = $paymentTransaction->payment_method; // e.g. 'stripe'
+
+        // ── Stripe: issue real card refund via Stripe API ────────────────
+        if ($originalGateway === 'stripe') {
+            $stripeSecret = config('services.stripe.secret');
+            if ($stripeSecret && $paymentTransaction->transaction_no) {
+                try {
+                    $stripe       = new \Stripe\StripeClient($stripeSecret);
+                    $stripeRefund = $stripe->refunds->create([
+                        'payment_intent' => $paymentTransaction->transaction_no,
+                    ]);
+                    $refundTxNo = $stripeRefund->id; // use Stripe refund ID as reference
+                    Log::info("PaymentService::cashBack — Stripe refund issued: {$refundTxNo} for order {$order->id}");
+                } catch (\Exception $e) {
+                    Log::error("PaymentService::cashBack — Stripe refund failed for order {$order->id}: " . $e->getMessage());
+                    // Fall through: record the cashback transaction as wallet credit so customer is not left empty-handed
+                }
+            }
+            // For Stripe refunds: do NOT credit the wallet — money goes back to card
             $transaction = Transaction::create([
                 'order_id'       => $order->id,
                 'transaction_no' => $refundTxNo,
                 'amount'         => $order->total,
-                'payment_method' => $gatewaySlug,
+                'payment_method' => 'stripe',
                 'sign'           => '-',
                 'type'           => 'cash_back'
             ]);
-
-            $user = User::find($order->user_id);
-            if ($user) {
-                $user->balance = ($user->balance + $order->total);
-                $user->save();
-            }
-
             return $transaction;
         }
 
-        return null;
+        // ── Other gateways (COD, credit, PayPal, etc.): credit wallet ───
+        $transaction = Transaction::create([
+            'order_id'       => $order->id,
+            'transaction_no' => $refundTxNo,
+            'amount'         => $order->total,
+            'payment_method' => $gatewaySlug,
+            'sign'           => '-',
+            'type'           => 'cash_back'
+        ]);
+
+        $user = User::find($order->user_id);
+        if ($user) {
+            $user->balance = ($user->balance + $order->total);
+            $user->save();
+        }
+
+        return $transaction;
     }
 }

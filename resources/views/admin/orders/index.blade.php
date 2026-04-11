@@ -18,10 +18,34 @@
         @endif
     </div>
 
+    {{-- Toggle bar: Real Orders / Incomplete (payment abandoned) --}}
+    <div class="flex gap-2 mb-5">
+        <a href="{{ route('admin.orders.index') }}"
+           class="px-4 py-2 text-sm font-semibold rounded-xl transition {{ !$showIncomplete ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+            Orders
+        </a>
+        <a href="{{ route('admin.orders.index', ['incomplete' => 1]) }}"
+           class="px-4 py-2 text-sm font-semibold rounded-xl transition flex items-center gap-2 {{ $showIncomplete ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+            Incomplete Payments
+            @if($incompleteCount > 0)
+                <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full {{ $showIncomplete ? 'bg-white text-amber-600' : 'bg-amber-500 text-white' }}">{{ $incompleteCount }}</span>
+            @endif
+        </a>
+    </div>
+
+    @if($showIncomplete)
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;margin-bottom:20px;">
+        <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        <p class="text-sm text-amber-800 font-medium m-0">These orders were created but payment was <strong>never completed</strong> — the customer cancelled or left the payment page. <strong>Do not process or fulfil these.</strong> They will be cleaned up automatically.</p>
+    </div>
+    @endif
+
     <form method="GET" action="{{ route('admin.orders.index') }}" class="flex gap-3 mb-6 flex-wrap">
+        @if($showIncomplete)<input type="hidden" name="incomplete" value="1">@endif
         <input type="text" name="search" value="{{ $search ?? '' }}"
                placeholder="Search by order # or customer name/email..."
                class="flex-1 min-w-[220px] px-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white" />
+        @if(!$showIncomplete)
         <select name="status" class="px-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white">
             <option value="">All Order Statuses</option>
             <option value="1"  {{ request('status')=='1'  ? 'selected':'' }}>Pending</option>
@@ -36,9 +60,10 @@
             <option value="5"  {{ request('payment_status')=='5'  ? 'selected':'' }}>Paid</option>
             <option value="10" {{ request('payment_status')=='10' ? 'selected':'' }}>Unpaid / Pay on Delivery</option>
         </select>
+        @endif
         <button type="submit" class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition">Search</button>
         @if(request()->anyFilled(['search','status','payment_status']))
-            <a href="{{ route('admin.orders.index') }}" class="px-5 py-2 bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-200 transition">Clear</a>
+            <a href="{{ route('admin.orders.index', $showIncomplete ? ['incomplete'=>1] : []) }}" class="px-5 py-2 bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-200 transition">Clear</a>
         @endif
     </form>
 

@@ -42,6 +42,14 @@ class OrderDetailsResource extends JsonResource
             'cancellation_requested'         => $this->reasonPayload()['cancellation_requested'] ?? false,
             'source'                         => $this->source,
             'active'                         => (int) $this->active,
+            'refund_transaction'             => ($refund = \App\Models\Transaction::where('order_id', $this->id)->where('type', 'cash_back')->first())
+                ? [
+                    'amount'           => AppLibrary::currencyAmountFormat($refund->amount),
+                    'transaction_no'   => $refund->transaction_no,
+                    'payment_method'   => $refund->payment_method,
+                    'created_at'       => $refund->created_at?->format('M d, Y'),
+                ]
+                : null,
             'return_and_refund'              => $this->returnAndRefund ? [
                 'id'                 => $this->returnAndRefund->id,
                 'status'             => $this->returnAndRefund->status,

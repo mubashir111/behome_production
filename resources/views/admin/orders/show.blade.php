@@ -318,6 +318,11 @@
 
                 {{-- Transaction record --}}
                 @if($transaction)
+                @php
+                    $refundTransaction = \App\Models\Transaction::where(['order_id' => $order->id, 'type' => 'cash_back'])->first();
+                    $isStripePayment   = $transaction->payment_method === 'stripe';
+                    $isCancelledOrder  = in_array($order->status, [15, 20]); // CANCELED or REJECTED
+                @endphp
                 <div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Transaction Record</p>
                     <div class="flex justify-between text-sm">
@@ -334,6 +339,49 @@
                     </div>
                     <div class="text-xs text-slate-400 break-all font-mono mt-1">{{ $transaction->transaction_no }}</div>
                 </div>
+
+                {{-- ── Refund Section (only for paid + cancelled/rejected orders) ── --}}
+                @if($isPaid && $isCancelledOrder)
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    @if($refundTransaction)
+                        {{-- Refund already issued --}}
+                        <div class="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                            <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            <div>
+                                <p class="text-sm font-semibold text-emerald-700">Refund issued</p>
+                                <p class="text-xs text-emerald-600">
+                                    {{ $currencySymbol }}{{ number_format($refundTransaction->amount, 2) }}
+                                    @if($isStripePayment) returned to card @else credited to wallet @endif
+                                    · Ref: <span class="font-mono">{{ $refundTransaction->transaction_no }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    @else
+                        {{-- Refund pending admin action --}}
+                        <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-3">
+                            <p class="text-sm font-semibold text-amber-700 mb-1">Refund not yet issued</p>
+                            <p class="text-xs text-amber-600">
+                                This order was paid via <strong>{{ ucfirst($transaction->payment_method) }}</strong>.
+                                Amount to refund: <strong>{{ $currencySymbol }}{{ number_format($order->total, 2) }}</strong>.
+                                @if($isStripePayment)
+                                    Clicking below will refund the full amount directly to the customer's card via Stripe.
+                                @else
+                                    Clicking below will credit the customer's store wallet.
+                                @endif
+                            </p>
+                        </div>
+                        <form method="POST" action="{{ route('admin.orders.issue-refund', $order) }}"
+                              onsubmit="return confirm('Issue refund of {{ $currencySymbol }}{{ number_format($order->total, 2) }} to this customer? This cannot be undone.')">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                Issue Refund — {{ $currencySymbol }}{{ number_format($order->total, 2) }}
+                                @if($isStripePayment) (Stripe → Card) @else (Wallet Credit) @endif
+                            </button>
+                        </form>
+                    @endif
+                </div>
+                @endif
                 @endif
             </div>
 

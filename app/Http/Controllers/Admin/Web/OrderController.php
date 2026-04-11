@@ -22,14 +22,23 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-        $currencySymbol = config('app.currency_symbol');
-        $search         = trim($request->get('search', ''));
-        $status         = $request->get('status');
-        $paymentStatus  = $request->get('payment_status');
+        $currencySymbol  = config('app.currency_symbol');
+        $search          = trim($request->get('search', ''));
+        $status          = $request->get('status');
+        $paymentStatus   = $request->get('payment_status');
+        $showIncomplete  = $request->boolean('incomplete'); // opt-in to see abandoned payment orders
 
         $query = \App\Models\Order::with(['user', 'orderProducts'])
             ->where('order_type', '!=', \App\Enums\OrderType::POS)
             ->latest();
+
+        // By default hide inactive orders (payment was started but never completed / cancelled).
+        // Admin can opt in with ?incomplete=1 to review them.
+        if (!$showIncomplete) {
+            $query->where('active', \App\Enums\Ask::YES);
+        } else {
+            $query->where('active', \App\Enums\Ask::NO);
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -47,9 +56,13 @@ class OrderController extends Controller
             $query->where('payment_status', (int) $paymentStatus);
         }
 
+        $incompleteCount = \App\Models\Order::where('order_type', '!=', \App\Enums\OrderType::POS)
+            ->where('active', \App\Enums\Ask::NO)
+            ->count();
+
         $orders = $query->paginate(15)->appends($request->query());
 
-        return view('admin.orders.index', compact('orders', 'currencySymbol', 'search'));
+        return view('admin.orders.index', compact('orders', 'currencySymbol', 'search', 'showIncomplete', 'incompleteCount'));
     }
 
     public function show(Order $order)
@@ -143,6 +156,66 @@ class OrderController extends Controller
         }
 
         return redirect()->back()->with('success', 'Reply sent successfully.');
+    }
+
+    public function issueRefund(Order $order)
+    {
+        $transaction = $order->transaction;
+
+        if (!$transaction || $transaction->type !== 'payment') {
+            return back()->with('error', 'No payment transaction found for this order.');
+        }
+
+        $existing = \App\Models\Transaction::where(['order_id' => $order->id, 'type' => 'cash_back'])->first();
+        if ($existing) {
+            return back()->with('error', 'A refund has already been issued for this order.');
+        }
+
+        $gwSlug = $transaction->payment_method;
+
+        // Stripe: real card refund via API
+        if ($gwSlug === 'stripe') {
+            $stripeSecret = config('services.stripe.secret');
+            if (!$stripeSecret) {
+                return back()->with('error', 'Stripe secret key is not configured.');
+            }
+            try {
+                $stripe       = new \Stripe\StripeClient($stripeSecret);
+                $stripeRefund = $stripe->refunds->create([
+                    'payment_intent' => $transaction->transaction_no,
+                ]);
+
+                \App\Models\Transaction::create([
+                    'order_id'       => $order->id,
+                    'transaction_no' => $stripeRefund->id,
+                    'amount'         => $order->total,
+                    'payment_method' => 'stripe',
+                    'sign'           => '-',
+                    'type'           => 'cash_back',
+                ]);
+
+                \App\Services\AuditLogger::refundStageChanged($order, \App\Enums\RefundStatus::REFUND_ISSUED, (float) $order->total);
+
+                // Notify the customer via the order message thread
+                $formatted = number_format((float) $order->total, 2);
+                $currency  = config('app.currency_symbol', 'AED');
+                $order->messages()->create([
+                    'user_id'     => auth()->id(),
+                    'sender_type' => 'admin',
+                    'message'     => "Your refund of {$currency} {$formatted} has been processed and will be returned to your card within 5–10 business days.\n\nReference: {$stripeRefund->id}",
+                    'is_read'     => false,
+                ]);
+
+                return back()->with('success', "Stripe refund of {$order->total} issued successfully. The customer will see it on their card within 5–10 business days.");
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Admin issueRefund Stripe error order #{$order->id}: " . $e->getMessage());
+                return back()->with('error', 'Stripe refund failed: ' . $e->getMessage());
+            }
+        }
+
+        // Non-Stripe (COD, PayPal, etc.): credit wallet
+        app(\App\Services\PaymentService::class)->cashBack($order, $gwSlug);
+        return back()->with('success', "Refund of {$order->total} credited to customer's wallet balance.");
     }
 
     public function updatePaymentStatus(PaymentStatusRequest $request, Order $order)
