@@ -375,7 +375,7 @@ export default function Checkout() {
                         if (!publishableKey) {
                             console.error('Stripe error: publishableKey is missing from backend response');
                             showToast('Stripe is not configured correctly on the server (missing Public Key).', 'error');
-                            setIsPlacingOrder(false);
+                            setPlacingOrder(false);
                             return;
                         }
 

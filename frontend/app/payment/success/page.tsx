@@ -37,6 +37,7 @@ function PaymentSuccessContent() {
                 .then((res) => {
                     if (res.status) {
                         setState('success');
+                        window.dispatchEvent(new Event('cart:updated'));
                     } else {
                         setState('failed');
                         setErrorMsg(res.message || 'Payment verification failed.');
@@ -60,6 +61,7 @@ function PaymentSuccessContent() {
                         const isActive  = res.data.active === 5;
                         if (isPaid || isCod || isActive) {
                             setState('success');
+                            window.dispatchEvent(new Event('cart:updated'));
                         } else {
                             setState('failed');
                             setErrorMsg('Your payment could not be confirmed. Please contact support or try again.');
