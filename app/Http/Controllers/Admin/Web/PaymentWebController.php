@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Admin\Web;
 
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Smartisan\Settings\Facades\Settings;
+use App\Http\Controllers\Controller;
 
 class PaymentWebController extends Controller
 {
@@ -52,7 +51,7 @@ class PaymentWebController extends Controller
 
         $payments = $query->paginate(20)->withQueryString();
 
-        $currencySymbol = Settings::group('site')->get('site_currency_symbol') ?? '$';
+        $currencySymbol = config('app.currency_symbol', '$');
 
         $gateways = Transaction::distinct()
             ->pluck('payment_method')

@@ -55,11 +55,12 @@ class PaymentService
                 // Clear cart items for online payments
                 $order->load('orderProducts');
                 foreach ($order->orderProducts as $item) {
-                    \App\Models\Cart::where([
-                        'user_id'      => $order->user_id,
-                        'product_id'   => $item->product_id,
-                        'variation_id' => $item->variation_id > 0 ? $item->variation_id : 0
-                    ])->delete();
+                    $q = \App\Models\Cart::where('user_id', $order->user_id)
+                                        ->where('product_id', $item->product_id);
+                    $item->variation_id > 0
+                        ? $q->where('variation_id', $item->variation_id)
+                        : $q->where(fn($w) => $w->whereNull('variation_id')->orWhere('variation_id', 0));
+                    $q->delete();
                 }
             });
 

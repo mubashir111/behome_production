@@ -301,11 +301,13 @@ class FrontendOrderService
                     $orderProducts = json_decode($request->products);
                     if (!blank($orderProducts)) {
                         foreach ($orderProducts as $p) {
-                            Cart::where([
-                                'user_id'      => Auth::user()->id,
-                                'product_id'   => $p->product_id,
-                                'variation_id' => $p->variation_id ?? 0
-                            ])->delete();
+                            $varId = $p->variation_id ?? null;
+                            $q = Cart::where('user_id', Auth::user()->id)
+                                     ->where('product_id', $p->product_id);
+                            $varId > 0
+                                ? $q->where('variation_id', $varId)
+                                : $q->where(fn($w) => $w->whereNull('variation_id')->orWhere('variation_id', 0));
+                            $q->delete();
                         }
                     }
                 }
