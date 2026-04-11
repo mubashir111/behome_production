@@ -63,7 +63,15 @@ class FrontendOrderService
             $frontendOrderType   = $request->get('order_by') ?? 'desc';
 
             return Order::where('order_type', "!=", OrderType::POS)
-                ->with(['user', 'orderProducts']) // Eager load relations to fix N+1
+                ->with(['user', 'orderProducts'])
+                // Hide orders that are mid-payment (unpaid online + created within last 30 min).
+                // COD and Credit orders are always unpaid at creation — always show them.
+                ->where(function ($q) {
+                    $codGatewayIds = \App\Models\PaymentGateway::whereIn('slug', ['cashondelivery', 'credit'])->pluck('id');
+                    $q->where('payment_status', \App\Enums\PaymentStatus::PAID)           // paid — always show
+                      ->orWhereIn('payment_method', $codGatewayIds)                        // COD/Credit — always show
+                      ->orWhere('created_at', '<', now()->subMinutes(30));                 // abandoned — show so customer can retry
+                })
                 ->where(function ($query) use ($requests) {
                     $query->where('user_id', auth()->user()->id);
                     foreach ($requests as $key => $request) {
@@ -99,7 +107,11 @@ class FrontendOrderService
     {
         try {
             DB::transaction(function () use ($request) {
-                $oldOrder     = Order::where(['user_id' => Auth::user()->id, 'active' => Status::INACTIVE]);
+                // Only clean up abandoned online-payment orders.
+                // COD and Credit orders are active/confirmed at placement — never delete them here.
+                $offlineGatewayIds = \App\Models\PaymentGateway::whereIn('slug', ['cashondelivery', 'credit'])->pluck('id');
+                $oldOrder     = Order::where(['user_id' => Auth::user()->id, 'active' => Status::INACTIVE])
+                    ->whereNotIn('payment_method', $offlineGatewayIds);
                 $orderReplace = $oldOrder;
                 if (!blank($oldOrder->get())) {
                     $ids          = $oldOrder->pluck('id');
@@ -276,9 +288,16 @@ class FrontendOrderService
                     ]);
                 }
 
-                // Selective cart clearing: Only for COD. Others clear on payment confirmation.
+                // COD orders are confirmed at placement — activate immediately.
+                // Online payment orders stay inactive until PaymentService::payment() is called.
                 $paymentGateway = \App\Models\PaymentGateway::find($request->payment_method);
-                if ($paymentGateway && $paymentGateway->slug === 'cashondelivery') {
+                if ($paymentGateway && in_array($paymentGateway->slug, ['cashondelivery', 'credit'])) {
+                    $this->order->active = \App\Enums\Ask::YES;
+                    $this->order->save();
+                    Stock::where(['model_id' => $this->order->id, 'model_type' => Order::class, 'status' => Status::INACTIVE])
+                        ->update(['status' => Status::ACTIVE]);
+
+                    // Clear cart for COD
                     $orderProducts = json_decode($request->products);
                     if (!blank($orderProducts)) {
                         foreach ($orderProducts as $p) {

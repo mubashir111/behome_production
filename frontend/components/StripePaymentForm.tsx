@@ -50,8 +50,10 @@ export default function StripePaymentForm({ orderId, onSuccess, onCancel }: Stri
       }
       setIsProcessing(false);
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      showToast('Payment successful!', 'success');
-      onSuccess();
+      // Inline success (no 3DS redirect required). Navigate to the success page
+      // WITH payment_intent in the URL so the verify endpoint is called exactly
+      // as it would be after a Stripe redirect.
+      window.location.href = `/payment/success?order_id=${orderId}&payment_intent=${paymentIntent.id}&redirect_status=succeeded`;
     } else {
         // Handle other statuses (e.g. processing, requires_action)
         // If redirect: 'if_required' and it requires action, stripe will handle it.

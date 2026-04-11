@@ -369,14 +369,25 @@ export default function Checkout() {
 
                 if (paymentResponse.status) {
                     if (paymentGateway === 'stripe' && paymentResponse.data?.client_secret) {
+                        const { publishableKey, client_secret } = paymentResponse.data;
+                        
+                        // Critical check for missing Stripe keys
+                        if (!publishableKey) {
+                            console.error('Stripe error: publishableKey is missing from backend response');
+                            showToast('Stripe is not configured correctly on the server (missing Public Key).', 'error');
+                            setIsPlacingOrder(false);
+                            return;
+                        }
+
                         // Modern Stripe flow (Inline)
-                        setStripePromise(loadStripe(paymentResponse.data.publishableKey));
+                        setStripePromise(loadStripe(publishableKey));
                         setStripeOptions({
-                            clientSecret: paymentResponse.data.client_secret,
+                            clientSecret: client_secret,
                             appearance: { theme: 'night', labels: 'floating' },
                         });
                         setCurrentOrderId(orderId);
                     } else if (paymentResponse.data?.redirect_url) {
+
                         window.location.href = paymentResponse.data.redirect_url;
                     } else {
                         // COD or gateways that confirm inline — go straight to success

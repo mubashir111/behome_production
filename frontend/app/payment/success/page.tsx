@@ -6,15 +6,15 @@ import Link from 'next/link';
 import PageLoadingShell from '@/components/PageLoadingShell';
 import { apiFetch } from '@/lib/api';
 
-type VerifyState = 'verifying' | 'success' | 'already_paid' | 'failed';
+type VerifyState = 'verifying' | 'success' | 'failed';
 
 function PaymentSuccessContent() {
-    const searchParams = useSearchParams();
-    const orderId        = searchParams.get('order_id');
-    const paymentIntent  = searchParams.get('payment_intent');         // added by Stripe Elements return_url
-    const redirectStatus = searchParams.get('redirect_status');        // 'succeeded' | 'failed' etc.
+    const searchParams    = useSearchParams();
+    const orderId         = searchParams.get('order_id');
+    const paymentIntent   = searchParams.get('payment_intent');
+    const redirectStatus  = searchParams.get('redirect_status');
 
-    const [state, setState] = useState<VerifyState>('verifying');
+    const [state, setState]       = useState<VerifyState>('verifying');
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
@@ -24,15 +24,14 @@ function PaymentSuccessContent() {
             return;
         }
 
-        // If Stripe redirected with a payment_intent, verify it server-side.
-        // If the webhook already marked it paid we'll still get a success response.
         if (paymentIntent) {
+            // ── Stripe payment: verify server-side ────────────────────────
             apiFetch(`/v1/payment/verify/${orderId}`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    payment_gateway: 'stripe',
-                    payment_intent: paymentIntent,
-                    redirect_status: redirectStatus,
+                    payment_gateway:  'stripe',
+                    payment_intent:   paymentIntent,
+                    redirect_status:  redirectStatus,
                 }),
             })
                 .then((res) => {
@@ -48,8 +47,32 @@ function PaymentSuccessContent() {
                     setErrorMsg(err.message || 'Could not reach the server.');
                 });
         } else {
-            // No payment_intent param — order was already confirmed (COD / redirect gateway / webhook)
-            setState('already_paid');
+            // ── No payment_intent: COD or already confirmed ───────────────
+            // Always check the real order status from the API — never assume success.
+            apiFetch(`/v1/orders/${orderId}`)
+                .then((res) => {
+                    if (res.status && res.data) {
+                        // payment_status 5 = Paid, or COD/credit orders are always OK
+                        const isPaid    = res.data.payment_status === 5;
+                        const isCod     = ['cashondelivery', 'credit'].some((s: string) =>
+                            (res.data.payment_method_name ?? '').toLowerCase().includes(s.replace('cashondelivery', 'cash'))
+                        );
+                        const isActive  = res.data.active === 5;
+                        if (isPaid || isCod || isActive) {
+                            setState('success');
+                        } else {
+                            setState('failed');
+                            setErrorMsg('Your payment could not be confirmed. Please contact support or try again.');
+                        }
+                    } else {
+                        setState('failed');
+                        setErrorMsg('Could not find your order. Please contact support.');
+                    }
+                })
+                .catch((err) => {
+                    setState('failed');
+                    setErrorMsg(err.message || 'Could not reach the server.');
+                });
         }
     }, [orderId, paymentIntent, redirectStatus]);
 
@@ -62,7 +85,7 @@ function PaymentSuccessContent() {
                             <div className="col-md-8 text-center">
                                 <div className="bg-dark-gray border-radius-6px p-50px">
                                     <div className="spinner-border text-base-color mb-20px" role="status" style={{ width: 48, height: 48 }}></div>
-                                    <h4 className="text-white alt-font fw-600 mb-10px">Confirming your payment…</h4>
+                                    <h4 className="text-white alt-font fw-600 mb-10px">Confirming your order…</h4>
                                     <p className="text-gray">Please wait a moment.</p>
                                 </div>
                             </div>
@@ -82,11 +105,11 @@ function PaymentSuccessContent() {
                             <div className="col-md-8 text-center">
                                 <div className="bg-dark-gray border-radius-6px p-50px">
                                     <i className="bi bi-x-circle-fill text-red fs-60 mb-20px d-block"></i>
-                                    <h4 className="text-white alt-font fw-600 mb-10px">Payment Failed</h4>
-                                    <p className="text-gray mb-30px">{errorMsg || 'Something went wrong with your payment. Please try again.'}</p>
+                                    <h4 className="text-white alt-font fw-600 mb-10px">Payment Not Confirmed</h4>
+                                    <p className="text-gray mb-30px">{errorMsg || 'Something went wrong. Please try again or contact support.'}</p>
                                     <div className="d-flex justify-content-center gap-3">
                                         <Link href="/checkout" className="btn btn-base-color btn-medium btn-round-edge">Try Again</Link>
-                                        <Link href="/account" className="btn btn-transparent-white btn-medium btn-round-edge">My Account</Link>
+                                        <Link href="/account" className="btn btn-transparent-white btn-medium btn-round-edge">My Orders</Link>
                                     </div>
                                 </div>
                             </div>
@@ -97,7 +120,7 @@ function PaymentSuccessContent() {
         );
     }
 
-    // success or already_paid
+    // success
     return (
         <main>
             <section className="top-space-padding pb-0">
@@ -108,7 +131,7 @@ function PaymentSuccessContent() {
                                 <i className="bi bi-check-circle-fill text-base-color fs-60 mb-20px d-block"></i>
                                 <h4 className="text-white alt-font fw-600 mb-10px">Thank you for your order!</h4>
                                 <p className="text-gray mb-30px">
-                                    Your order #{orderId} has been placed and payment confirmed. We will send you an email shortly.
+                                    Your order #{orderId} has been placed and confirmed. We will send you an email shortly.
                                 </p>
                                 <div className="d-flex justify-content-center gap-3">
                                     <Link href="/shop" className="btn btn-base-color btn-medium btn-round-edge">Continue Shopping</Link>

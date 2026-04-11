@@ -12,7 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Soft-delete unpaid online orders abandoned for more than 30 minutes.
+        // Runs every 15 minutes so the window is tight.
+        $schedule->command('orders:cleanup-abandoned --minutes=30')->everyFifteenMinutes();
     }
 
     /**

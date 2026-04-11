@@ -31,6 +31,9 @@ class PaymentService
     public function payment($order, $gatewaySlug, $transactionNo): object
     {
         try {
+            // ── Core payment transaction ─────────────────────────────────────
+            // Notifications are dispatched OUTSIDE the transaction so a mail/SMS/push
+            // failure can never roll back a successful payment.
             DB::transaction(function () use ($order, $gatewaySlug, $transactionNo) {
                 $transaction = Transaction::where(['order_id' => $order->id])->first();
                 if (!$transaction) {
@@ -49,22 +52,7 @@ class PaymentService
                 $order->save();
                 Stock::where(['model_id' => $order->id, 'model_type' => Order::class, 'status' => Status::INACTIVE])?->update(['status' => Status::ACTIVE]);
 
-                SendOrderMail::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
-                SendOrderSms::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
-                SendOrderPush::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
-
-                SendOrderGotMail::dispatch(['order_id' => $order->id]);
-                SendOrderGotSms::dispatch(['order_id' => $order->id]);
-                SendOrderGotPush::dispatch(['order_id' => $order->id]);
-
-                // Specifically notify Admin about Payment Received
-                try {
-                    $orderMailNotificationBuilderService = new OrderMailNotificationBuilder($order->id);
-                    $orderMailNotificationBuilderService->adminPaymentReceivedNotification();
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::info($e->getMessage());
-                }
-                // Selective cart clearing for online payments
+                // Clear cart items for online payments
                 $order->load('orderProducts');
                 foreach ($order->orderProducts as $item) {
                     \App\Models\Cart::where([
@@ -74,9 +62,29 @@ class PaymentService
                     ])->delete();
                 }
             });
+
+            // ── Notifications — outside transaction ──────────────────────────
+            // If any of these fail, the payment is already committed and safe.
+            try {
+                SendOrderMail::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
+                SendOrderSms::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
+                SendOrderPush::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
+                SendOrderGotMail::dispatch(['order_id' => $order->id]);
+                SendOrderGotSms::dispatch(['order_id' => $order->id]);
+                SendOrderGotPush::dispatch(['order_id' => $order->id]);
+            } catch (\Exception $e) {
+                Log::warning('PaymentService: notification dispatch failed — ' . $e->getMessage());
+            }
+
+            try {
+                (new OrderMailNotificationBuilder($order->id))->adminPaymentReceivedNotification();
+            } catch (\Exception $e) {
+                Log::warning('PaymentService: admin notification failed — ' . $e->getMessage());
+            }
+
             return $this->transaction;
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
+            Log::error('PaymentService::payment failed — ' . $exception->getMessage());
             DB::rollBack();
             throw new Exception($exception->getMessage(), 422);
         }

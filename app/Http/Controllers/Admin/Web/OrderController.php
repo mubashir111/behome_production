@@ -20,30 +20,35 @@ class OrderController extends Controller
         $this->orderService = $orderService;
     }
 
-    public function index(PaginateRequest $request)
+    public function index(Request $request)
     {
-        $request->merge(['paginate' => 1]);
-        $orders = $this->orderService->list($request);
         $currencySymbol = config('app.currency_symbol');
-        $search = $request->get('search', '');
+        $search         = trim($request->get('search', ''));
+        $status         = $request->get('status');
+        $paymentStatus  = $request->get('payment_status');
+
+        $query = \App\Models\Order::with(['user', 'orderProducts'])
+            ->where('order_type', '!=', \App\Enums\OrderType::POS)
+            ->latest();
+
         if ($search) {
-            $orders = \App\Models\Order::with(['user', 'transaction', 'orderProducts'])
-                ->where(function ($q) use ($search) {
-                    $q->where('order_serial_no', 'like', "%{$search}%")
-                      ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
-                })
-                ->latest()
-                ->paginate(15)
-                ->appends(['search' => $search]);
+            $query->where(function ($q) use ($search) {
+                $q->where('order_serial_no', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%")
+                                                    ->orWhere('email', 'like', "%{$search}%"));
+            });
         }
-        if ($request->get('status')) {
-            $status = (int) $request->get('status');
-            $orders = \App\Models\Order::with(['user', 'transaction', 'orderProducts'])
-                ->where('status', $status)
-                ->latest()
-                ->paginate(15)
-                ->appends(['status' => $status]);
+
+        if ($status !== null && $status !== '') {
+            $query->where('status', (int) $status);
         }
+
+        if ($paymentStatus !== null && $paymentStatus !== '') {
+            $query->where('payment_status', (int) $paymentStatus);
+        }
+
+        $orders = $query->paginate(15)->appends($request->query());
+
         return view('admin.orders.index', compact('orders', 'currencySymbol', 'search'));
     }
 

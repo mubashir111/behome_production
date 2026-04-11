@@ -27,9 +27,16 @@ class Stripe extends PaymentAbstract
         $this->paymentGateway = PaymentGateway::with('gatewayOptions')->where(['slug' => 'stripe'])->first();
         if (!blank($this->paymentGateway)) {
             $this->paymentGatewayOption = $this->paymentGateway->gatewayOptions->pluck('value', 'option');
-            $this->gateway              = new StripeClient\StripeClient($this->paymentGatewayOption['stripe_secret']);
+        }
+
+        // Prefer .env keys; fall back to admin panel DB values
+        $stripeSecret = config('services.stripe.secret') ?: ($this->paymentGatewayOption['stripe_secret'] ?? null);
+
+        if ($stripeSecret) {
+            $this->gateway = new StripeClient\StripeClient($stripeSecret);
         }
     }
+
 
     public function payment($order, $request)
     {
@@ -56,11 +63,22 @@ class Stripe extends PaymentAbstract
                 ],
             ]);
 
+            $pubKey = config('services.stripe.key') ?: ($this->paymentGatewayOption['stripe_key'] ?? '');
+            
+            \Illuminate\Support\Facades\Log::info('Stripe Initiate: Creating PaymentIntent', [
+                'order_id' => $order->id,
+                'amount'   => $order->total,
+                'has_pub_key' => !empty($pubKey),
+                'pub_key_start' => substr($pubKey, 0, 8) . '...',
+            ]);
+
             return [
                 'client_secret' => $intent->client_secret,
                 'paymentIntent' => $intent->id,
-                'publishableKey' => $this->paymentGatewayOption['stripe_key'] ?? '',
+                'publishableKey' => $pubKey,
             ];
+
+
 
         } catch (Exception $e) {
             Log::error('Stripe PaymentIntent Error: ' . $e->getMessage());

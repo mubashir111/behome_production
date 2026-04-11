@@ -11,12 +11,15 @@ class PaymentWebController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Transaction::with(['order.user'])
-            ->where('type', 'payment')
-            ->latest();
+        // Show all transaction types (payment + refund) unless filtered.
+        $query = Transaction::with(['order.user'])->latest();
 
         if ($request->filled('gateway')) {
             $query->where('payment_method', $request->gateway);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
         }
 
         if ($request->filled('status')) {
@@ -51,8 +54,7 @@ class PaymentWebController extends Controller
 
         $currencySymbol = Settings::group('site')->get('site_currency_symbol') ?? '$';
 
-        $gateways = Transaction::where('type', 'payment')
-            ->distinct()
+        $gateways = Transaction::distinct()
             ->pluck('payment_method')
             ->filter()
             ->sort()

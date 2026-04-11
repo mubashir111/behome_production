@@ -67,7 +67,15 @@ class PaymentController extends Controller
         ]);
 
         try {
-            $order = Order::findOrFail($order_id);
+            // Use withTrashed() in case the order was soft-deleted (e.g. customer
+            // placed a replacement order before payment completed). We still need
+            // to mark it paid so the refund / audit trail is correct.
+            $order = Order::withTrashed()->findOrFail($order_id);
+
+            // Restore if soft-deleted so normal order queries can find it again.
+            if ($order->trashed()) {
+                $order->restore();
+            }
 
             // Already paid (webhook may have beaten us here) — return success immediately.
             if ($order->payment_status === \App\Enums\PaymentStatus::PAID) {
@@ -96,24 +104,33 @@ class PaymentController extends Controller
                     return $this->errorResponse('Stripe is not configured on the server', 500);
                 }
 
+                $maskedKey = substr($stripeSecret, 0, 8) . '...';
+                \Illuminate\Support\Facades\Log::info("Stripe verify: Attempting retrieval for Intent {$paymentIntentId} using key starting with {$maskedKey}");
+
                 $stripe = new \Stripe\StripeClient($stripeSecret);
 
                 try {
                     $paymentIntent = $stripe->paymentIntents->retrieve($paymentIntentId);
+                    \Illuminate\Support\Facades\Log::info("Stripe verify: Intent retrieved. Status: {$paymentIntent->status}");
                 } catch (Exception $e) {
                     \Illuminate\Support\Facades\Log::error('Stripe verify: retrieve failed — ' . $e->getMessage());
-                    return $this->errorResponse('Could not verify payment with Stripe', 422);
+                    return $this->errorResponse('Could not verify payment with Stripe: ' . $e->getMessage(), 422);
                 }
 
                 // Confirm the PaymentIntent belongs to this order.
-                if ((string)($paymentIntent->metadata->order_id ?? '') !== (string)$order->id) {
-                    \Illuminate\Support\Facades\Log::warning("Stripe verify: PaymentIntent {$paymentIntentId} order_id mismatch (expected {$order->id})");
+                $metaOrderId = (string)($paymentIntent->metadata->order_id ?? '');
+                if ($metaOrderId !== (string)$order->id) {
+                    \Illuminate\Support\Facades\Log::warning("Stripe verify: PaymentIntent {$paymentIntentId} order_id mismatch (meta: {$metaOrderId}, expected: {$order->id})");
                     return $this->errorResponse('Payment intent does not match this order', 422);
                 }
 
                 if ($paymentIntent->status !== 'succeeded') {
+                    \Illuminate\Support\Facades\Log::warning("Stripe verify: PaymentIntent {$paymentIntentId} is not 'succeeded' (current status: {$paymentIntent->status})");
                     return $this->errorResponse('Payment not completed (status: ' . $paymentIntent->status . ')', 422);
                 }
+
+                \Illuminate\Support\Facades\Log::info("Stripe verify: Success! Marking order {$order->id} as paid.");
+
 
                 // Mark order as paid.
                 (new \App\Services\PaymentService())->payment($order, 'stripe', $paymentIntent->id);
