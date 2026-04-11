@@ -563,7 +563,7 @@ export default function Checkout() {
                                         <input name="zip" value={formData.zip} onChange={handleInputChange} className="border-radius-4px input-small" required type="text" />
                                     </div>
                                     <div className="col-12 mb-20px">
-                                        <label className="mb-10px">Notes & details</label>
+                                        <label className="mb-10px">Notes & details <span className="text-white opacity-5 fs-12">(optional)</span></label>
                                         <textarea
                                             name="order_note"
                                             value={formData.order_note}
@@ -576,7 +576,7 @@ export default function Checkout() {
                                 </div>
                             </div>
                             <div className="col-lg-5">
-                                <div className="bg-dark-gray border-radius-6px p-50px lg-p-25px your-order-box ui-panel ui-panel-lg">
+                                <div className="bg-dark-gray border-radius-6px p-50px lg-p-25px xs-p-20px your-order-box ui-panel ui-panel-lg">
                                     <span className="fs-26 alt-font fw-600 text-white mb-5px d-block">Your order</span>
                                     <table className="w-100 total-price-table your-order-table">
                                         <tbody>

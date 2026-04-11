@@ -293,7 +293,7 @@ export default function Cart() {
                                     </div>
 
                                     {/* ── Mobile card list (xs and sm only) ── */}
-                                    <div className="d-md-none" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <div className="d-md-none" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingBottom: 120 }}>
                                         {cartItems.map((item) => (
                                             <div key={item.id} style={{
                                                 display: 'flex',
@@ -338,10 +338,10 @@ export default function Cart() {
 
                                                     {/* Qty controls + line total */}
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
-                                                        <div className="quantity" style={{ transform: 'scale(0.88)', transformOrigin: 'left center', display: 'flex', alignItems: 'center', alignContent: 'flex-end', flexWrap: 'wrap' }}>
-                                                            <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)} style={{ display: 'flex', justifyContent: 'flex-start' }}>-</button>
-                                                            <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} style={{ textAlign: 'center' }} />
-                                                            <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)} style={{ display: 'flex', justifyContent: 'flex-end' }}>+</button>
+                                                        <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
+                                                            <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)} style={{ minWidth: 40, minHeight: 40 }}>-</button>
+                                                            <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} style={{ textAlign: 'center', minWidth: 36 }} />
+                                                            <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)} style={{ minWidth: 40, minHeight: 40 }}>+</button>
                                                         </div>
                                                         <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
                                                             {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
@@ -373,6 +373,30 @@ export default function Cart() {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* ── Mobile sticky checkout bar (hidden on lg+) ── */}
+                                <div className="d-lg-none" style={{
+                                    position: 'sticky', bottom: 0, zIndex: 50,
+                                    background: 'linear-gradient(to top, rgba(20,20,20,0.98) 80%, transparent)',
+                                    padding: '16px 20px 20px',
+                                    marginLeft: -12, marginRight: -12,
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                                        <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>Total</span>
+                                        <span style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>
+                                            {formatAmount(Math.max(
+                                                subtotal
+                                                + cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0)
+                                                - couponDiscount,
+                                                0
+                                            ))}
+                                        </span>
+                                    </div>
+                                    <a href="/checkout" className="btn btn-base-color btn-large btn-round-edge btn-box-shadow w-100 text-transform-none">
+                                        Proceed to Checkout
+                                    </a>
+                                </div>
+
                                 <div className="col-lg-4">
                                     <div className="dark-card-bg border-radius-6px p-50px xl-p-30px lg-p-25px xs-p-20px ui-panel ui-panel-lg">
                                         <span className="fs-26 alt-font fw-600 text-white mb-5px d-block">Cart totals</span>
