@@ -112,6 +112,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     // Wishlist
     const [inWishlist, setInWishlist] = useState(false);
     const [wishlistLoading, setWishlistLoading] = useState(false);
+    const [addingToCart, setAddingToCart] = useState(false);
 
     // Reviews
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -314,6 +315,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const addToCart = async (redirectToCart = false) => {
         const token = localStorage.getItem('token');
         if (!token) { notify('Please login to add items to cart', 'error'); return false; }
+        setAddingToCart(true);
         try {
             const res = await apiFetch('/cart', {
                 method: 'POST',
@@ -341,6 +343,8 @@ export default function ProductPageClient({ params }: { params: { slug: string }
         } catch (err: any) {
             notify(err.message || 'An error occurred', 'error');
             return false;
+        } finally {
+            setAddingToCart(false);
         }
     };
 
@@ -721,11 +725,13 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                             <button
                                                 className="flex-grow-1 d-flex align-items-center justify-content-center gap-2 border-radius-6px fw-600 fs-15 transition-all product-atc-btn"
                                                 onClick={() => addToCart()}
-                                                disabled={!stockOk}
-                                                style={{ opacity: stockOk ? 1 : 0.5 }}
+                                                disabled={!stockOk || addingToCart}
+                                                style={{ opacity: stockOk && !addingToCart ? 1 : 0.6 }}
                                             >
-                                                <i className="bi bi-bag fs-18" />
-                                            <span className="d-none d-md-inline">Add to cart</span>
+                                                {addingToCart
+                                                    ? <><span className="spinner-border spinner-border-sm" role="status" /><span>Adding…</span></>
+                                                    : <><i className="bi bi-bag fs-18" /><span>Add to cart</span></>
+                                                }
                                             </button>
 
                                             {/* Wishlist */}
@@ -733,6 +739,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                                 type="button"
                                                 onClick={toggleWishlist}
                                                 disabled={wishlistLoading}
+                                                aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                                                 className="d-flex align-items-center justify-content-center border-radius-6px transition-all product-wishlist-btn"
                                             >
                                                 <i className={`${inWishlist ? 'bi bi-heart-fill' : 'bi bi-heart'} product-wishlist-icon`} />
