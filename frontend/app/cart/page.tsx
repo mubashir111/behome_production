@@ -337,13 +337,26 @@ export default function Cart() {
                                                     </span>
 
                                                     {/* Qty controls + line total */}
-                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
-                                                        <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
-                                                            <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)} style={{ minWidth: 40, minHeight: 40 }}>-</button>
-                                                            <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} style={{ textAlign: 'center', minWidth: 36 }} />
-                                                            <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)} style={{ minWidth: 40, minHeight: 40 }}>+</button>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                                                        {/* Custom qty stepper — avoids .quantity's position:absolute buttons */}
+                                                        <div style={{ display: 'flex', alignItems: 'center', height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                                disabled={updatingItems.has(item.id)}
+                                                                type="button"
+                                                                style={{ width: 36, height: 36, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                                                            >−</button>
+                                                            <span style={{ minWidth: 32, textAlign: 'center', color: '#fff', fontWeight: 600, fontSize: 14, lineHeight: 1 }}>
+                                                                {item.quantity}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                                disabled={updatingItems.has(item.id)}
+                                                                type="button"
+                                                                style={{ width: 36, height: 36, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                                                            >+</button>
                                                         </div>
-                                                        <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
+                                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>
                                                             {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
                                                         </span>
                                                     </div>
