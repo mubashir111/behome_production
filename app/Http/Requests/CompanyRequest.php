@@ -37,6 +37,7 @@ class CompanyRequest extends FormRequest
             'company_latitude'     => ['nullable', 'max:190'],
             'company_longitude'    => ['nullable', 'max:190'],
             'company_address'      => ['required', 'string', 'max:500'],
+            'company_logo'         => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
         ];
     }
 }

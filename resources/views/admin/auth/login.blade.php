@@ -31,11 +31,30 @@
 <body class="p-4">
     <div class="w-full max-w-md">
         <!-- Logo/Header -->
+        @php
+            $__loginLogo   = \App\Models\ThemeSetting::where('key', 'company_logo')->first();
+            $__loginLogoUrl = $__loginLogo ? $__loginLogo->company_logo : '';
+            $__loginName    = \Smartisan\Settings\Facades\Settings::group('company')->get('company_name') ?: config('app.name');
+        @endphp
         <div class="text-center mb-10">
-            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">
-                BeHome Admin
+            @if($__loginLogoUrl)
+                <div class="flex items-center justify-center mb-4">
+                    <img src="{{ $__loginLogoUrl }}" alt="{{ $__loginName }}"
+                         style="height:56px;width:auto;object-fit:contain;max-width:220px;">
+                </div>
+            @else
+                <div class="flex items-center justify-center mb-4">
+                    <div style="width:52px;height:52px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(99,102,241,0.4);">
+                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                    </div>
+                </div>
+            @endif
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">
+                {{ $__loginName }}
             </h1>
-            <p class="text-slate-400">Welcome back! Please login to your account.</p>
+            <p class="text-slate-400 text-sm">Admin Panel &mdash; Welcome back! Please login to your account.</p>
         </div>
 
         <!-- Login Card -->
@@ -91,7 +110,7 @@
 
         <!-- Footer Info -->
         <p class="text-center mt-10 text-slate-500 text-sm">
-            &copy; {{ date('Y') }} BeHome Inc. All rights reserved.
+            &copy; {{ date('Y') }} {{ $__loginName }}. All rights reserved.
         </p>
     </div>
 </body>

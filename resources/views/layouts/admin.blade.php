@@ -454,15 +454,29 @@
     <div style="display:flex; min-height:100vh;">
 
         <!-- ══ Sidebar ══ -->
+        @php
+            $__companyLogoModel = \App\Models\ThemeSetting::where('key', 'company_logo')->first();
+            $__companyLogoUrl   = $__companyLogoModel ? $__companyLogoModel->company_logo : '';
+            $__companyName      = \Smartisan\Settings\Facades\Settings::group('company')->get('company_name') ?: config('app.name');
+            $__companyAddress   = \Smartisan\Settings\Facades\Settings::group('company')->get('company_address') ?: '';
+            $__companyCity      = \Smartisan\Settings\Facades\Settings::group('company')->get('company_city') ?: '';
+            $__companyPhone     = \Smartisan\Settings\Facades\Settings::group('company')->get('company_phone') ?: '';
+            $__companyEmail     = \Smartisan\Settings\Facades\Settings::group('company')->get('company_email') ?: '';
+        @endphp
         <aside class="admin-sidebar">
             <!-- Logo -->
             <div class="sidebar-logo">
-                <div class="sidebar-logo-icon">
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                </div>
-                <span class="sidebar-logo-text">BeHome <span>Admin</span></span>
+                @if($__companyLogoUrl)
+                    <img src="{{ $__companyLogoUrl }}" alt="{{ $__companyName }}"
+                         style="height:36px;width:auto;object-fit:contain;max-width:160px;flex-shrink:0;">
+                @else
+                    <div class="sidebar-logo-icon">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                    </div>
+                    <span class="sidebar-logo-text">{{ $__companyName }} <span>Admin</span></span>
+                @endif
             </div>
 
             <!-- Nav -->
@@ -794,9 +808,29 @@
 
             <!-- Footer -->
             <div class="sidebar-footer">
-                <div class="sidebar-pro-card">
-                    <p>BeHome Pro</p>
-                    <p>Full access enabled</p>
+                <div style="padding:12px 4px 4px;border-top:1px solid rgba(255,255,255,0.06);">
+                    <p style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.8);margin:0 0 4px;">{{ $__companyName }}</p>
+                    @if($__companyAddress)
+                        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0 0 2px;line-height:1.4;">
+                            {{ $__companyAddress }}@if($__companyCity), {{ $__companyCity }}@endif
+                        </p>
+                    @endif
+                    @if($__companyPhone)
+                        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin:0 0 2px;">
+                            <span style="opacity:.6;">&#9990;</span> {{ $__companyPhone }}
+                        </p>
+                    @endif
+                    @if($__companyEmail)
+                        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            <span style="opacity:.6;">&#9993;</span> {{ $__companyEmail }}
+                        </p>
+                    @endif
+                    @if(!$__companyAddress && !$__companyPhone && !$__companyEmail)
+                        <a href="{{ route('admin.settings.company') }}"
+                           style="font-size:11px;color:#818cf8;text-decoration:none;">
+                            &#9998; Add company details
+                        </a>
+                    @endif
                 </div>
             </div>
         </aside>

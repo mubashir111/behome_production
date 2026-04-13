@@ -30,20 +30,20 @@ class AdministratorRequest extends FormRequest
                 'required',
                 'email',
                 'max:190',
-                Rule::unique("users", "email")->ignore($this->route('administrator.id'))
+                Rule::unique("users", "email")->ignore($this->route('user')?->id)
             ],
             'password'              => [
-                $this->route('administrator.id') ? 'nullable' : 'required',
+                $this->route('user') ? 'nullable' : 'required',
                 'string',
                 'min:6',
                 'confirmed'
             ],
-            'password_confirmation' => [$this->route('administrator.id') ? 'nullable' : 'required', 'string', 'min:6'],
+            'password_confirmation' => [$this->route('user') ? 'nullable' : 'required', 'string', 'min:6'],
             'phone'                 => [
                 'nullable',
                 'string',
                 'max:20',
-                Rule::unique("users", "phone")->ignore($this->route('administrator.id'))
+                Rule::unique("users", "phone")->ignore($this->route('user')?->id)
             ],
             'status'                => ['required', 'numeric', 'max:24'],
             'country_code'          => ['required', 'string', 'max:20'],

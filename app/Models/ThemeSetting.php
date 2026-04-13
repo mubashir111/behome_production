@@ -12,6 +12,8 @@ class ThemeSetting extends Model implements HasMedia
 
     protected $table = "settings";
 
+    protected $fillable = ['key', 'payload', 'group'];
+
     public function getLogoAttribute(): string
     {
         if (!empty($this->getFirstMediaUrl('theme-logo'))) {
@@ -34,5 +36,13 @@ class ThemeSetting extends Model implements HasMedia
             return asset($this->getFirstMediaUrl('theme-footer-logo'));
         }
         return asset('images/required/theme-footer-logo.png');
+    }
+
+    public function getCompanyLogoAttribute(): string
+    {
+        if (!empty($this->getFirstMediaUrl('company-logo'))) {
+            return asset($this->getFirstMediaUrl('company-logo'));
+        }
+        return '';
     }
 }

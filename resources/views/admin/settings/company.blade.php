@@ -28,8 +28,53 @@
 
     @include('admin._alerts')
 
-    <form action="{{ route('admin.settings.company.update') }}" method="POST" class="space-y-8">
+    <form action="{{ route('admin.settings.company.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         @csrf
+
+        <!-- Section 00: Logo -->
+        <div class="admin-card">
+            <h3 class="admin-section-title">
+                <span class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center text-sm font-bold">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </span>
+                Company Logo
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                <div>
+                    @php $companyLogoModel = \App\Models\ThemeSetting::where('key', 'company_logo')->first(); @endphp
+                    <div class="relative group rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden transition-all hover:border-violet-300 p-6 mb-3" style="min-height:120px;">
+                        @if($companyLogoModel && $companyLogoModel->company_logo)
+                            <img src="{{ $companyLogoModel->company_logo }}" class="h-16 w-auto object-contain" id="preview_company_logo" alt="Company Logo">
+                        @else
+                            <img src="" class="h-16 w-auto object-contain hidden" id="preview_company_logo" alt="Company Logo">
+                            <div class="text-slate-400 text-sm text-center" id="company_logo_placeholder">
+                                <svg class="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                No logo uploaded
+                            </div>
+                        @endif
+                    </div>
+                    <input type="file" name="company_logo" accept="image/*"
+                           onchange="previewCompanyLogo(this)"
+                           class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                    <p class="mt-1 text-[10px] text-slate-400">Recommended: 200×60px (PNG/SVG/WebP). Shown in the admin sidebar.</p>
+                </div>
+
+                <div class="text-sm text-slate-500 bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                    <p class="font-semibold text-slate-700 mb-1">Where is this used?</p>
+                    <ul class="space-y-1 text-[13px]">
+                        <li>• Admin sidebar logo area</li>
+                        <li>• Admin panel header/branding</li>
+                        <li>• Email templates (if configured)</li>
+                    </ul>
+                    <p class="mt-3 text-[11px] text-slate-400">For the storefront logo, go to <a href="{{ route('admin.settings.theme') }}" class="text-indigo-600 font-semibold hover:underline">Theme Settings</a>.</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Section 01: Identification -->
         <div class="admin-card">
@@ -142,4 +187,22 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+function previewCompanyLogo(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = document.getElementById('preview_company_logo');
+            var placeholder = document.getElementById('company_logo_placeholder');
+            img.src = e.target.result;
+            img.classList.remove('hidden');
+            if (placeholder) placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+@endpush
 @endsection
