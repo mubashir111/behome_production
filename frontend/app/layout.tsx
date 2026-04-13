@@ -12,7 +12,7 @@ import Footer from '@/components/Footer';
 import ToastProvider from '@/components/ToastProvider';
 import SettingsProvider from '@/components/SettingsProvider';
 import CartProvider from '@/components/CartProvider';
-import { SITE_URL } from '@/lib/config';
+
 import { constructMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = constructMetadata();
@@ -31,7 +31,7 @@ export default function RootLayout({
         <link href="/images/apple-touch-icon-114x114.png" rel="apple-touch-icon" sizes="114x114" />
 
         {/* Single purged bundle — all CSS including revolution (1 request) */}
-        <link rel="stylesheet" href="/css/all.min.css?v=3" />
+        <link rel="stylesheet" href="/css/all.min.css?v=4" />
       </head>
       <body className={`bg-dark-gray ${marcellus.variable} ${outfit.variable}`} data-mobile-nav-style="classic">
         <SettingsProvider>
@@ -60,7 +60,7 @@ export default function RootLayout({
         <Script src="/revolution/js/extensions/revolution.extension.slideanims.min.js" strategy="afterInteractive" />
         <Script src="/revolution/js/extensions/revolution.extension.video.min.js" strategy="afterInteractive" />
 
-        <Script src="/js/main.js?v=2" strategy="lazyOnload" />
+        <Script src="/js/main.js?v=2" strategy="afterInteractive" />
       </body>
     </html>
   );

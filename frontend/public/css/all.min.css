@@ -25736,7 +25736,13 @@ header .header-top-bar+.navbar {
 }
 
 header .header-top-bar+.navbar.disable-fixed {
-    top: 0
+    top: 40px
+}
+
+@media (max-width: 991px) {
+    header .header-top-bar+.navbar.disable-fixed {
+        top: 10px
+    }
 }
 
 header .header-top-bar .widget {

@@ -4,10 +4,14 @@ import { useEffect } from 'react';
 
 /**
  * NavbarRevealer
- * 
- * Hides all elements with the .navbar class by default (via CSS in layout.tsx)
- * and reveals them once the window 'load' event fires, ensuring styles
- * are fully applied before displaying the navbar.
+ *
+ * Keeps the navbar invisible until main.js has had a chance to apply its
+ * sticky/fixed positioning, then fades it in — eliminating the 1-frame jump
+ * where the navbar renders in the wrong position before JS repositions it.
+ *
+ * Strategy: wait for DOMContentLoaded (scripts parsed) + two rAF ticks
+ * (enough for main.js synchronous init to complete), then reveal.
+ * Hard cap at 800 ms so it never stays hidden on slow connections.
  */
 export default function NavbarRevealer() {
   useEffect(() => {
@@ -17,21 +21,21 @@ export default function NavbarRevealer() {
       });
     };
 
-    // If the document is already loaded, reveal immediately
-    if (document.readyState === 'complete') {
-      reveal();
+    const run = () => {
+      // Two rAF ticks: first gives main.js DOM mutations time to flush,
+      // second lets the browser repaint with those mutations applied.
+      requestAnimationFrame(() => requestAnimationFrame(reveal));
+    };
+
+    const timer = setTimeout(reveal, 800); // hard safety cap
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
     } else {
-      // Otherwise wait for the load event
-      window.addEventListener('load', reveal);
-      
-      // Safety timeout in case some resource (like a large image) is hanging
-      const timer = setTimeout(reveal, 3000);
-      
-      return () => {
-        window.removeEventListener('load', reveal);
-        clearTimeout(timer);
-      };
+      run();
     }
+
+    return () => clearTimeout(timer);
   }, []);
 
   return null;

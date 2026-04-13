@@ -4337,3 +4337,14 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
     color: #fff;
     font-weight: 600;
 }
+
+/* ── Navbar initial-load jump fix ─────────────────────────────────────────────
+   style.min.css sets `.header-top-bar + .navbar.disable-fixed { top: 0 }`.
+   main.js immediately overrides this to `top: 40px` (topbar height) via inline
+   style on the first scroll-position check, and transition:.3s animates the gap
+   → visible "stuck then jumps" on load.
+   Setting the initial CSS to 40px means CSS start == main.js end value,
+   so the transition has nothing to animate. ---------------------------------- */
+header .header-top-bar + .navbar.disable-fixed {
+    top: 40px !important;
+}

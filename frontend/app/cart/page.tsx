@@ -387,29 +387,6 @@ export default function Cart() {
                                     </div>
                                 </div>
 
-                                {/* ── Mobile sticky checkout bar (hidden on lg+) ── */}
-                                <div className="d-lg-none" style={{
-                                    position: 'sticky', bottom: 0, zIndex: 50,
-                                    background: 'linear-gradient(to top, rgba(20,20,20,0.98) 80%, transparent)',
-                                    padding: '16px 20px 20px',
-                                    marginLeft: -12, marginRight: -12,
-                                }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                                        <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>Total</span>
-                                        <span style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>
-                                            {formatAmount(Math.max(
-                                                subtotal
-                                                + cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0)
-                                                - couponDiscount,
-                                                0
-                                            ))}
-                                        </span>
-                                    </div>
-                                    <a href="/checkout" className="btn btn-base-color btn-large btn-round-edge btn-box-shadow w-100 text-transform-none">
-                                        Proceed to Checkout
-                                    </a>
-                                </div>
-
                                 <div className="col-lg-4">
                                     <div className="dark-card-bg border-radius-6px p-50px xl-p-30px lg-p-25px xs-p-20px ui-panel ui-panel-lg">
                                         <span className="fs-26 alt-font fw-600 text-white mb-5px d-block">Cart totals</span>

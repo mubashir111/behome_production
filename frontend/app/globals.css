@@ -924,7 +924,17 @@ main.no-layout-pad .page-shell {
 
   .layout-content,
   .header-with-topbar+.layout-content {
-    padding-top: 80px;
+    padding-top: 95px;
+  }
+}
+
+/* Mobile: template spacing classes (.page-shell, .top-space-padding) stack on top
+   of layout-content's header clearance → large blank gap below navbar.
+   Zero only those wrapper classes, not every section. */
+@media (max-width: 767px) {
+  .layout-content .page-shell,
+  .layout-content .top-space-padding {
+    padding-top: 0 !important;
   }
 }
 
