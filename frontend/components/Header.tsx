@@ -47,7 +47,7 @@ export default async function Header() {
                             </a>
 
                         </div>
-                        <div className="col-12 col-xl-6 col-lg-8 order-3 order-lg-2 menu-order position-static">
+                        <div className="col-12 col-xl-5 col-lg-6 order-3 order-lg-2 menu-order position-static">
                             <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
                                 {/*  Mobile Navigation Header  */}
                                 <div className="mobile-nav-header d-lg-none">
@@ -322,10 +322,10 @@ export default async function Header() {
                             </div>
                         </div>
                         {/*  Right Side Icons  */}
-                        <div className="col-6 col-xl-3 col-lg-2 order-2 order-lg-3 ms-auto d-flex justify-content-end align-items-center">
+                        <div className="col-6 col-xl-4 col-lg-4 order-2 order-lg-3 ms-auto d-flex justify-content-end align-items-center">
                             <div className="d-flex align-items-center header-icons-row" style={{ gap: '13px' }}>
-                                {/*  Search — hidden on mobile (search is inside drawer)  */}
-                                <div className="d-none d-lg-flex">
+                                {/*  Search — desktop xl only  */}
+                                <div className="d-none d-xl-flex">
                                     <HeaderSearch />
                                 </div>
                                 {/*  Cart — always visible  */}
