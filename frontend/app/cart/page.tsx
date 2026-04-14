@@ -6,7 +6,7 @@ import { apiFetch } from '@/lib/api';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import { useToast } from '@/components/ToastProvider';
 import { extractCurrencySymbol, readStoredCoupon, storeCoupon } from '@/lib/checkout';
-import { useCurrency } from '@/components/SettingsProvider';
+import { useCurrency, useSettings } from '@/components/SettingsProvider';
 
 export default function Cart() {
     const [cartItems, setCartItems] = useState<any[]>([]);
@@ -16,6 +16,8 @@ export default function Cart() {
     const [subtotal, setSubtotal] = useState(0);
     const { showToast } = useToast();
     const { currency: { symbol: currencySymbol }, formatAmount } = useCurrency();
+    const { settings } = useSettings();
+    const freeShippingThreshold = Number(settings?.site_free_delivery_threshold) || 0;
     const [couponCode, setCouponCode] = useState('');
     const [couponDiscount, setCouponDiscount] = useState(0);
     const [couponMessage, setCouponMessage] = useState('');
@@ -389,6 +391,31 @@ export default function Cart() {
 
                                 <div className="col-lg-4">
                                     <div className="dark-card-bg border-radius-6px p-50px xl-p-30px lg-p-25px xs-p-20px ui-panel ui-panel-lg">
+
+                                        {/* Free shipping progress bar */}
+                                        {freeShippingThreshold > 0 && (() => {
+                                            const remaining = freeShippingThreshold - subtotal;
+                                            const pct = Math.min((subtotal / freeShippingThreshold) * 100, 100);
+                                            return (
+                                                <div className="mb-25px pb-25px" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                                                    {remaining > 0 ? (
+                                                        <p className="fs-13 text-white mb-10px" style={{ opacity: 0.8 }}>
+                                                            <i className="feather icon-feather-truck me-8px" style={{ color: 'var(--base-color)' }}></i>
+                                                            Add <strong style={{ color: 'var(--base-color)' }}>{formatAmount(remaining)}</strong> more for free delivery
+                                                        </p>
+                                                    ) : (
+                                                        <p className="fs-13 fw-600 mb-10px" style={{ color: 'var(--base-color)' }}>
+                                                            <i className="feather icon-feather-check-circle me-8px"></i>
+                                                            You've unlocked free delivery!
+                                                        </p>
+                                                    )}
+                                                    <div style={{ height: 5, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
+                                                        <div style={{ height: '100%', width: `${pct}%`, background: 'var(--base-color)', borderRadius: 99, transition: 'width 0.4s ease' }} />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+
                                         <span className="fs-26 alt-font fw-600 text-white mb-5px d-block">Cart totals</span>
                                         <table className="w-100 total-price-table">
                                             <tbody>

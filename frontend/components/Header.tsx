@@ -4,6 +4,7 @@ import UserAccount from './UserAccount';
 import CartIcon from './CartIcon';
 import NotificationBell from './NotificationBell';
 import HeaderSearch from './HeaderSearch';
+import MobileSearchBar from './MobileSearchBar';
 import LanguageSwitcher from './LanguageSwitcher';
 import TopBar from './TopBar';
 
@@ -73,11 +74,7 @@ export default async function Header() {
                                 </div>
                                 {/* ── Mobile search bar ── */}
                                 <div className="mobile-drawer-search d-lg-none">
-                                    <a href="/shop" className="mobile-drawer-search-bar">
-                                        <i className="feather icon-feather-search"></i>
-                                        <span>Search products…</span>
-                                        <i className="feather icon-feather-arrow-right mobile-drawer-search-arrow"></i>
-                                    </a>
+                                    <MobileSearchBar />
                                 </div>
 
                                 {/* ── Mobile account quick-link ── */}

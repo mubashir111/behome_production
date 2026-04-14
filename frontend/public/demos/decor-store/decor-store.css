@@ -96,7 +96,7 @@ body {
 input::-webkit-input-placeholder,
 select::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
-    color: var(--medium-gray) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
     text-overflow: ellipsis;
     opacity: 1;
 }
@@ -104,7 +104,7 @@ textarea::-webkit-input-placeholder {
 input::-moz-placeholder,
 select::-moz-placeholder,
 textarea::-moz-placeholder {
-    color: var(--medium-gray) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
     text-overflow: ellipsis;
     opacity: 1;
 }
@@ -3495,9 +3495,15 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
 .product-review-textarea {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #fff;
+    color: #ffffff !important;
     padding: 12px;
     resize: vertical;
+    outline: none;
+}
+
+.product-review-textarea:focus {
+    border-color: var(--base-color);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .product-review-star-btn {

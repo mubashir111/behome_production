@@ -17,6 +17,8 @@ interface Product {
     is_offer: boolean;
     category?: { name: string };
     wishlist?: boolean;
+    rating_star?: number;
+    rating_star_count?: number;
 }
 
 interface ProductCardProps {
@@ -99,6 +101,15 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                     <span className="fw-500 text-white d-block mb-5px">{product.category.name}</span>
                 )}
                 <a className="text-white fs-17 fw-600" href={`/product/${product.slug}`}>{product.name}</a>
+                {product.rating_star_count ? (
+                    <div className="d-flex align-items-center justify-content-center gap-1 mt-5px mb-3px">
+                        {[1,2,3,4,5].map(i => (
+                            <i key={i} className={`bi ${i <= Math.round(product.rating_star ?? 0) ? 'bi-star-fill' : 'bi-star'}`}
+                                style={{ fontSize: 11, color: i <= Math.round(product.rating_star ?? 0) ? '#f59e0b' : 'rgba(255,255,255,0.2)' }} />
+                        ))}
+                        <span className="fs-11 text-white ms-3px" style={{ opacity: 0.5 }}>({product.rating_star_count})</span>
+                    </div>
+                ) : null}
                 <div className="fw-500 fs-15 lh-normal">
                     {product.is_offer ? (
                         <>
