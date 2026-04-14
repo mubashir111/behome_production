@@ -9,6 +9,7 @@
     font-display: block;
     src: url("/fonts/fa-brands-400.woff2") format("woff2");
 }
+
 /* font */
 /* Google Fonts loaded via next/font in layout.tsx for better performance */
 
@@ -202,7 +203,32 @@ textarea:-ms-input-placeholder {
 /* --- Mobile Menu Restoration --- */
 @media (max-width: 991px) {
 
-    /* Override template's default solid white background on mobile to keep the glass effect */
+    /* Fix the header to the top on mobile */
+    header.header-with-topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 998;
+        background: rgba(8, 8, 10, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .header-navbar-main {
+        height: 64px !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    header .navbar {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Navbar itself stays transparent — header background handles it */
     header .navbar.header-light {
         background-color: transparent !important;
     }
@@ -611,6 +637,11 @@ textarea:-ms-input-placeholder {
 }
 
 /* header */
+.header-navbar-main {
+    height: 80px;
+    transition: all 0.3s ease;
+}
+
 header .navbar-brand img {
     max-height: 46px !important;
     height: auto !important;
@@ -2750,12 +2781,11 @@ select,
         flex: 0 0 100% !important;
     }
 
-    /* Reduce the large top padding gap below the navbar on mobile.
-       Default is 136px (header-with-topbar + top-space-padding).
-       On mobile the header is ~80px so 90px is enough. */
+    /* Header is now position:fixed on mobile (topbar ~40px + navbar 80px = ~120px).
+       top-space-padding pushes page content below the fixed header. */
     .header-with-topbar+.top-space-padding,
     .top-space-padding {
-        padding-top: 90px !important;
+        padding-top: 125px !important;
     }
 
     /* Also reduce the general section top/bottom padding on mobile */
@@ -2880,12 +2910,11 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     overflow: hidden;
     flex-shrink: 0;
-    background: rgb(40 40 40) !important;
+    background: rgb(237 237 237) !important;
     border-color: rgb(46 46 46) !important;
 }
 
@@ -2945,6 +2974,14 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
 /* ═══════════════════════════════════════════════════════════════
    MOBILE & TABLET RESPONSIVE — decor-store specific
    ═══════════════════════════════════════════════════════════════ */
+
+/* --- Product page & page-shell mobile padding --- */
+@media (max-width: 767px) {
+    section.page-shell .container {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+}
 
 /* --- Cart: overflow protection --- */
 @media (max-width: 767px) {
@@ -4353,6 +4390,6 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
    → visible "stuck then jumps" on load.
    Setting the initial CSS to 40px means CSS start == main.js end value,
    so the transition has nothing to animate. ---------------------------------- */
-header .header-top-bar + .navbar.disable-fixed {
+header .header-top-bar+.navbar.disable-fixed {
     top: 40px !important;
 }

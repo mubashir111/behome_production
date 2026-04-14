@@ -993,11 +993,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                 <h4 className="alt-font text-white fw-700 mt-5px mb-0">Related products</h4>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-12 px-0">
-                                <ProductGrid products={relatedProducts} showCategory />
-                            </div>
-                        </div>
+                        <ProductGrid products={relatedProducts} showCategory />
                     </div>
                 </section>
             )}

@@ -35,7 +35,6 @@ export default async function Contact() {
     const phones: string[]  = s.phones  || ['+44 207 123 4567', '+44 800 123 4567'];
     const emails: string[]  = s.emails  || ['hello@behome.co.uk', 'support@behome.co.uk'];
     const careersEmail = s.careers_email || 'careers@behome.co.uk';
-    const mapQuery    = s.map_query     || 'Westminster, London, United Kingdom';
 
     return (
         <main>
@@ -115,26 +114,6 @@ export default async function Contact() {
 </section>
 {/*  end section  */}
 
-{/*  start section  */}
-<section className="p-0 border-radius-6px lg-no-border-radius overflow-hidden" id="location">
-<div className="container-fluid px-0">
-<div className="row justify-content-center g-0">
-<div className="col-12 p-0">
-<iframe
-    src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.3376946143!2d-0.12775632328832885!3d51.50073447181584!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487604ce3941eb1f%3A0x1a5342fdf089c627!2s${encodeURIComponent(mapQuery)}!5e0!3m2!1sen!2suk!4v1710000000000!5m2!1sen!2suk`}
-    width="100%"
-    height="450"
-    style={{ border: 0, display: 'block' }}
-    allowFullScreen
-    loading="lazy"
-    referrerPolicy="no-referrer-when-downgrade"
-    title="Behome store location"
-></iframe>
-</div>
-</div>
-</div>
-</section>
-{/*  end section  */}
 
         </main>
     );

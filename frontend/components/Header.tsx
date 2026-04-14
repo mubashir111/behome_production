@@ -30,8 +30,8 @@ export default async function Header() {
             <TopBar />
             {/*  end header top bar  */}
             {/*  start navigation  */}
-            <nav className="navbar navbar-expand-lg header-light bg-transparent disable-fixed px-lg-0 py-lg-0">
-                <div className="container-fluid px-4 d-flex align-items-center" style={{ height: '80px' }}>
+            <nav className="navbar navbar-expand-lg header-light bg-transparent disable-fixed px-lg-0 py-0 py-lg-0">
+                <div className="container-fluid px-0 px-md-4 d-flex align-items-center header-navbar-main">
                     <div className="row w-100 align-items-center m-0">
                         <div className="col-6 col-xl-3 col-lg-2 order-1 d-flex align-items-center gap-3">
                             <a className="glass-logo-wrapper" href="https://www.blkrockarchitect.ae/en" target="" rel="noopener noreferrer">
@@ -45,7 +45,6 @@ export default async function Header() {
                                 </div>
                                 <span className="logo-text">BEHOME</span>
                             </a>
-
                         </div>
                         <div className="col-12 col-xl-5 col-lg-6 order-3 order-lg-2 menu-order position-static">
                             <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
