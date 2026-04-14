@@ -7,7 +7,7 @@
     <div class="admin-page-header">
         <div>
             <h2 class="admin-page-title">Notification Alerts</h2>
-            <p class="admin-page-subtitle">Configure system-wide triggers for order notifications across Email, SMS, and Push.</p>
+            <p class="admin-page-subtitle">Configure system-wide triggers for order email notifications.</p>
         </div>
     </div>
 
@@ -42,39 +42,20 @@
                             </label>
                         </div>
 
-                        <!-- SMS Toggle -->
-                        <div class="flex flex-col items-center gap-2">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">SMS</span>
-                            <label class="custom-switch">
-                                <input type="checkbox" name="alerts[{{ $alert->id }}][sms]" value="1" {{ $alert->sms == \App\Enums\SwitchBox::ON ? 'checked' : '' }}>
-                                <span class="custom-slider slider-emerald"></span>
-                            </label>
-                        </div>
-
-                        <!-- Push Toggle -->
-                        <div class="flex flex-col items-center gap-2">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Push</span>
-                            <label class="custom-switch">
-                                <input type="checkbox" name="alerts[{{ $alert->id }}][push_notification]" value="1" {{ $alert->push_notification == \App\Enums\SwitchBox::ON ? 'checked' : '' }}>
-                                <span class="custom-slider slider-orange"></span>
-                            </label>
-                        </div>
+                        {{-- Keep hidden inputs so SMS/Push values are preserved on save --}}
+                        <input type="hidden" name="alerts[{{ $alert->id }}][sms]" value="0">
+                        <input type="hidden" name="alerts[{{ $alert->id }}][push_notification]" value="0">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 gap-6">
                     <div>
                         <label class="admin-label">Email Message Template</label>
                         <textarea name="alerts[{{ $alert->id }}][mail_message]" class="admin-textarea text-xs leading-relaxed" placeholder="Enter email template...">{{ $alert->mail_message }}</textarea>
                     </div>
-                    <div>
-                        <label class="admin-label">SMS Message Template</label>
-                        <textarea name="alerts[{{ $alert->id }}][sms_message]" class="admin-textarea text-xs leading-relaxed" placeholder="Enter SMS template...">{{ $alert->sms_message }}</textarea>
-                    </div>
-                    <div>
-                        <label class="admin-label">Push Notification Template</label>
-                        <textarea name="alerts[{{ $alert->id }}][push_notification_message]" class="admin-textarea text-xs leading-relaxed" placeholder="Enter push template...">{{ $alert->push_notification_message }}</textarea>
-                    </div>
+                    {{-- Keep hidden inputs so template values are preserved on save --}}
+                    <input type="hidden" name="alerts[{{ $alert->id }}][sms_message]" value="{{ $alert->sms_message }}">
+                    <input type="hidden" name="alerts[{{ $alert->id }}][push_notification_message]" value="{{ $alert->push_notification_message }}">
                 </div>
             </div>
             @endforeach

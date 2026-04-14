@@ -16,7 +16,7 @@ class OrderMail extends Mailable implements ShouldQueue
     public int    $timeout = 30;
 
     public string $name;
-    public int    $orderId;
+    public string $orderId;
     public mixed  $message;
     public ?Order $order;
 
