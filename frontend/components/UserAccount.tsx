@@ -15,7 +15,7 @@ export default function UserAccount() {
         return name.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
-    useEffect(() => {
+    const syncAuth = () => {
         const storedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         if (storedUser && token) {
@@ -25,7 +25,16 @@ export default function UserAccount() {
             } catch (e) {
                 console.error("Failed to parse user from localStorage", e);
             }
+        } else {
+            setIsLoggedIn(false);
+            setUser(null);
         }
+    };
+
+    useEffect(() => {
+        syncAuth();
+        window.addEventListener('auth:login', syncAuth);
+        return () => window.removeEventListener('auth:login', syncAuth);
     }, []);
 
     const handleLogout = async () => {

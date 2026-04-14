@@ -9,6 +9,7 @@ import PageLoadingShell from '@/components/PageLoadingShell';
 import { useToast } from '@/components/ToastProvider';
 import { useCart } from '@/components/CartProvider';
 import { useSettings } from '@/components/SettingsProvider';
+import { useAuthModal } from '@/context/AuthModalContext';
 
 
 function ShopContent() {
@@ -58,6 +59,7 @@ function ShopContent() {
     const [sortBy, setSortBy] = useState('default');
     const [viewMode, setViewMode] = useState<'2' | '3' | '4' | 'list'>('4');
     const { showToast } = useToast();
+    const { openAuthModal } = useAuthModal();
     const [priceRange, setPriceRange] = useState<any | null>(null);
     const [searchInput, setSearchInput] = useState(searchQuery);
     const [naIndex, setNaIndex] = useState(0);
@@ -70,7 +72,7 @@ function ShopContent() {
     const addToCart = async (product: any) => {
         try {
             const token = localStorage.getItem('token');
-            if (!token) { showToast('Please login to add items to cart', 'error'); return; }
+            if (!token) { openAuthModal(() => addToCart(product)); return; }
             const res = await apiFetch('/cart', {
                 method: 'POST',
                 body: JSON.stringify({ product_id: product.id, quantity: 1, variation_id: null }),
@@ -360,7 +362,7 @@ function ShopContent() {
                                                             </div>
                                                             <div className="d-flex gap-2">
                                                                 <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)}>Add to Cart</button>
-                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-35px h-35px text-white d-flex align-items-center justify-content-center rounded-circle border-0" onMessage={(m, t) => showToast(m, t)} />
+                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-35px h-35px text-white d-flex align-items-center justify-content-center rounded-circle border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -373,7 +375,7 @@ function ShopContent() {
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
                                                             <div className="shop-hover d-flex justify-content-center">
-                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onMessage={(m, t) => showToast(m, t)} />
+                                                                <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
                                                                 <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)}>
                                                                     <i className="feather icon-feather-shopping-bag fs-15"></i>
                                                                 </button>

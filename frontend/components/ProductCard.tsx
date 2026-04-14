@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
 import WishlistButton from './WishlistButton';
 import { useToast } from './ToastProvider';
+import { useAuthModal } from '@/context/AuthModalContext';
 
 interface Product {
     id: number;
@@ -26,6 +27,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, showCategory = false, onAddToCart }: ProductCardProps) {
     const { showToast, showCartToast } = useToast();
+    const { openAuthModal } = useAuthModal();
 
     const handleAddToCart = async () => {
         if (onAddToCart) {
@@ -36,7 +38,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                showToast('Please login to add items to cart', 'error');
+                openAuthModal(() => handleAddToCart());
                 return;
             }
 
@@ -78,7 +80,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                         productId={product.id}
                         initialInWishlist={Boolean(product.wishlist)}
                         className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"
-                        onRequireAuth={() => showToast('Please login to save items to wishlist', 'error')}
+                        onRequireAuth={() => openAuthModal()}
                         onMessage={(msg, type) => showToast(msg, type)}
                     />
                     <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"

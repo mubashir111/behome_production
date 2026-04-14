@@ -10,6 +10,7 @@ import ProductDescriptionBlocks from '@/components/ProductDescriptionBlocks';
 import { useToast } from '@/components/ToastProvider';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCurrency } from '@/components/SettingsProvider';
+import { useAuthModal } from '@/context/AuthModalContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const [quantity, setQuantity] = useState(1);
     const { showToast, showCartToast } = useToast();
     const { formatAmount } = useCurrency();
+    const { openAuthModal } = useAuthModal();
     const [activeImageIndex, setActiveImageIndex] = useState(0);
 
     // Variations
@@ -314,7 +316,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     // ── Add to cart ──────────────────────────────────────────────────────────
     const addToCart = async (redirectToCart = false) => {
         const token = localStorage.getItem('token');
-        if (!token) { notify('Please login to add items to cart', 'error'); return false; }
+        if (!token) { openAuthModal(() => addToCart(redirectToCart)); return false; }
         setAddingToCart(true);
         try {
             const res = await apiFetch('/cart', {
@@ -379,7 +381,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     // ── Wishlist toggle ──────────────────────────────────────────────────────
     const toggleWishlist = async () => {
         const token = localStorage.getItem('token');
-        if (!token) { notify('Please login to save to wishlist', 'error'); return; }
+        if (!token) { openAuthModal(() => toggleWishlist()); return; }
         setWishlistLoading(true);
         // Optimistically flip the heart immediately so UI feels instant
         const wasInWishlist = inWishlist;
@@ -403,7 +405,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const submitReview = async (e: React.FormEvent) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
-        if (!token) { setReviewMessage('Please login to leave a review'); return; }
+        if (!token) { openAuthModal(() => submitReview(e)); return; }
         if (!reviewForm.review.trim()) { setReviewMessage('Please write a review'); return; }
         setSubmittingReview(true);
         setReviewMessage('');

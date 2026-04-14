@@ -12,6 +12,8 @@ import Footer from '@/components/Footer';
 import ToastProvider from '@/components/ToastProvider';
 import SettingsProvider from '@/components/SettingsProvider';
 import CartProvider from '@/components/CartProvider';
+import { AuthModalProvider } from '@/context/AuthModalContext';
+import AuthModal from '@/components/AuthModal';
 
 import { constructMetadata } from '@/lib/metadata';
 
@@ -39,10 +41,13 @@ export default function RootLayout({
         <SettingsProvider>
           <CartProvider>
             <ToastProvider>
-              <NavbarRevealer />
-              <Header />
-              <div className="layout-content">{children}</div>
-              <Footer />
+              <AuthModalProvider>
+                <NavbarRevealer />
+                <Header />
+                <div className="layout-content">{children}</div>
+                <Footer />
+                <AuthModal />
+              </AuthModalProvider>
             </ToastProvider>
           </CartProvider>
         </SettingsProvider>
