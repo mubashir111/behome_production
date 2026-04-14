@@ -150,6 +150,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('coupons', \App\Http\Controllers\Admin\Web\CouponController::class);
         Route::resource('suppliers', \App\Http\Controllers\Admin\Web\SupplierController::class);
         Route::resource('purchases', \App\Http\Controllers\Admin\Web\PurchaseController::class);
+        Route::get('stock/report', [\App\Http\Controllers\Admin\Web\StockReportController::class, 'index'])->name('stock.report');
+        Route::get('stock/product/{product}/history', [\App\Http\Controllers\Admin\Web\StockReportController::class, 'productHistory'])->name('stock.product.history');
         Route::resource('sliders', \App\Http\Controllers\Admin\Web\SliderController::class);
         Route::post('sliders/{slider}/toggle-status', [\App\Http\Controllers\Admin\Web\SliderController::class, 'toggleStatus'])->name('sliders.toggle-status');
 
