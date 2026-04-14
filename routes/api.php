@@ -786,6 +786,43 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
         Route::post('/change-status/{frontendOrder}', [FrontendOrderController::class, 'changeStatus']);
     });
 
+    // Customer notifications — derived from recent order status changes
+    Route::prefix('notifications')->name('notifications.')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', function (\Illuminate\Http\Request $request) {
+            $user   = $request->user();
+            $orders = \App\Models\Order::where('user_id', $user->id)
+                ->orderBy('updated_at', 'desc')
+                ->limit(20)
+                ->get(['id', 'order_serial_no', 'status', 'total', 'payment_status', 'created_at', 'updated_at']);
+
+            $statusLabels = [
+                \App\Enums\OrderStatus::PENDING    => ['label' => 'Order Placed',       'icon' => 'cart',    'color' => '#6366f1'],
+                \App\Enums\OrderStatus::CONFIRMED  => ['label' => 'Order Confirmed',    'icon' => 'check',   'color' => '#10b981'],
+                \App\Enums\OrderStatus::ON_THE_WAY => ['label' => 'On The Way',         'icon' => 'truck',   'color' => '#3b82f6'],
+                \App\Enums\OrderStatus::DELIVERED  => ['label' => 'Order Delivered',    'icon' => 'gift',    'color' => '#22c55e'],
+                \App\Enums\OrderStatus::CANCELED   => ['label' => 'Order Cancelled',    'icon' => 'x',       'color' => '#ef4444'],
+                \App\Enums\OrderStatus::REJECTED   => ['label' => 'Order Rejected',     'icon' => 'warning', 'color' => '#f97316'],
+                \App\Enums\OrderStatus::RETURNED   => ['label' => 'Return Processed',   'icon' => 'return',  'color' => '#8b5cf6'],
+            ];
+
+            $notifications = $orders->map(function ($order) use ($statusLabels) {
+                $info = $statusLabels[$order->status] ?? ['label' => 'Order Update', 'icon' => 'bell', 'color' => '#94a3b8'];
+                return [
+                    'id'         => $order->id,
+                    'title'      => $info['label'],
+                    'body'       => 'Order #' . $order->order_serial_no . ' — ' . \App\Libraries\AppLibrary::currencyAmountFormat($order->total),
+                    'icon'       => $info['icon'],
+                    'color'      => $info['color'],
+                    'link'       => '/account/order/' . $order->id,
+                    'time'       => $order->updated_at?->diffForHumans(),
+                    'created_at' => $order->updated_at?->toIso8601String(),
+                ];
+            });
+
+            return response()->json(['data' => $notifications, 'total' => $notifications->count()]);
+        });
+    });
+
     Route::prefix('device-token')->name('device-token.')->middleware(['auth:sanctum'])->group(function () {
         Route::post('/web', [TokenStoreController::class, 'webToken']);
         Route::post('/mobile', [TokenStoreController::class, 'deviceToken']);

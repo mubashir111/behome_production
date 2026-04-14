@@ -863,12 +863,39 @@
                 </div>
 
                 <div style="display:flex;align-items:center;gap:16px;">
-                    <!-- Notifications -->
-                    <button style="background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;color:#64748b;line-height:0;" title="Notifications">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                    </button>
+                    <!-- ── Notification Bell ── -->
+                    <div style="position:relative;" id="notif-wrapper">
+                        <button id="notif-bell-btn"
+                                style="background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;color:#64748b;line-height:0;position:relative;"
+                                title="Notifications">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <span id="notif-badge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;border-radius:8px;line-height:16px;text-align:center;padding:0 3px;"></span>
+                        </button>
+
+                        <!-- Dropdown Panel -->
+                        <div id="notif-dropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:-10px;width:360px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.15);border:1px solid #e2e8f0;z-index:1000;overflow:hidden;">
+                            <!-- Header -->
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #f1f5f9;">
+                                <span style="font-size:14px;font-weight:700;color:#0f172a;">Notifications</span>
+                                <div style="display:flex;gap:8px;">
+                                    <button id="notif-mark-read" style="font-size:11px;font-weight:600;color:#6366f1;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='none'">Mark all read</button>
+                                    <button id="notif-clear" style="font-size:11px;font-weight:600;color:#94a3b8;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">Clear all</button>
+                                </div>
+                            </div>
+
+                            <!-- List -->
+                            <div id="notif-list" style="max-height:400px;overflow-y:auto;">
+                                <div id="notif-empty" style="padding:32px;text-align:center;color:#94a3b8;font-size:13px;">
+                                    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px;display:block;opacity:.4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                    </svg>
+                                    No notifications yet
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Divider -->
                     <div style="width:1px;height:28px;background:#e2e8f0;"></div>
@@ -1053,14 +1080,146 @@
 
     @stack('scripts')
 
-    {{-- ══ Admin Notification Polling ══ --}}
+    {{-- ══ Admin Notification Polling + Bell Dropdown ══ --}}
     <script>
     (function () {
-        var POLL_URL    = '{{ route('admin.notifications.poll') }}';
-        var ORDERS_URL  = '{{ route('admin.orders.index') }}';
-        var MSGS_URL    = '{{ route('admin.order-messages.index') }}';
-        var INTERVAL    = 30000; // 30 s
+        var POLL_URL       = '{{ route('admin.notifications.poll') }}';
+        var MARK_READ_URL  = '{{ route('admin.notifications.mark-read') }}';
+        var CLEAR_URL      = '{{ route('admin.notifications.clear') }}';
+        var ORDERS_URL     = '{{ route('admin.orders.index') }}';
+        var MSGS_URL       = '{{ route('admin.order-messages.index') }}';
+        var CSRF           = '{{ csrf_token() }}';
+        var INTERVAL       = 30000; // 30 s
         var lastMs = Date.now();
+
+        // ── Bell UI elements ──
+        var bellBtn     = document.getElementById('notif-bell-btn');
+        var bellBadge   = document.getElementById('notif-badge');
+        var dropdown    = document.getElementById('notif-dropdown');
+        var notifList   = document.getElementById('notif-list');
+        var emptyState  = document.getElementById('notif-empty');
+        var markReadBtn = document.getElementById('notif-mark-read');
+        var clearBtn    = document.getElementById('notif-clear');
+
+        // Toggle dropdown
+        bellBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = dropdown.style.display !== 'none';
+            dropdown.style.display = open ? 'none' : 'block';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function (e) {
+            if (!document.getElementById('notif-wrapper').contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Mark all read
+        markReadBtn.addEventListener('click', function () {
+            fetch(MARK_READ_URL, { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(function () {
+                setBellBadge(0);
+                notifList.querySelectorAll('.notif-item').forEach(function (el) {
+                    el.style.background = '#fff';
+                });
+            });
+        });
+
+        // Clear all
+        clearBtn.addEventListener('click', function () {
+            fetch(CLEAR_URL, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(function () {
+                notifList.innerHTML = '';
+                notifList.appendChild(emptyState);
+                emptyState.style.display = '';
+                setBellBadge(0);
+            });
+        });
+
+        function setBellBadge(count) {
+            if (!bellBadge) return;
+            if (count > 0) {
+                bellBadge.textContent = count > 99 ? '99+' : count;
+                bellBadge.style.display = '';
+            } else {
+                bellBadge.style.display = 'none';
+            }
+        }
+
+        var iconMap = {
+            cart:    '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>',
+            message: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>',
+            warning: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+            return:  '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>',
+            payment: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>',
+            bell:    '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>',
+        };
+
+        var colorMap = {
+            order: '#6366f1', message: '#f59e0b', cancellation: '#ef4444',
+            return: '#3b82f6', payment: '#10b981', stock: '#f97316', bell: '#94a3b8',
+        };
+
+        var renderedIds = new Set();
+
+        function renderNotifications(notifications) {
+            if (!notifications || notifications.length === 0) {
+                emptyState.style.display = '';
+                return;
+            }
+            emptyState.style.display = 'none';
+
+            notifications.forEach(function (n) {
+                if (renderedIds.has(n.id)) {
+                    // Update read state if changed
+                    var existing = document.getElementById('notif-item-' + n.id);
+                    if (existing && n.is_read) existing.style.background = '#fff';
+                    return;
+                }
+                renderedIds.add(n.id);
+
+                var color = colorMap[n.type] || '#94a3b8';
+                var icon  = iconMap[n.icon] || iconMap['bell'];
+                var time  = timeAgo(n.created_at);
+
+                var el = document.createElement('div');
+                el.id = 'notif-item-' + n.id;
+                el.className = 'notif-item';
+                el.style.cssText = 'display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid #f8fafc;cursor:pointer;transition:background .1s;background:' + (n.is_read ? '#fff' : '#f8faff') + ';';
+                el.onmouseover = function() { this.style.background = '#f1f5f9'; };
+                el.onmouseout  = function() { this.style.background = n.is_read ? '#fff' : '#f8faff'; };
+                if (n.link) el.onclick = function() { window.location.href = n.link; };
+
+                el.innerHTML =
+                    '<div style="width:30px;height:30px;border-radius:8px;background:' + color + '20;color:' + color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + icon + '</div>' +
+                    '<div style="flex:1;min-width:0;">' +
+                        '<p style="font-size:12.5px;font-weight:' + (n.is_read ? '500' : '700') + ';color:#0f172a;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(n.title) + '</p>' +
+                        (n.body ? '<p style="font-size:11.5px;color:#64748b;margin:0 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(n.body) + '</p>' : '') +
+                        '<p style="font-size:10px;color:#94a3b8;margin:0;">' + time + '</p>' +
+                    '</div>' +
+                    (!n.is_read ? '<div style="width:7px;height:7px;border-radius:50%;background:#6366f1;flex-shrink:0;margin-top:6px;"></div>' : '');
+
+                // Prepend so newest is on top
+                if (notifList.firstChild && notifList.firstChild !== emptyState) {
+                    notifList.insertBefore(el, notifList.firstChild);
+                } else {
+                    notifList.appendChild(el);
+                }
+            });
+        }
+
+        function timeAgo(dateStr) {
+            var diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+            if (diff < 60)   return 'Just now';
+            if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+            return Math.floor(diff/86400) + 'd ago';
+        }
+
+        function escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
 
         // ── Sidebar badges ──
         var orderBadge   = document.getElementById('sidebar-new-orders-badge');
@@ -1122,28 +1281,20 @@
                 if (!data) return;
                 lastMs = data.server_time || Date.now();
 
-                // ── Sidebar orders badge — always reflects true unviewed total ──
+                // ── Sidebar orders badge ──
                 setBadge(orderBadge, data.unviewed_total);
 
-                // ── New orders (arrived this poll cycle) ──
+                // ── New orders ──
                 if (data.new_orders > 0) {
-
                     data.orders.forEach(function(o) {
                         var msg = '🛒 New Order <strong>#' + o.order_serial_no + '</strong><br>'
                             + '{{ $currencySymbol ?? '₹' }}' + parseFloat(o.total).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
                         toast(msg, 'order', ORDERS_URL);
-                        browserNotify(
-                            '🛒 New Order #' + o.order_serial_no,
-                            'Total: {{ $currencySymbol ?? '₹' }}' + parseFloat(o.total).toFixed(2),
-                            ORDERS_URL
-                        );
+                        browserNotify('🛒 New Order #' + o.order_serial_no, 'Total: {{ $currencySymbol ?? '₹' }}' + parseFloat(o.total).toFixed(2), ORDERS_URL);
                     });
-
-                    // Play subtle sound
                     try {
                         var ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        var osc = ctx.createOscillator();
-                        var gain = ctx.createGain();
+                        var osc = ctx.createOscillator(); var gain = ctx.createGain();
                         osc.connect(gain); gain.connect(ctx.destination);
                         osc.frequency.value = 880;
                         gain.gain.setValueAtTime(0.15, ctx.currentTime);
@@ -1152,28 +1303,43 @@
                     } catch(e) {}
                 }
 
-                // ── Unread order messages ──
+                // ── Unread messages badge ──
                 setBadge(msgBadge, data.unread_msgs);
 
-                // ── Cancellation requests (new ones this poll cycle) ──
+                // ── Cancellations ──
                 if (data.cancellations > 0) {
                     toast('⚠️ <strong>' + data.cancellations + ' cancellation request(s)</strong> need your attention', 'cancel', MSGS_URL + '?filter=cancellation');
                     browserNotify('⚠ Cancellation Request', data.cancellations + ' order(s) need your review', MSGS_URL + '?filter=cancellation');
                 }
 
-                // ── Return & refund requests ──
+                // ── Returns badge ──
                 setBadge(returnsBadge, data.unviewed_returns);
                 if (data.new_returns > 0) {
                     var returnsUrl = '{{ route('admin.returns.index') }}';
-                    toast('↩ <strong>' + data.new_returns + ' return request(s)</strong> submitted by customer(s)', 'msg', returnsUrl);
-                    browserNotify(
-                        '↩ New Return Request',
-                        data.new_returns + ' customer(s) submitted a return/refund request',
-                        returnsUrl
-                    );
+                    toast('↩ <strong>' + data.new_returns + ' return request(s)</strong> submitted', 'msg', returnsUrl);
+                    browserNotify('↩ New Return Request', data.new_returns + ' customer(s) submitted a return request', returnsUrl);
                 }
+
+                // ── Bell dropdown ──
+                if (data.notifications) {
+                    renderNotifications(data.notifications);
+                }
+                setBellBadge(data.unread_notif_count || 0);
             });
         }
+
+        // Initial load of notifications on page load
+        fetch(POLL_URL + '?since=0', { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(data) {
+            if (!data) return;
+            if (data.notifications) renderNotifications(data.notifications);
+            setBellBadge(data.unread_notif_count || 0);
+            setBadge(orderBadge, data.unviewed_total);
+            setBadge(msgBadge, data.unread_msgs);
+            setBadge(returnsBadge, data.unviewed_returns);
+            lastMs = data.server_time || Date.now();
+        });
 
         // Request browser notification permission on first interaction
         if ('Notification' in window && Notification.permission === 'default') {
@@ -1183,7 +1349,7 @@
             }, { once: true });
         }
 
-        // Start polling after 30s (first poll)
+        // Start polling every 30s
         setTimeout(function loop() { poll(); setTimeout(loop, INTERVAL); }, INTERVAL);
     })();
     </script>

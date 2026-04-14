@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
 import UserAccount from './UserAccount';
 import CartIcon from './CartIcon';
+import NotificationBell from './NotificationBell';
 import HeaderSearch from './HeaderSearch';
 import LanguageSwitcher from './LanguageSwitcher';
 import TopBar from './TopBar';
@@ -334,6 +335,8 @@ export default async function Header() {
                                     </a>
                                     <CartIcon />
                                 </div>
+                                {/*  Notification Bell — logged-in users only  */}
+                                <NotificationBell />
                                 {/*  User Profile — hidden on mobile (account is inside drawer)  */}
                                 <div className="d-none d-lg-flex">
                                     <UserAccount />
