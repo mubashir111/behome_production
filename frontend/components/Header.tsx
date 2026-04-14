@@ -36,7 +36,7 @@ export default async function Header() {
                         <div className="col-6 col-xl-3 col-lg-2 order-1 d-flex align-items-center gap-3">
                             <a className="glass-logo-wrapper" href="https://www.blkrockarchitect.ae/en" target="" rel="noopener noreferrer">
                                 <div className="glass-logo-box2">
-                                    <Image alt="Blackrock Logo" src="/images/new/logo/blackrock.PNG" width={72} height={72} priority style={{ objectFit: 'contain' }} />
+                                    <Image alt="Blackrock Logo" src="/images/new/logo/blackrock2.PNG" width={72} height={72} priority style={{ objectFit: 'contain' }} />
                                 </div>
                             </a>
                             <a className="glass-logo-wrapper" href="/">
