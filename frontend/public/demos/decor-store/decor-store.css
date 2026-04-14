@@ -2785,7 +2785,7 @@ select,
        top-space-padding pushes page content below the fixed header. */
     .header-with-topbar+.top-space-padding,
     .top-space-padding {
-        padding-top: 125px !important;
+        padding-top: 64px !important;
     }
 
     /* Also reduce the general section top/bottom padding on mobile */
@@ -4392,4 +4392,10 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
    so the transition has nothing to animate. ---------------------------------- */
 header .header-top-bar+.navbar.disable-fixed {
     top: 40px !important;
+}
+
+@media (max-width: 991px) {
+    header .header-top-bar+.navbar.disable-fixed {
+        top: 0 !important;
+    }
 }

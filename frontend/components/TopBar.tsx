@@ -35,7 +35,7 @@ export default function TopBar() {
 
     return (
         <div
-            className="header-top-bar glass-effect top-bar-dark border-bottom border-color-transparent-white-light px-lg-0"
+            className="header-top-bar glass-effect top-bar-dark border-bottom border-color-transparent-white-light px-lg-0 d-none d-md-block"
             style={{
                 overflow: 'hidden',
                 maxHeight: closing ? '0px' : '45px',
