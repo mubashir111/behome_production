@@ -38,18 +38,31 @@ class Cashondelivery extends PaymentAbstract
         try {
             $site = Settings::group('site')->all();
             if ($site['site_cash_on_delivery'] == Activity::ENABLE) {
-                $capturePaymentNotification = DB::table('capture_payment_notifications')->where([
-                    ['order_id', $order->id]
-                ]);
-                $capturePaymentNotification?->delete();
-                $token = rand(111111111, 999999999);
-                CapturePaymentNotification::create([
-                    'order_id'   => $order->id,
-                    'token'      => $token,
-                    'created_at' => now()
-                ]);
+                // Perform activation logic immediately for COD
+                DB::transaction(function () use ($order) {
+                    $order->active = Ask::YES;
+                    $order->save();
+                    
+                    Stock::where([
+                        'model_id' => $order->id, 
+                        'model_type' => Order::class, 
+                        'status' => Status::INACTIVE
+                    ])?->update(['status' => Status::ACTIVE]);
 
-                return redirect()->away(route('payment.success', ['paymentGateway' => 'cashondelivery', 'order' => $order, 'token' => $token]));
+                    // Send notifications
+                    SendOrderMail::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
+                    SendOrderSms::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
+                    SendOrderPush::dispatch(['order_id' => $order->id, 'status' => OrderStatus::PENDING]);
+
+                    SendOrderGotMail::dispatch(['order_id' => $order->id]);
+                    SendOrderGotSms::dispatch(['order_id' => $order->id]);
+                    SendOrderGotPush::dispatch(['order_id' => $order->id]);
+                });
+
+                $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+                $redirectUrl = "{$frontendUrl}/account/order/{$order->id}?status=success";
+                
+                return redirect()->away($redirectUrl);
             } else {
                 return redirect()->route('payment.index', ['order' => $order, 'paymentGateway' => 'cashondelivery'])->with('error', trans('all.message.something_wrong'));
             }
