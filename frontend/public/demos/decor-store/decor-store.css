@@ -2914,8 +2914,8 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
     -webkit-backdrop-filter: blur(15px);
     overflow: hidden;
     flex-shrink: 0;
-    background: rgb(237 237 237) !important;
-    border-color: rgb(46 46 46) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(197, 160, 89, 0.2) !important;
 }
 
 /* Fix mobile logo overlap by shrinking icons and hiding text on narrow screens */
