@@ -17,6 +17,7 @@ use App\Enums\PaymentStatus;
 use App\Events\SendOrderSms;
 use App\Events\SendOrderMail;
 use App\Events\SendOrderPush;
+use App\Models\UserNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -292,6 +293,7 @@ class OrderService
                     $order->status = $request->status;
                     $order->save();
                     AuditLogger::orderStatusChanged($order, $oldStatus, $request->status, $request->reason ?? null);
+                    $this->sendOrderStatusNotification($order, $request->status);
                 }
             } else {
                 if ($request->status == OrderStatus::REJECTED || $request->status == OrderStatus::CANCELED) {
@@ -322,12 +324,40 @@ class OrderService
                 $order->status = $request->status;
                 $order->save();
                 AuditLogger::orderStatusChanged($order, $oldStatus, $request->status, $request->reason ?? null);
+                $this->sendOrderStatusNotification($order, $request->status);
             }
             return $order;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
+    }
+
+    private function sendOrderStatusNotification(Order $order, OrderStatus $status): void
+    {
+        if (!$order->user_id) return;
+
+        $map = [
+            OrderStatus::CONFIRMED  => ['title' => 'Order Confirmed',     'body' => 'Your order #:no has been confirmed and is being prepared.', 'icon' => 'check',   'color' => '#10b981'],
+            OrderStatus::ON_THE_WAY => ['title' => 'Order On The Way',    'body' => 'Great news! Your order #:no is out for delivery.',          'icon' => 'truck',   'color' => '#3b82f6'],
+            OrderStatus::DELIVERED  => ['title' => 'Order Delivered',     'body' => 'Your order #:no has been delivered. Enjoy!',               'icon' => 'gift',    'color' => '#22c55e'],
+            OrderStatus::CANCELED   => ['title' => 'Order Cancelled',     'body' => 'Your order #:no has been cancelled.',                      'icon' => 'x',       'color' => '#ef4444'],
+            OrderStatus::REJECTED   => ['title' => 'Order Rejected',      'body' => 'Unfortunately your order #:no was rejected.',              'icon' => 'warning', 'color' => '#f97316'],
+            OrderStatus::RETURNED   => ['title' => 'Return Processed',    'body' => 'Your return for order #:no has been processed.',           'icon' => 'return',  'color' => '#8b5cf6'],
+        ];
+
+        if (!isset($map[$status])) return;
+
+        $info = $map[$status];
+        UserNotification::send(
+            title:  $info['title'],
+            body:   str_replace(':no', $order->order_serial_no, $info['body']),
+            type:   'info',
+            icon:   $info['icon'],
+            color:  $info['color'],
+            link:   '/account/order/' . $order->id,
+            userId: $order->user_id,
+        );
     }
 
     /**

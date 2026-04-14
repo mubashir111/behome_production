@@ -1,6 +1,14 @@
 /* ===================================
     Crafto - Decor store
 ====================================== */
+/* Font Awesome 7 Brands — needed for social icons (fa-facebook-f, fa-instagram, etc.) */
+@font-face {
+    font-family: "Font Awesome 7 Brands";
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url("/fonts/fa-brands-400.woff2") format("woff2");
+}
 /* font */
 /* Google Fonts loaded via next/font in layout.tsx for better performance */
 

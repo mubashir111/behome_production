@@ -52,27 +52,23 @@ export default async function Header() {
                                 {/*  Mobile Navigation Header  */}
                                 <div className="mobile-nav-header d-lg-none">
                                     <div className="mobile-logo">
-                                        <div className="mobile-logo d-flex align-items-center gap-3">
-
-                                            <a className="glass-logo-wrapper" href="/">
-                                                <div className="glass-logo-box">
-                                                    <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
-                                                </div>
-                                                <span className="logo-text">BEHOME</span>
-                                            </a>
-
-                                        </div>
-                                        <div className="mobile-icons">
-                                            <a className="icon-box position-relative" href="/cart">
-                                                <i className="feather icon-feather-shopping-bag"></i>
-                                                <CartIcon />
-                                            </a>
-                                            <a className="icon-box" href="/account">
-                                                <i className="feather icon-feather-user"></i>
-                                            </a>
-                                            <div className="close-button" data-bs-target="#navbarNav" data-bs-toggle="collapse">
-                                                <i className="feather icon-feather-x"></i>
+                                        <a className="glass-logo-wrapper" href="/">
+                                            <div className="glass-logo-box">
+                                                <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
                                             </div>
+                                            <span className="logo-text">BEHOME</span>
+                                        </a>
+                                    </div>
+                                    <div className="mobile-icons">
+                                        <a className="icon-box position-relative" href="/cart">
+                                            <i className="feather icon-feather-shopping-bag"></i>
+                                            <CartIcon />
+                                        </a>
+                                        <a className="icon-box" href="/account">
+                                            <i className="feather icon-feather-user"></i>
+                                        </a>
+                                        <div className="close-button" data-bs-target="#navbarNav" data-bs-toggle="collapse">
+                                            <i className="feather icon-feather-x"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -94,6 +90,20 @@ export default async function Header() {
                                         <div className="mobile-drawer-account-text">
                                             <span className="mobile-drawer-account-label">My Account</span>
                                             <span className="mobile-drawer-account-sub">View profile &amp; orders</span>
+                                        </div>
+                                        <i className="feather icon-feather-chevron-right mobile-drawer-account-arrow"></i>
+                                    </a>
+                                </div>
+
+                                {/* ── Mobile Notifications quick-link ── */}
+                                <div className="mobile-drawer-account d-lg-none">
+                                    <a href="/account?tab=orders" className="mobile-drawer-account-link">
+                                        <div className="mobile-drawer-account-avatar">
+                                            <i className="feather icon-feather-bell"></i>
+                                        </div>
+                                        <div className="mobile-drawer-account-text">
+                                            <span className="mobile-drawer-account-label">Notifications</span>
+                                            <span className="mobile-drawer-account-sub">Orders &amp; updates</span>
                                         </div>
                                         <i className="feather icon-feather-chevron-right mobile-drawer-account-arrow"></i>
                                     </a>
@@ -335,8 +345,10 @@ export default async function Header() {
                                     </a>
                                     <CartIcon />
                                 </div>
-                                {/*  Notification Bell — logged-in users only  */}
-                                <NotificationBell />
+                                {/*  Notification Bell — desktop only  */}
+                                <div className="d-none d-lg-flex">
+                                    <NotificationBell />
+                                </div>
                                 {/*  User Profile — hidden on mobile (account is inside drawer)  */}
                                 <div className="d-none d-lg-flex">
                                     <UserAccount />

@@ -402,6 +402,15 @@
         .admin-btn-danger{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;background:#fff1f2;color:#ef4444;font-size:13.5px;font-weight:700;border-radius:10px;border:1px solid #fecdd3;cursor:pointer;text-decoration:none;transition:background .15s;font-family:'Inter',sans-serif}
         .admin-btn-danger:hover{background:#fee2e2}
         .admin-btn-sm{padding:6px 14px!important;font-size:12px!important;border-radius:8px!important}
+        .admin-btn-danger-sm{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#fff1f2;color:#ef4444;font-size:12px;font-weight:600;border-radius:8px;border:1px solid #fecdd3;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif}
+        .admin-btn-danger-sm:hover{background:#fee2e2}
+        .admin-form-label{display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:6px}
+        .admin-form-input,.admin-form-select{width:100%;padding:10px 14px;font-size:13.5px;color:#1e293b;background:#fff;border:1px solid #e2e8f0;border-radius:10px;outline:none;transition:border-color .15s,box-shadow .15s;font-family:'Inter',sans-serif}
+        .admin-form-input:focus,.admin-form-select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+        .admin-form-input::placeholder{color:#cbd5e1}
+        .admin-form-select{appearance:none;cursor:pointer}
+        .admin-form-hint{font-size:11.5px;color:#94a3b8;margin-top:5px;margin-bottom:0}
+        .admin-form-error{font-size:11.5px;color:#ef4444;margin-top:4px;margin-bottom:0}
         .admin-form-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding-top:20px;margin-top:20px;border-top:1px solid #f1f5f9}
         /* Alerts */
         .admin-alert{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:12px;font-size:13.5px;font-weight:600;margin-bottom:16px}
@@ -585,6 +594,18 @@
                     Order Messages
                     @php $orderUnread = \App\Models\OrderMessage::where('sender_type', 'customer')->where('is_read', false)->count(); @endphp
                     <span id="sidebar-order-msg-badge" class="sidebar-badge" style="background:#ef4444;{{ $orderUnread > 0 ? '' : 'display:none;' }}">{{ $orderUnread ?: '' }}</span>
+                </a>
+
+                <a href="{{ route('admin.user-notifications.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.user-notifications*') ? 'active' : '' }}">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    Send Notifications
+                    @php $recentNotifs = \App\Models\UserNotification::where('created_at', '>=', now()->subDay())->count(); @endphp
+                    @if($recentNotifs > 0)
+                        <span class="sidebar-badge" style="background:#6366f1;">{{ $recentNotifs }}</span>
+                    @endif
                 </a>
 
                 <a href="{{ route('admin.coupons.index') }}"

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { apiFetch } from '@/lib/api';
 
 interface Notification {
-  id: number;
+  id: string;
   title: string;
   body: string;
   icon: string;
@@ -12,6 +12,7 @@ interface Notification {
   link: string;
   time: string;
   created_at: string;
+  is_read: boolean;
 }
 
 const iconSvg: Record<string, JSX.Element> = {
@@ -66,7 +67,6 @@ export default function NotificationBell() {
   const [loggedIn, setLoggedIn]       = useState(false);
   const dropdownRef                   = useRef<HTMLDivElement>(null);
 
-  // Check login state
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     setLoggedIn(!!token);
@@ -77,12 +77,10 @@ export default function NotificationBell() {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await apiFetch('/v1/notifications');
+      const res = await apiFetch('/frontend/notifications');
       if (res?.data) {
         setNotifications(res.data);
-        // Treat anything from last 24h as unread
-        const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        setUnread(res.data.filter((n: Notification) => new Date(n.created_at) > cutoff).length);
+        setUnread(res.unread ?? 0);
       }
     } catch {
       // silent
@@ -91,14 +89,30 @@ export default function NotificationBell() {
     }
   }, []);
 
-  // Fetch on open
-  useEffect(() => {
-    if (open) fetchNotifications();
-  }, [open, fetchNotifications]);
+  const markAllRead = useCallback(async () => {
+    try {
+      await apiFetch('/frontend/notifications/mark-read', { method: 'POST' });
+      setUnread(0);
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    } catch {
+      // silent
+    }
+  }, []);
 
-  // Fetch badge count on mount (once)
+  // Fetch on open + mark read
   useEffect(() => {
-    if (loggedIn) fetchNotifications();
+    if (open) {
+      fetchNotifications();
+      if (unread > 0) markAllRead();
+    }
+  }, [open, fetchNotifications, markAllRead, unread]);
+
+  // Mount + poll every 30s
+  useEffect(() => {
+    if (!loggedIn) return;
+    fetchNotifications();
+    const timer = setInterval(fetchNotifications, 30_000);
+    return () => clearInterval(timer);
   }, [loggedIn, fetchNotifications]);
 
   // Close on outside click
@@ -118,7 +132,7 @@ export default function NotificationBell() {
     <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
       {/* Bell Button */}
       <button
-        onClick={() => { setOpen(v => !v); if (!open) setUnread(0); }}
+        onClick={() => setOpen(v => !v)}
         className="glass-icon-box"
         aria-label="Notifications"
         style={{ position: 'relative' }}
@@ -145,7 +159,7 @@ export default function NotificationBell() {
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 12px)', right: 0,
-          width: '320px', background: '#1a1a2e',
+          width: '340px', background: '#1a1a2e',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
           zIndex: 9999, overflow: 'hidden',
@@ -155,9 +169,16 @@ export default function NotificationBell() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)',
           }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Notifications</span>
-            <a href="/account" style={{ fontSize: '11px', color: '#818cf8', textDecoration: 'none', fontWeight: 600 }}>
-              View all orders →
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>
+              Notifications
+              {unread > 0 && (
+                <span style={{ marginLeft: '8px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 800, borderRadius: '10px', padding: '1px 7px' }}>
+                  {unread} new
+                </span>
+              )}
+            </span>
+            <a href="/notifications" style={{ fontSize: '11px', color: '#818cf8', textDecoration: 'none', fontWeight: 600 }}>
+              View all →
             </a>
           </div>
 
@@ -185,9 +206,10 @@ export default function NotificationBell() {
                   display: 'flex', gap: '10px', padding: '12px 16px',
                   borderBottom: '1px solid rgba(255,255,255,0.05)',
                   textDecoration: 'none', transition: 'background .15s',
+                  background: n.is_read ? 'transparent' : 'rgba(99,102,241,0.06)',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                onMouseLeave={e => (e.currentTarget.style.background = n.is_read ? 'transparent' : 'rgba(99,102,241,0.06)')}
               >
                 {/* Icon circle */}
                 <div style={{
@@ -199,9 +221,14 @@ export default function NotificationBell() {
                 </div>
                 {/* Text */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff', margin: '0 0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {n.title}
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <p style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff', margin: '0 0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {n.title}
+                    </p>
+                    {!n.is_read && (
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#6366f1', flexShrink: 0 }} />
+                    )}
+                  </div>
                   <p style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.5)', margin: '0 0 3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {n.body}
                   </p>
@@ -209,6 +236,13 @@ export default function NotificationBell() {
                 </div>
               </a>
             ))}
+          </div>
+
+          {/* Footer */}
+          <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+            <a href="/notifications" onClick={() => setOpen(false)} style={{ fontSize: '12px', color: '#818cf8', textDecoration: 'none', fontWeight: 600 }}>
+              View all notifications
+            </a>
           </div>
         </div>
       )}

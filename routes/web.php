@@ -152,6 +152,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('purchases', \App\Http\Controllers\Admin\Web\PurchaseController::class);
         Route::get('stock/report', [\App\Http\Controllers\Admin\Web\StockReportController::class, 'index'])->name('stock.report');
         Route::get('stock/product/{product}/history', [\App\Http\Controllers\Admin\Web\StockReportController::class, 'productHistory'])->name('stock.product.history');
+
+        // User Notifications (admin → customer)
+        Route::resource('user-notifications', \App\Http\Controllers\Admin\Web\UserNotificationController::class)
+            ->only(['index', 'create', 'store', 'destroy'])
+            ->names([
+                'index'   => 'user-notifications.index',
+                'create'  => 'user-notifications.create',
+                'store'   => 'user-notifications.store',
+                'destroy' => 'user-notifications.destroy',
+            ]);
         Route::resource('sliders', \App\Http\Controllers\Admin\Web\SliderController::class);
         Route::post('sliders/{slider}/toggle-status', [\App\Http\Controllers\Admin\Web\SliderController::class, 'toggleStatus'])->name('sliders.toggle-status');
 

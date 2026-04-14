@@ -120,6 +120,34 @@ const nextConfig = {
         source: '/images/:path*',
         destination: `${BACKEND_URL}/images/:path*`,
       },
+      // Laravel payment callback routes (gateway/order patterns)
+      // These must be proxied to the Laravel backend for payment processing.
+      // Note: /payment/success and /payment/failed are Next.js pages — these
+      // patterns only match URLs with a gateway slug + order ID segment.
+      {
+        source: '/payment/:gateway/pay/:order',
+        destination: `${BACKEND_URL}/payment/:gateway/pay/:order`,
+      },
+      {
+        source: '/payment/:order/pay',
+        destination: `${BACKEND_URL}/payment/:order/pay`,
+      },
+      {
+        source: '/payment/:gateway/:order/success',
+        destination: `${BACKEND_URL}/payment/:gateway/:order/success`,
+      },
+      {
+        source: '/payment/:gateway/:order/fail',
+        destination: `${BACKEND_URL}/payment/:gateway/:order/fail`,
+      },
+      {
+        source: '/payment/:gateway/:order/cancel',
+        destination: `${BACKEND_URL}/payment/:gateway/:order/cancel`,
+      },
+      {
+        source: '/payment/successful/:order',
+        destination: `${BACKEND_URL}/payment/successful/:order`,
+      },
     ];
   },
 };

@@ -786,40 +786,83 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
         Route::post('/change-status/{frontendOrder}', [FrontendOrderController::class, 'changeStatus']);
     });
 
-    // Customer notifications — derived from recent order status changes
+    // Customer notifications — order updates + admin-sent messages
     Route::prefix('notifications')->name('notifications.')->middleware(['auth:sanctum'])->group(function () {
+
         Route::get('/', function (\Illuminate\Http\Request $request) {
-            $user   = $request->user();
-            $orders = \App\Models\Order::where('user_id', $user->id)
-                ->orderBy('updated_at', 'desc')
-                ->limit(20)
-                ->get(['id', 'order_serial_no', 'status', 'total', 'payment_status', 'created_at', 'updated_at']);
+            $user = $request->user();
 
-            $statusLabels = [
-                \App\Enums\OrderStatus::PENDING    => ['label' => 'Order Placed',       'icon' => 'cart',    'color' => '#6366f1'],
-                \App\Enums\OrderStatus::CONFIRMED  => ['label' => 'Order Confirmed',    'icon' => 'check',   'color' => '#10b981'],
-                \App\Enums\OrderStatus::ON_THE_WAY => ['label' => 'On The Way',         'icon' => 'truck',   'color' => '#3b82f6'],
-                \App\Enums\OrderStatus::DELIVERED  => ['label' => 'Order Delivered',    'icon' => 'gift',    'color' => '#22c55e'],
-                \App\Enums\OrderStatus::CANCELED   => ['label' => 'Order Cancelled',    'icon' => 'x',       'color' => '#ef4444'],
-                \App\Enums\OrderStatus::REJECTED   => ['label' => 'Order Rejected',     'icon' => 'warning', 'color' => '#f97316'],
-                \App\Enums\OrderStatus::RETURNED   => ['label' => 'Return Processed',   'icon' => 'return',  'color' => '#8b5cf6'],
-            ];
+            // 1. Order placed notification (only PENDING = new order, always read)
+            $pendingOrder = \App\Models\Order::where('user_id', $user->id)
+                ->where('status', \App\Enums\OrderStatus::PENDING)
+                ->orderBy('created_at', 'desc')
+                ->first(['id', 'order_serial_no', 'total', 'created_at']);
 
-            $notifications = $orders->map(function ($order) use ($statusLabels) {
-                $info = $statusLabels[$order->status] ?? ['label' => 'Order Update', 'icon' => 'bell', 'color' => '#94a3b8'];
-                return [
-                    'id'         => $order->id,
-                    'title'      => $info['label'],
-                    'body'       => 'Order #' . $order->order_serial_no . ' — ' . \App\Libraries\AppLibrary::currencyAmountFormat($order->total),
-                    'icon'       => $info['icon'],
-                    'color'      => $info['color'],
-                    'link'       => '/account/order/' . $order->id,
-                    'time'       => $order->updated_at?->diffForHumans(),
-                    'created_at' => $order->updated_at?->toIso8601String(),
-                ];
-            });
+            $orderNotifs = collect();
+            if ($pendingOrder) {
+                $orderNotifs->push([
+                    'id'         => 'order_' . $pendingOrder->id,
+                    'title'      => 'Order Placed',
+                    'body'       => 'Order #' . $pendingOrder->order_serial_no . ' — ' . \App\Libraries\AppLibrary::currencyAmountFormat($pendingOrder->total),
+                    'icon'       => 'cart',
+                    'color'      => '#6366f1',
+                    'link'       => '/account/order/' . $pendingOrder->id,
+                    'time'       => $pendingOrder->created_at->diffForHumans(),
+                    'created_at' => $pendingOrder->created_at->toIso8601String(),
+                    'is_read'    => true,
+                ]);
+            }
 
-            return response()->json(['data' => $notifications, 'total' => $notifications->count()]);
+            // 2. Admin-sent notifications (targeted to user OR broadcast to all)
+            $readIds = \DB::table('user_notification_reads')
+                ->where('user_id', $user->id)
+                ->pluck('notification_id')
+                ->toArray();
+
+            $adminNotifs = \App\Models\UserNotification::where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id)->orWhereNull('user_id');
+                })
+                ->orderBy('created_at', 'desc')
+                ->limit(15)
+                ->get()
+                ->map(function ($n) use ($readIds) {
+                    return [
+                        'id'         => 'admin_' . $n->id,
+                        'title'      => $n->title,
+                        'body'       => $n->body,
+                        'icon'       => $n->icon,
+                        'color'      => $n->color,
+                        'link'       => $n->link ?: '#',
+                        'time'       => $n->created_at->diffForHumans(),
+                        'created_at' => $n->created_at->toIso8601String(),
+                        'is_read'    => in_array($n->id, $readIds),
+                    ];
+                });
+
+            // Merge and sort by created_at desc
+            $all = $orderNotifs->concat($adminNotifs)
+                ->sortByDesc('created_at')
+                ->values();
+
+            $unread = $all->where('is_read', false)->count();
+
+            return response()->json(['data' => $all, 'unread' => $unread]);
+        });
+
+        // Mark all admin notifications as read
+        Route::post('/mark-read', function (\Illuminate\Http\Request $request) {
+            $user = $request->user();
+            $notifIds = \App\Models\UserNotification::where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)->orWhereNull('user_id');
+            })->pluck('id');
+
+            $rows = $notifIds->map(fn($id) => ['user_id' => $user->id, 'notification_id' => $id]);
+            \DB::table('user_notification_reads')->upsert(
+                $rows->toArray(),
+                ['user_id', 'notification_id'],
+                ['read_at']
+            );
+            return response()->json(['success' => true]);
         });
     });
 
