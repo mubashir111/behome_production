@@ -342,7 +342,12 @@ function ShopContent() {
                                     ))}
                                 </div>
                             ) : products.length === 0 ? (
-                                <div className="text-white opacity-6 fs-17 py-5">No products found.</div>
+                                <div className="text-center py-60px">
+                                    <i className="feather icon-feather-search fs-50 d-block mb-20px text-white" style={{ opacity: 0.25 }}></i>
+                                    <p className="text-white fw-600 fs-18 mb-8px">No products found</p>
+                                    <p className="text-white fs-14 mb-25px" style={{ opacity: 0.5 }}>Try adjusting your filters or search term.</p>
+                                    <button className="btn btn-small btn-round-edge btn-base-color" onClick={() => window.location.href = '/shop'}>Clear all filters</button>
+                                </div>
                             ) : (
                                 <>
                                     <div className={`row ${gridClass}`}>

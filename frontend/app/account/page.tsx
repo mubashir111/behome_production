@@ -27,6 +27,14 @@ function AccountContent() {
     const [otpEmail, setOtpEmail] = useState('');
     const [siteSettings, setSiteSettings] = useState<any>(null);
 
+    // Forgot password
+    type FpStep = 'none' | 'email' | 'otp' | 'reset';
+    const [fpStep, setFpStep] = useState<FpStep>('none');
+    const [fpEmail, setFpEmail] = useState('');
+    const [fpOtp, setFpOtp] = useState('');
+    const [fpPassword, setFpPassword] = useState('');
+    const [fpPasswordConfirm, setFpPasswordConfirm] = useState('');
+
     // Dashboard Data
     const [orders, setOrders] = useState<any[]>([]);
     const [addresses, setAddresses] = useState<any[]>([]);
@@ -267,6 +275,47 @@ function AccountContent() {
         } catch {
             showToast('Failed to resend OTP', 'error');
         }
+    };
+
+    const handleForgotEmail = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true); setError('');
+        try {
+            const res = await apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email: fpEmail }) });
+            if (res.status) { setFpStep('otp'); showToast('Check your email for the reset code.', 'success'); }
+            else { setError(res.errors?.email?.[0] || res.message || 'Email not found.'); }
+        } catch (err: any) { setError(err.message || 'Something went wrong.'); }
+        finally { setLoading(false); }
+    };
+
+    const handleForgotOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true); setError('');
+        try {
+            const res = await apiFetch('/auth/forgot-password/verify-email', { method: 'POST', body: JSON.stringify({ email: fpEmail, token: fpOtp }) });
+            if (res.status) { setFpStep('reset'); }
+            else { setError(res.message || res.errors?.code?.[0] || 'Invalid or expired code.'); }
+        } catch (err: any) { setError(err.message || 'Verification failed.'); }
+        finally { setLoading(false); }
+    };
+
+    const handleForgotReset = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (fpPassword !== fpPasswordConfirm) { setError('Passwords do not match'); return; }
+        setLoading(true); setError('');
+        try {
+            const res = await apiFetch('/auth/forgot-password/reset-password', {
+                method: 'POST',
+                body: JSON.stringify({ email: fpEmail, password: fpPassword, password_confirmation: fpPasswordConfirm }),
+            });
+            if (res.status) {
+                localStorage.setItem('token', res.token);
+                localStorage.setItem('user', JSON.stringify(res.user?.data ?? res.user));
+                showToast('Password reset successfully!', 'success');
+                window.location.reload();
+            } else { setError(res.message || 'Reset failed.'); }
+        } catch (err: any) { setError(err.message || 'Reset failed.'); }
+        finally { setLoading(false); }
     };
 
     const handleLogout = async () => {
@@ -829,26 +878,81 @@ function AccountContent() {
                     <div className="row g-0 justify-content-center">
                         <div className="col-xl-4 col-lg-5 col-md-10 contact-form-style-04 md-mb-50px me-lg-4">
                             <div className="bg-dark-gray box-shadow-extra-large border-radius-6px border border-color-extra-medium-gray ui-panel ui-panel-lg h-100">
-                                <span className="fs-26 xs-fs-24 alt-font fw-600 text-white mb-20px d-block">Member login</span>
-                                <form onSubmit={handleLogin}>
-                                    <label className="text-white mb-10px fw-500 fs-14">Email address<span className="text-red">*</span></label>
-                                    <input className="mb-20px bg-dark-gray-light border-color-transparent-white-light text-white form-control required" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} placeholder="Enter your email" type="email" required />
-                                    <label className="text-white mb-10px fw-500 fs-14">Password<span className="text-red">*</span></label>
-                                    <input className="mb-20px bg-dark-gray-light border-color-transparent-white-light text-white form-control required" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} placeholder="Enter your password" type="password" required />
-                                    <button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow w-100 text-transform-none fw-600" type="submit" disabled={loading}>
-                                        {loading ? 'Logging in...' : 'Login'}
-                                    </button>
-                                </form>
+
+                                {/* ── Forgot Password Steps ── */}
+                                {fpStep !== 'none' ? (
+                                    <div>
+                                        {fpStep === 'email' && (
+                                            <>
+                                                <button onClick={() => { setFpStep('none'); setError(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 13, padding: '0 0 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                    <i className="feather icon-feather-arrow-left"></i> Back to login
+                                                </button>
+                                                <span className="fs-22 fw-600 text-white mb-8px d-block">Forgot password?</span>
+                                                <p className="mb-20px fs-13" style={{ color: 'rgba(255,255,255,0.45)' }}>Enter your email and we'll send you a reset code.</p>
+                                                <form onSubmit={handleForgotEmail}>
+                                                    <label className="text-white mb-10px fw-500 fs-14">Email address <span className="text-red">*</span></label>
+                                                    <input className="mb-20px bg-dark-gray-light border-color-transparent-white-light text-white form-control" value={fpEmail} onChange={e => setFpEmail(e.target.value)} placeholder="Enter your email" type="email" required autoFocus />
+                                                    <button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow w-100 text-transform-none fw-600" type="submit" disabled={loading}>{loading ? 'Sending…' : 'Send Reset Code'}</button>
+                                                </form>
+                                            </>
+                                        )}
+                                        {fpStep === 'otp' && (
+                                            <>
+                                                <span className="fs-22 fw-600 text-white mb-8px d-block">Check your email</span>
+                                                <p className="mb-20px fs-13" style={{ color: 'rgba(255,255,255,0.45)' }}>We sent a code to <strong style={{ color: 'var(--base-color)' }}>{fpEmail}</strong></p>
+                                                <form onSubmit={handleForgotOtp}>
+                                                    <label className="text-white mb-10px fw-500 fs-14">Reset Code <span className="text-red">*</span></label>
+                                                    <input className="mb-20px bg-dark-gray-light border-color-transparent-white-light text-white form-control" placeholder="000000" type="text" maxLength={6} value={fpOtp} onChange={e => setFpOtp(e.target.value.replace(/\D/g, ''))} required autoFocus style={{ letterSpacing: '0.35em', fontSize: 22, textAlign: 'center' }} />
+                                                    <button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow w-100 text-transform-none fw-600" type="submit" disabled={loading}>{loading ? 'Verifying…' : 'Verify Code'}</button>
+                                                </form>
+                                                <div className="text-center mt-15px">
+                                                    <button onClick={() => setFpStep('email')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Change email</button>
+                                                </div>
+                                            </>
+                                        )}
+                                        {fpStep === 'reset' && (
+                                            <>
+                                                <span className="fs-22 fw-600 text-white mb-8px d-block">Set new password</span>
+                                                <p className="mb-20px fs-13" style={{ color: 'rgba(255,255,255,0.45)' }}>Choose a strong password for your account.</p>
+                                                <form onSubmit={handleForgotReset}>
+                                                    <label className="text-white mb-10px fw-500 fs-14">New Password <span className="text-red">*</span></label>
+                                                    <input className="mb-20px bg-dark-gray-light border-color-transparent-white-light text-white form-control" value={fpPassword} onChange={e => setFpPassword(e.target.value)} placeholder="At least 6 characters" type="password" required minLength={6} autoFocus />
+                                                    <label className="text-white mb-10px fw-500 fs-14">Confirm Password <span className="text-red">*</span></label>
+                                                    <input className="mb-25px bg-dark-gray-light border-color-transparent-white-light text-white form-control" value={fpPasswordConfirm} onChange={e => setFpPasswordConfirm(e.target.value)} placeholder="Repeat password" type="password" required minLength={6} />
+                                                    <button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow w-100 text-transform-none fw-600" type="submit" disabled={loading}>{loading ? 'Saving…' : 'Reset Password'}</button>
+                                                </form>
+                                            </>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className="fs-26 xs-fs-24 alt-font fw-600 text-white mb-20px d-block">Member login</span>
+                                        <form onSubmit={handleLogin}>
+                                            <label className="text-white mb-10px fw-500 fs-14">Email address<span className="text-red">*</span></label>
+                                            <input className="mb-20px bg-dark-gray-light border-color-transparent-white-light text-white form-control required" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} placeholder="Enter your email" type="email" required />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                                <label className="text-white fw-500 fs-14">Password<span className="text-red">*</span></label>
+                                                <button type="button" onClick={() => { setFpEmail(loginData.email); setFpStep('email'); setError(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--base-color)', fontSize: 12, fontWeight: 500 }}>
+                                                    Forgot password?
+                                                </button>
+                                            </div>
+                                            <input className="mb-20px bg-dark-gray-light border-color-transparent-white-light text-white form-control required" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} placeholder="Enter your password" type="password" required />
+                                            <button className="btn btn-medium btn-round-edge btn-base-color btn-box-shadow w-100 text-transform-none fw-600" type="submit" disabled={loading}>
+                                                {loading ? 'Logging in...' : 'Login'}
+                                            </button>
+                                        </form>
+                                    </>
+                                )}
 
                                 {/* Divider */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+                                {fpStep === 'none' && <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
                                     <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
                                     <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, whiteSpace: 'nowrap' }}>or continue with</span>
                                     <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
-                                </div>
+                                </div>}
 
                                 {/* Google Sign-In */}
-                                <div id="google-login-btn" style={{ display: 'flex', justifyContent: 'center' }}></div>
+                                {fpStep === 'none' && <div id="google-login-btn" style={{ display: 'flex', justifyContent: 'center' }}></div>}
                             </div>
                         </div>
                         <div className="col-lg-6 col-md-10 offset-xl-1">
