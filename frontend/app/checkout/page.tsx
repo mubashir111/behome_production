@@ -727,6 +727,20 @@ export default function Checkout() {
                                             <span className="btn-double-text" data-text={placingOrder ? "Placing order..." : "Place order"}>{placingOrder ? "Placing order..." : "Place order"}</span>
                                         </span>
                                     </button>
+
+                                    {/* Trust badges */}
+                                    <div style={{ marginTop: 18, borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 18, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                                        {[
+                                            { icon: 'icon-feather-lock',       label: 'SSL Secured'     },
+                                            { icon: 'icon-feather-rotate-ccw', label: '30-Day Returns'  },
+                                            { icon: 'icon-feather-shield',     label: 'Safe Checkout'   },
+                                        ].map(({ icon, label }) => (
+                                            <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '10px 6px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                                                <i className={`feather ${icon}`} style={{ fontSize: 16, color: 'var(--base-color)' }} />
+                                                <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.45)', textAlign: 'center', letterSpacing: '0.03em', textTransform: 'uppercase' }}>{label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>

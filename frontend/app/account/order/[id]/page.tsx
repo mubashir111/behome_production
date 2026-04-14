@@ -283,23 +283,31 @@ export default function OrderDetail() {
             <section className="page-shell page-shell-tight">
                 <div className="container">
 
-                    {/* Success Banner */}
+                    {/* Order Confirmation Banner */}
                     {isNewOrder && (
-                        <div className="row mb-30px" style={{ marginTop: '40px' }}>
+                        <div className="row mb-40px" style={{ marginTop: '40px' }}>
                             <div className="col-12">
-                                <div className="d-flex align-items-center justify-content-between gap-15px p-25px border-radius-6px" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.35)', backdropFilter: 'blur(4px)' }}>
-                                    <div className="d-flex align-items-center gap-15px">
-                                        <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'rgba(16,185,129,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                            <i className="bi bi-check-lg fs-18" style={{ color: '#10b981' }}></i>
-                                        </div>
-                                        <div>
-                                            <p className="text-white fw-700 mb-2px fs-16">Order placed successfully!</p>
-                                            <p className="mb-0 fs-13" style={{ color: 'rgba(255,255,255,0.55)' }}>Thank you for your order. We'll send a confirmation email shortly.</p>
-                                        </div>
+                                <div className="text-center p-40px xs-p-25px border-radius-12px" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(197,160,89,0.08) 100%)', border: '1px solid rgba(16,185,129,0.3)', backdropFilter: 'blur(8px)' }}>
+                                    {/* Icon */}
+                                    <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(16,185,129,0.18)', border: '2px solid rgba(16,185,129,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                                        <i className="feather icon-feather-check fs-30" style={{ color: '#10b981' }}></i>
                                     </div>
-                                    <span className="px-16px py-8px border-radius-4px fs-12 fw-600 text-nowrap" style={{ background: 'rgba(16,185,129,0.18)', color: '#34d399', padding: '10px 16px' }}>
-                                        Confirmed
-                                    </span>
+                                    <h4 className="text-white fw-700 mb-8px alt-font">Thank you for your order!</h4>
+                                    <p className="mb-0 fs-15" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                                        Order <strong className="text-white">#{order.order_serial_no}</strong> has been placed successfully.
+                                    </p>
+                                    <p className="mt-5px mb-25px fs-13" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                                        A confirmation email will be sent to you shortly.
+                                    </p>
+                                    {/* Actions */}
+                                    <div className="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+                                        <a href="/shop" className="btn btn-small btn-round-edge btn-base-color">
+                                            <i className="feather icon-feather-shopping-bag me-8px"></i>Continue Shopping
+                                        </a>
+                                        <a href="/account?tab=orders" className="btn btn-small btn-round-edge btn-dark-gray border border-color-extra-medium-gray text-white">
+                                            <i className="feather icon-feather-package me-8px"></i>View All Orders
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -328,6 +336,60 @@ export default function OrderDetail() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Order Status Timeline */}
+                    {order.status !== 15 && order.status !== 20 ? (() => {
+                        const steps = [
+                            { label: 'Order Placed',  icon: 'icon-feather-shopping-bag', status: 1  },
+                            { label: 'Confirmed',      icon: 'icon-feather-check-circle', status: 5  },
+                            { label: 'On the Way',     icon: 'icon-feather-truck',         status: 7  },
+                            { label: 'Delivered',      icon: 'icon-feather-home',          status: 10 },
+                        ];
+                        const currentIdx = steps.reduce((acc, s, i) => order.status >= s.status ? i : acc, 0);
+                        return (
+                            <div className="row mb-35px">
+                                <div className="col-12">
+                                    <div className="p-25px border-radius-6px" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
+                                            {steps.map((step, i) => {
+                                                const done = order.status >= step.status;
+                                                const active = i === currentIdx;
+                                                const isLast = i === steps.length - 1;
+                                                return (
+                                                    <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+                                                        {/* Connector line */}
+                                                        {!isLast && (
+                                                            <div style={{ position: 'absolute', top: 18, left: '50%', width: '100%', height: 2, background: order.status > step.status ? 'var(--base-color)' : 'rgba(255,255,255,0.1)', transition: 'background 0.4s', zIndex: 0 }} />
+                                                        )}
+                                                        {/* Dot */}
+                                                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: done ? 'var(--base-color)' : 'rgba(255,255,255,0.08)', border: `2px solid ${done ? 'var(--base-color)' : 'rgba(255,255,255,0.12)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1, transition: 'all 0.3s', boxShadow: active ? '0 0 0 4px rgba(197,160,89,0.2)' : 'none' }}>
+                                                            <i className={`feather ${step.icon}`} style={{ fontSize: 15, color: done ? '#111' : 'rgba(255,255,255,0.3)' }} />
+                                                        </div>
+                                                        {/* Label */}
+                                                        <p className="mb-0 mt-10px text-center" style={{ fontSize: 11, fontWeight: active ? 700 : 500, color: done ? '#fff' : 'rgba(255,255,255,0.35)', letterSpacing: '0.02em', lineHeight: 1.3, maxWidth: 70 }}>
+                                                            {step.label}
+                                                        </p>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })() : (
+                        <div className="row mb-35px">
+                            <div className="col-12">
+                                <div className="p-20px border-radius-6px d-flex align-items-center gap-15px" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                                    <i className="feather icon-feather-x-circle fs-22" style={{ color: '#ef4444', flexShrink: 0 }}></i>
+                                    <div>
+                                        <p className="fw-600 mb-2px" style={{ color: '#f87171' }}>Order {order.status === 15 ? 'Cancelled' : 'Rejected'}</p>
+                                        <p className="mb-0 fs-13" style={{ color: 'rgba(255,255,255,0.45)' }}>This order has been {order.status === 15 ? 'cancelled' : 'rejected'}. If you have questions, please contact support.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Messages Panel */}
                     {showMessages && (
