@@ -42,10 +42,10 @@ class Cashondelivery extends PaymentAbstract
                 DB::transaction(function () use ($order) {
                     $order->active = Ask::YES;
                     $order->save();
-                    
+
                     Stock::where([
-                        'model_id' => $order->id, 
-                        'model_type' => Order::class, 
+                        'model_id' => $order->id,
+                        'model_type' => Order::class,
                         'status' => Status::INACTIVE
                     ])?->update(['status' => Status::ACTIVE]);
 
@@ -59,9 +59,9 @@ class Cashondelivery extends PaymentAbstract
                     SendOrderGotPush::dispatch(['order_id' => $order->id]);
                 });
 
-                $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+                $frontendUrl = rtrim(config('app.frontend_url', 'https://behom.ae'), '/');
                 $redirectUrl = "{$frontendUrl}/account/order/{$order->id}?status=success";
-                
+
                 return redirect()->away($redirectUrl);
             } else {
                 return redirect()->route('payment.index', ['order' => $order, 'paymentGateway' => 'cashondelivery'])->with('error', trans('all.message.something_wrong'));
@@ -92,7 +92,7 @@ class Cashondelivery extends PaymentAbstract
                     $capturePaymentNotification = DB::table('capture_payment_notifications')->where([
                         ['token', $request->token]
                     ]);
-                    $token                      = $capturePaymentNotification->first();
+                    $token = $capturePaymentNotification->first();
 
                     if (!blank($token) && $order->id == $token->order_id) {
                         $order->active = Ask::YES;

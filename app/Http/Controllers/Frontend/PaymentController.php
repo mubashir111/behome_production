@@ -34,14 +34,14 @@ class PaymentController extends Controller
 
     public function index(PaymentGateway $paymentGateway, Order $order): \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
     {
-        $credit          = false;
-        $cashOnDelivery  = false;
+        $credit = false;
+        $cashOnDelivery = false;
         $paymentGateways = PaymentGateway::with('gatewayOptions')->where(['status' => Activity::ENABLE])->get();
-        $company         = Settings::group('company')->all();
-        $site            = Settings::group('site')->all();
-        $logo            = ThemeSetting::where(['key' => 'theme_logo'])->first();
-        $faviconLogo     = ThemeSetting::where(['key' => 'theme_favicon_logo'])->first();
-        $currency        = Currency::findOrFail(Settings::group('site')->get('site_default_currency'));
+        $company = Settings::group('company')->all();
+        $site = Settings::group('site')->all();
+        $logo = ThemeSetting::where(['key' => 'theme_logo'])->first();
+        $faviconLogo = ThemeSetting::where(['key' => 'theme_favicon_logo'])->first();
+        $currency = Currency::findOrFail(Settings::group('site')->get('site_default_currency'));
         if ($order?->user?->balance >= $order->total) {
             $credit = true;
         }
@@ -52,16 +52,16 @@ class PaymentController extends Controller
 
         if (blank($order->transaction) && $order->payment_status === PaymentStatus::UNPAID) {
             return view('payment', [
-                'company'         => $company,
-                'logo'            => $logo,
-                'currency'        => $currency,
-                'faviconLogo'     => $faviconLogo,
+                'company' => $company,
+                'logo' => $logo,
+                'currency' => $currency,
+                'faviconLogo' => $faviconLogo,
                 'paymentGateways' => $paymentGateways,
-                'order'           => $order,
-                'creditAmount'    => AppLibrary::currencyAmountFormat($order->user?->balance),
-                'credit'          => $credit,
-                'cashOnDelivery'  => $cashOnDelivery,
-                'paymentMethod'   => $paymentGateway
+                'order' => $order,
+                'creditAmount' => AppLibrary::currencyAmountFormat($order->user?->balance),
+                'credit' => $credit,
+                'cashOnDelivery' => $cashOnDelivery,
+                'paymentMethod' => $paymentGateway
             ]);
         }
         return redirect()->route('home')->with('error', trans('all.message.payment_canceled'));
@@ -71,7 +71,7 @@ class PaymentController extends Controller
     {
         if ($this->paymentManagerService->gateway($request->paymentMethod)->status()) {
             $className = 'App\\Http\\PaymentGateways\\PaymentRequests\\' . ucfirst($request->paymentMethod);
-            $gateway   = new $className;
+            $gateway = new $className;
             $request->validate($gateway->rules());
             return $this->paymentManagerService->gateway($request->paymentMethod)->payment($order, $request);
         } else {
@@ -110,7 +110,7 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
         }
 
-        $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', 'https://behom.ae'), '/');
         return redirect()->away("{$frontendUrl}/account/order/{$order->id}?status=success");
     }
 }
