@@ -38,7 +38,7 @@ export default function Checkout() {
         city: '',
         state: '',
         zip: '',
-        country: 'Bangladesh',
+        country: 'United Arab Emirates',
         country_code: '',
         order_note: '',
         payment_method: '2', // Default to E-wallet (Stripe)
@@ -642,19 +642,12 @@ export default function Checkout() {
                                         <label className="mb-10px">Country <span className="text-red">*</span></label>
                                         <select name="country" value={formData.country} onChange={handleInputChange} className="border-radius-4px input-small" required>
                                             {[
-                                                'Afghanistan','Albania','Algeria','Argentina','Armenia','Australia','Austria','Azerbaijan',
-                                                'Bahrain','Bangladesh','Belarus','Belgium','Bolivia','Bosnia and Herzegovina','Brazil','Bulgaria',
-                                                'Cambodia','Canada','Chile','China','Colombia','Croatia','Cyprus','Czech Republic',
-                                                'Denmark','Ecuador','Egypt','Estonia','Ethiopia',
-                                                'Finland','France','Georgia','Germany','Ghana','Greece','Guatemala',
-                                                'Hong Kong','Hungary','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy',
-                                                'Japan','Jordan','Kazakhstan','Kenya','Kuwait','Latvia','Lebanon','Libya','Lithuania','Luxembourg',
-                                                'Malaysia','Malta','Mexico','Moldova','Morocco','Myanmar','Nepal','Netherlands',
-                                                'New Zealand','Nigeria','Norway','Oman','Pakistan','Palestine','Panama','Peru','Philippines','Poland','Portugal',
-                                                'Qatar','Romania','Russia','Saudi Arabia','Serbia','Singapore','Slovakia','Slovenia',
-                                                'South Africa','South Korea','Spain','Sri Lanka','Sweden','Switzerland','Syria',
-                                                'Taiwan','Tanzania','Thailand','Tunisia','Turkey','Ukraine','United Arab Emirates',
-                                                'United Kingdom','United States','Uruguay','Uzbekistan','Venezuela','Vietnam','Yemen','Zimbabwe',
+                                                'United Arab Emirates',
+                                                'Saudi Arabia',
+                                                'Kuwait',
+                                                'Qatar',
+                                                'Bahrain',
+                                                'Oman',
                                             ].map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
                                     </div>

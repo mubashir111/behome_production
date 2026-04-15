@@ -302,8 +302,8 @@ export default function OrderDetail() {
         // Totals: use pre-formatted _currency_price fields
         const totalsRows = [
             { label: 'Subtotal', value: order.subtotal_currency_price },
-            order.tax_currency_price && order.tax_currency_price !== '0.00' && { label: 'Tax', value: order.tax_currency_price },
-            order.shipping_charge_currency_price && order.shipping_charge_currency_price !== '0.00' && { label: 'Shipping', value: order.shipping_charge_currency_price },
+            order.tax > 0 && { label: 'Tax', value: order.tax_currency_price },
+            order.shipping_charge > 0 && { label: 'Shipping', value: order.shipping_charge_currency_price },
             order.discount > 0 && { label: 'Discount', value: order.discount_currency_price, negative: true },
         ].filter(Boolean).map((row: any) =>
             `<tr><td style="padding:6px 12px;text-align:right;color:#555">${row.label}</td>

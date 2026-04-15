@@ -315,6 +315,8 @@ export default function ProductPageClient({ params }: { params: { slug: string }
         }
 
         const handleKeyNavigation = (event: KeyboardEvent) => {
+            const tag = (event.target as HTMLElement)?.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
             if (event.key === 'ArrowLeft') {
                 goToPrevImage();
             }

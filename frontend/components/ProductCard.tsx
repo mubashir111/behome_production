@@ -85,7 +85,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                     <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                 </a>
                 {/* Stock badges */}
-                {product.stock === 0 && (
+                {product.stock != null && product.stock <= 0 && (
                     <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.45)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', textTransform: 'uppercase', zIndex: 2, pointerEvents: 'none' }}>Out of Stock</span>
                 )}
                 {product.stock != null && product.stock > 0 && product.stock <= 5 && (
@@ -101,8 +101,8 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                     />
                     <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"
                         onClick={handleAddToCart} title="Add to cart"
-                        disabled={product.stock === 0}
-                        style={{ opacity: product.stock === 0 ? 0.4 : 1, cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}>
+                        disabled={product.stock != null && product.stock <= 0}
+                        style={{ opacity: product.stock != null && product.stock <= 0 ? 0.4 : 1, cursor: product.stock != null && product.stock <= 0 ? 'not-allowed' : 'pointer' }}>
                         <i className="feather icon-feather-shopping-bag fs-15"></i>
                     </button>
                     <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"

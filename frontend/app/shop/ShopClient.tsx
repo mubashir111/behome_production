@@ -37,7 +37,6 @@ function ShopContent() {
         if (points.length === 0) return [];
         const ranges = [];
 
-        // Return rounded number as string, no currency formatting
         const f = (n: number) => Math.round(n).toString();
 
         ranges.push({ min: 0, max: points[0], label: `Under ${f(points[0])}` });
@@ -450,7 +449,7 @@ function ShopContent() {
                                                     <div className="shop-box d-flex align-items-center gap-4 pb-20px" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                                                         <a href={`/product/${product.slug}`} style={{ flexShrink: 0, width: 110, position: 'relative', display: 'block' }}>
                                                             <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={110} height={130} unoptimized style={{ width: 110, height: 130, objectFit: 'cover', borderRadius: 4 }} />
-                                                            {product.stock === 0 && (
+                                                            {product.stock != null && product.stock <= 0 && (
                                                                 <span style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(10,10,15,0.85)', border: '1px solid rgba(197,160,89,0.45)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, letterSpacing: '0.04em', textTransform: 'uppercase', backdropFilter: 'blur(4px)' }}>Out of Stock</span>
                                                             )}
                                                         </a>
@@ -468,7 +467,7 @@ function ShopContent() {
                                                                 </p>
                                                             )}
                                                             <div className="d-flex gap-2">
-                                                                <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)} disabled={product.stock === 0 || addingToCartIds.has(product.id)} style={{ opacity: addingToCartIds.has(product.id) ? 0.7 : 1 }}>{product.stock === 0 ? 'Out of Stock' : addingToCartIds.has(product.id) ? 'Adding…' : 'Add to Cart'}</button>
+                                                                <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)} disabled={(product.stock != null && product.stock <= 0) || addingToCartIds.has(product.id)} style={{ opacity: addingToCartIds.has(product.id) ? 0.7 : 1 }}>{product.stock != null && product.stock <= 0 ? 'Out of Stock' : addingToCartIds.has(product.id) ? 'Adding…' : 'Add to Cart'}</button>
                                                                 <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-35px h-35px text-white d-flex align-items-center justify-content-center rounded-circle border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
                                                             </div>
                                                         </div>
@@ -481,7 +480,7 @@ function ShopContent() {
                                                                 {product.is_offer && <span className="lable hot">Offer</span>}
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
-                                                            {product.stock === 0 && (
+                                                            {product.stock != null && product.stock <= 0 && (
                                                                 <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.45)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', textTransform: 'uppercase', zIndex: 2, pointerEvents: 'none' }}>Out of Stock</span>
                                                             )}
                                                             {product.stock > 0 && product.stock <= 5 && (
@@ -489,7 +488,7 @@ function ShopContent() {
                                                             )}
                                                             <div className="shop-hover d-flex justify-content-center">
                                                                 <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
-                                                                <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)} disabled={product.stock === 0 || addingToCartIds.has(product.id)} style={{ opacity: addingToCartIds.has(product.id) ? 0.6 : 1 }}>
+                                                                <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)} disabled={(product.stock != null && product.stock <= 0) || addingToCartIds.has(product.id)} style={{ opacity: addingToCartIds.has(product.id) ? 0.6 : 1 }}>
                                                                     <i className={`feather ${addingToCartIds.has(product.id) ? 'icon-feather-loader' : 'icon-feather-shopping-bag'} fs-15`}></i>
                                                                 </button>
                                                                 <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => setQuickViewSlug(product.slug)} aria-label="Quick view">

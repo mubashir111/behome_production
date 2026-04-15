@@ -133,7 +133,7 @@ function PaymentSuccessContent() {
 
     // ── SUCCESS STATE ─────────────────────────────────────────────────────────
     const products: any[] = orderDetails?.order_products ?? orderDetails?.products ?? [];
-    const shippingAddress = orderDetails?.shippingAddress ?? orderDetails?.shipping_address ?? null;
+    const shippingAddress = (orderDetails?.order_address ?? [])[0] ?? null;
 
     const printInvoice = () => {
         const win = window.open('', '_blank');
@@ -409,7 +409,7 @@ function PaymentSuccessContent() {
                                 <Link href="/shop" className="btn btn-base-color btn-medium btn-round-edge" style={{ flex: 1, textAlign: 'center', minWidth: 160 }}>
                                     Continue Shopping
                                 </Link>
-                                <Link href="/account" className="btn btn-transparent-white btn-medium btn-round-edge" style={{ flex: 1, textAlign: 'center', minWidth: 160 }}>
+                                <Link href="/account?tab=orders" className="btn btn-transparent-white btn-medium btn-round-edge" style={{ flex: 1, textAlign: 'center', minWidth: 160 }}>
                                     View My Orders
                                 </Link>
                                 {orderDetails && (

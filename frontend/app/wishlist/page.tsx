@@ -61,7 +61,8 @@ export default function Wishlist() {
                 showToast(`${product.name} added to cart`, 'success');
                 updateCart();
             } else {
-                showToast(res.message || 'Failed to add to cart', 'error');
+                // Product likely requires a variation — redirect to product page
+                window.location.href = `/product/${product.slug}`;
             }
         } catch (err: any) {
             showToast(err.message || 'An error occurred', 'error');

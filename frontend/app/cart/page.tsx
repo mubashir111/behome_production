@@ -140,7 +140,7 @@ export default function Cart() {
                 setCartItems(updatedItems);
                 const nextSubtotal = calculateTotal(updatedItems);
                 await syncCoupon(nextSubtotal);
-                showToast('Cart updated successfully', 'success');
+                window.dispatchEvent(new CustomEvent('cart:updated'));
             } else {
                 showToast('Failed to update quantity', 'error');
             }
