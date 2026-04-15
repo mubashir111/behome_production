@@ -12,6 +12,7 @@ export default function Cart() {
     const [cartItems, setCartItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [suggestions, setSuggestions] = useState<any[]>([]);
     const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
     const [subtotal, setSubtotal] = useState(0);
     const { showToast } = useToast();
@@ -78,6 +79,11 @@ export default function Cart() {
                 setCartItems(response.data);
                 const nextSubtotal = calculateTotal(response.data);
                 await syncCoupon(nextSubtotal);
+                if (response.data.length === 0) {
+                    apiFetch('/frontend/product/popular-products')
+                        .then(r => setSuggestions((r?.data ?? r ?? []).slice(0, 4)))
+                        .catch(() => {});
+                }
             } else {
                 setError('Failed to load cart');
             }
@@ -466,21 +472,55 @@ export default function Cart() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="row justify-content-center">
-                                <div className="col-md-8 col-lg-6">
-                                    <div className="text-center py-80px md-py-50px text-white">
-                                        <div className="mb-30px">
-                                            <i className="bi bi-cart-x fs-80 text-white/20"></i>
-                                        </div>
-                                        <h2 className="alt-font fw-600 mb-15px">Your cart is empty</h2>
-                                        <p className="fs-18 text-white/60 mb-35px mx-auto max-w-400px">Looks like you haven't added anything to your cart yet. Explore our collections to find something you'll love.</p>
-                                        <a href="/shop" className="btn btn-primary btn-large btn-round-edge px-45px btn-box-shadow">
-                                            <span>
-                                                <span className="btn-double-text" data-text="Start Shopping">Start Shopping</span>
-                                            </span>
-                                        </a>
+                            <div>
+                                {/* Empty state */}
+                                <div className="text-center py-60px md-py-40px text-white">
+                                    <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+                                        <i className="bi bi-cart-x" style={{ fontSize: 40, color: 'rgba(255,255,255,0.2)' }}></i>
                                     </div>
+                                    <h2 className="alt-font fw-600 mb-15px">Your cart is empty</h2>
+                                    <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', marginBottom: 32, maxWidth: 380, margin: '0 auto 32px' }}>
+                                        Looks like you haven't added anything yet. Explore our collections to find something you'll love.
+                                    </p>
+                                    <a href="/shop" className="btn btn-base-color btn-large btn-round-edge px-45px btn-box-shadow">
+                                        <span>
+                                            <span className="btn-double-text" data-text="Start Shopping">Start Shopping</span>
+                                        </span>
+                                    </a>
                                 </div>
+
+                                {/* Product suggestions */}
+                                {suggestions.length > 0 && (
+                                    <div style={{ marginTop: 48, paddingTop: 48, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                                        <p style={{ margin: '0 0 24px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}>You might like</p>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
+                                            {suggestions.map((product: any) => {
+                                                const img = (product.cover || product.image || '').trim() || '/images/demo-decor-store-product-01.jpg';
+                                                const price = product.discounted_price || product.currency_price || '';
+                                                return (
+                                                    <a key={product.id} href={`/product/${product.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                                                        <div style={{ background: 'rgba(15,15,25,0.95)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.2s' }}
+                                                            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(197,160,89,0.3)')}
+                                                            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                                                            <div style={{ aspectRatio: '4/3', overflow: 'hidden', background: 'rgba(255,255,255,0.03)' }}>
+                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                <img src={img} alt={product.name}
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.35s ease' }}
+                                                                    onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.05)'; }}
+                                                                    onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)'; }}
+                                                                    onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/demo-decor-store-product-01.jpg'; }} />
+                                                            </div>
+                                                            <div style={{ padding: '14px 16px' }}>
+                                                                <p style={{ margin: '0 0 6px', color: '#fff', fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
+                                                                {price && <p style={{ margin: 0, color: 'var(--base-color)', fontWeight: 700, fontSize: 13 }}>{price}</p>}
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

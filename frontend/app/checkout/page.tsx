@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import { extractCurrencySymbol, readStoredCoupon, storeCoupon } from '@/lib/checkout';
 import { useCurrency } from '@/components/SettingsProvider';
-import { useToast } from '@/components/ToastProvider';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import StripePaymentForm from '@/components/StripePaymentForm';
@@ -25,7 +24,6 @@ export default function Checkout() {
     const [shippingSettings, setShippingSettings] = useState<any>(null);
     const [paymentGateways, setPaymentGateways] = useState<any[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
-    const { showToast } = useToast();
     const { currency: { symbol: currencySymbol }, formatAmount } = useCurrency();
     const [couponCode, setCouponCode] = useState('');
     const [couponDiscount, setCouponDiscount] = useState(0);
@@ -50,6 +48,7 @@ export default function Checkout() {
     const [stripeOptions, setStripeOptions] = useState<any>(null);
     const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
     const [paymentCancelled, setPaymentCancelled] = useState(false);
+    const [orderError, setOrderError] = useState<{ message: string; action?: string; orderId?: number } | null>(null);
     const paymentSectionRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to payment section when it appears
@@ -293,6 +292,7 @@ export default function Checkout() {
     const placeOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         setPlacingOrder(true);
+        setOrderError(null);
 
         try {
             let addressId = selectedAddressId;
@@ -311,7 +311,7 @@ export default function Checkout() {
                     setAddresses(prev => [...prev, addressResponse.data]);
                     setSelectedAddressId(addressResponse.data.id);
                 } else {
-                    showToast('Failed to save address: ' + addressResponse.message, 'error');
+                    setOrderError({ message: 'Could not save your delivery address. Please check all address fields and try again.', action: 'address' });
                     return;
                 }
             }
@@ -371,16 +371,17 @@ export default function Checkout() {
                 if (paymentResponse.status) {
                     if (paymentGateway === 'stripe' && paymentResponse.data?.client_secret) {
                         const { publishableKey, client_secret } = paymentResponse.data;
-                        
-                        // Critical check for missing Stripe keys
+
                         if (!publishableKey) {
                             console.error('Stripe error: publishableKey is missing from backend response');
-                            showToast('Stripe is not configured correctly on the server (missing Public Key).', 'error');
-                            setPlacingOrder(false);
+                            setOrderError({
+                                message: 'Stripe is not configured correctly on the server. Please contact support or choose a different payment method.',
+                                action: 'payment',
+                                orderId,
+                            });
                             return;
                         }
 
-                        // Modern Stripe flow (Inline)
                         setStripePromise(loadStripe(publishableKey));
                         setStripeOptions({
                             clientSecret: client_secret,
@@ -388,21 +389,36 @@ export default function Checkout() {
                         });
                         setCurrentOrderId(orderId);
                     } else if (paymentResponse.data?.redirect_url) {
-
                         window.location.href = paymentResponse.data.redirect_url;
                     } else {
-                        // COD or gateways that confirm inline — go straight to success
                         router.push(`/payment/success?order_id=${orderId}`);
                     }
                 } else {
-                    showToast('Order placed but payment initiation failed. Please contact support.', 'error');
+                    setOrderError({
+                        message: `Your order was created (ref: #${orderId}) but payment could not be started. ${paymentResponse.message || ''} Please contact support or try again.`.trim(),
+                        action: 'payment',
+                        orderId,
+                    });
                 }
             } else {
-                showToast(orderResponse.message || 'Failed to place order.', 'error');
+                // Surface the backend validation message clearly
+                const apiMsg = orderResponse.message || '';
+                setOrderError({
+                    message: apiMsg
+                        ? `Could not place order: ${apiMsg}`
+                        : 'Something went wrong while placing your order. Please review your details and try again.',
+                    action: 'order',
+                });
             }
         } catch (error: any) {
             console.error('Order placement failed:', error);
-            showToast(error.message || 'An unexpected error occurred. Please try again.', 'error');
+            const msg = error.message || '';
+            setOrderError({
+                message: msg.toLowerCase().includes('network') || msg.toLowerCase().includes('fetch')
+                    ? 'A network error occurred. Please check your internet connection and try again.'
+                    : msg || 'An unexpected error occurred. Please try again.',
+                action: 'network',
+            });
         } finally {
             setPlacingOrder(false);
         }
@@ -721,6 +737,33 @@ export default function Checkout() {
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Inline error panel */}
+                                    {orderError && (
+                                        <div style={{
+                                            display: 'flex', alignItems: 'flex-start', gap: 12,
+                                            background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)',
+                                            borderRadius: 10, padding: '14px 16px', marginBottom: 16,
+                                        }}>
+                                            <i className="bi bi-exclamation-triangle-fill" style={{ color: '#f87171', fontSize: 16, marginTop: 2, flexShrink: 0 }}></i>
+                                            <div style={{ flex: 1 }}>
+                                                <p style={{ color: '#fca5a5', fontWeight: 600, margin: '0 0 2px', fontSize: 13 }}>
+                                                    {orderError.action === 'address' ? 'Address error' :
+                                                     orderError.action === 'payment' ? 'Payment error' :
+                                                     orderError.action === 'network' ? 'Connection error' : 'Order error'}
+                                                </p>
+                                                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                                                    {orderError.message}
+                                                </p>
+                                                {orderError.orderId && (
+                                                    <p style={{ margin: '6px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+                                                        Order reference: <strong style={{ color: 'rgba(255,255,255,0.6)' }}>#{orderError.orderId}</strong>
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <button onClick={() => setOrderError(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 18, cursor: 'pointer', padding: 0, lineHeight: 1, flexShrink: 0 }}>×</button>
+                                        </div>
+                                    )}
 
                                     <button type="submit" disabled={placingOrder} className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-10px">
                                         <span>
