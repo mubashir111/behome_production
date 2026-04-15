@@ -153,6 +153,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('stock/report', [\App\Http\Controllers\Admin\Web\StockReportController::class, 'index'])->name('stock.report');
         Route::get('stock/product/{product}/history', [\App\Http\Controllers\Admin\Web\StockReportController::class, 'productHistory'])->name('stock.product.history');
 
+        // Stock Notifications (back-in-stock subscribers)
+        Route::get('stock-notifications', [\App\Http\Controllers\Admin\Web\StockNotificationAdminController::class, 'index'])->name('stock-notifications.index');
+        Route::post('stock-notifications/send', [\App\Http\Controllers\Admin\Web\StockNotificationAdminController::class, 'send'])->name('stock-notifications.send');
+        Route::delete('stock-notifications/{stockNotification}', [\App\Http\Controllers\Admin\Web\StockNotificationAdminController::class, 'destroy'])->name('stock-notifications.destroy');
+
         // User Notifications (admin → customer)
         Route::resource('user-notifications', \App\Http\Controllers\Admin\Web\UserNotificationController::class)
             ->only(['index', 'create', 'store', 'destroy'])

@@ -39,6 +39,7 @@ export default function Footer() {
         fetchCategories();
     }, []);
 
+
     return (
         <footer className="footer-dark bg-dark-gray pb-0 pt-0 cover-background"
             style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), url(\'/images/new/bg/bg1.webp\')' }}>

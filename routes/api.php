@@ -907,6 +907,14 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
     Route::prefix('outlet')->name('outlet.')->group(function () {
         Route::get('/', [FrontendOutletController::class, 'index']);
     });
+
+    Route::prefix('stock-notify')->name('stock-notify.')->group(function () {
+        Route::post('/subscribe', [\App\Http\Controllers\Frontend\StockNotificationController::class, 'subscribe']);
+    });
+
+    Route::prefix('newsletter')->name('newsletter.')->group(function () {
+        Route::post('/subscribe', [\App\Http\Controllers\Frontend\NewsletterController::class, 'subscribe']);
+    });
 });
 
 use App\Http\Controllers\Api\AuthController as ApiAuthController;

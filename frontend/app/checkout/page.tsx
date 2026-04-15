@@ -50,6 +50,7 @@ export default function Checkout() {
     const [paymentCancelled, setPaymentCancelled] = useState(false);
     const [orderError, setOrderError] = useState<{ message: string; action?: string; orderId?: number } | null>(null);
     const [guestGate, setGuestGate] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
     const paymentSectionRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to payment section when it appears
@@ -858,7 +859,23 @@ export default function Checkout() {
                                         </div>
                                     )}
 
-                                    <button type="submit" disabled={placingOrder} className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-10px">
+                                    {/* T&C agreement */}
+                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 14, marginTop: 4 }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={agreedToTerms}
+                                            onChange={e => setAgreedToTerms(e.target.checked)}
+                                            style={{ marginTop: 3, flexShrink: 0, accentColor: 'var(--base-color)', width: 15, height: 15 }}
+                                        />
+                                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
+                                            I have read and agree to the{' '}
+                                            <a href="/privacy-policy" target="_blank" style={{ color: 'var(--base-color)', textDecoration: 'none' }}>Privacy Policy</a>,{' '}
+                                            <a href="/shipping-policy" target="_blank" style={{ color: 'var(--base-color)', textDecoration: 'none' }}>Shipping Policy</a>, and{' '}
+                                            <a href="/returns-policy" target="_blank" style={{ color: 'var(--base-color)', textDecoration: 'none' }}>Returns Policy</a>.
+                                        </span>
+                                    </label>
+
+                                    <button type="submit" disabled={placingOrder || !agreedToTerms} className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-10px" style={{ opacity: agreedToTerms ? 1 : 0.5 }}>
                                         <span>
                                             <span className="btn-double-text" data-text={placingOrder ? "Placing order..." : "Place order"}>{placingOrder ? "Placing order..." : "Place order"}</span>
                                         </span>

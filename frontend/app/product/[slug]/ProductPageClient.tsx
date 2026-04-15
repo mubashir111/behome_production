@@ -118,6 +118,12 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const [addingToCart, setAddingToCart] = useState(false);
 
+    // Back-in-stock notification
+    const [notifyEmail, setNotifyEmail] = useState('');
+    const [notifySubmitting, setNotifySubmitting] = useState(false);
+    const [notifyDone, setNotifyDone] = useState(false);
+    const [notifyError, setNotifyError] = useState('');
+
     // Reviews
     const [reviews, setReviews] = useState<Review[]>([]);
     const [reviewForm, setReviewForm] = useState({ star: 5, review: '' });
@@ -370,6 +376,28 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
     const buyNow = async () => {
         await addToCart(true);
+    };
+
+    const handleNotifyMe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!notifyEmail.trim()) return;
+        setNotifySubmitting(true);
+        setNotifyError('');
+        try {
+            const res = await apiFetch('/frontend/stock-notify/subscribe', {
+                method: 'POST',
+                body: JSON.stringify({ product_id: product?.id, email: notifyEmail.trim() }),
+            });
+            if (res?.status) {
+                setNotifyDone(true);
+            } else {
+                setNotifyError(res?.message || 'Unable to subscribe. Please try again.');
+            }
+        } catch {
+            setNotifyError('Something went wrong. Please try again.');
+        } finally {
+            setNotifySubmitting(false);
+        }
     };
 
     const shareToWhatsApp = () => {
@@ -711,9 +739,69 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                             <i className="feather icon-feather-alert-circle me-5px" />Only {displayStock} left in stock
                                         </span>
                                     ) : (
-                                        <span className="fs-13 fw-700 product-stock-low">
-                                            <i className="feather icon-feather-x-circle me-5px" />Out of Stock
-                                        </span>
+                                        <>
+                                            <span className="fs-13 fw-700 product-stock-low">
+                                                <i className="feather icon-feather-x-circle me-5px" />Out of Stock
+                                            </span>
+                                            {/* Back-in-stock notification form */}
+                                            <div style={{ marginTop: 16, padding: '16px 18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}>
+                                                {notifyDone ? (
+                                                    <p style={{ color: '#6fcf97', fontSize: 13, margin: 0 }}>
+                                                        <i className="feather icon-feather-check-circle me-6px" />
+                                                        We&apos;ll email you when this item is back in stock.
+                                                    </p>
+                                                ) : (
+                                                    <>
+                                                        <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, marginBottom: 10 }}>
+                                                            <i className="feather icon-feather-bell me-6px" />
+                                                            Get notified when this product is available again.
+                                                        </p>
+                                                        <form onSubmit={handleNotifyMe} style={{ display: 'flex', gap: 8 }}>
+                                                            <input
+                                                                type="email"
+                                                                value={notifyEmail}
+                                                                onChange={e => setNotifyEmail(e.target.value)}
+                                                                placeholder="Your email address"
+                                                                required
+                                                                style={{
+                                                                    flex: 1,
+                                                                    background: 'rgba(255,255,255,0.07)',
+                                                                    border: '1px solid rgba(255,255,255,0.15)',
+                                                                    borderRadius: 6,
+                                                                    padding: '8px 12px',
+                                                                    color: '#fff',
+                                                                    fontSize: 13,
+                                                                    outline: 'none',
+                                                                }}
+                                                            />
+                                                            <button
+                                                                type="submit"
+                                                                disabled={notifySubmitting}
+                                                                style={{
+                                                                    background: 'var(--base-color)',
+                                                                    color: '#fff',
+                                                                    border: 'none',
+                                                                    borderRadius: 6,
+                                                                    padding: '8px 16px',
+                                                                    fontSize: 13,
+                                                                    fontWeight: 600,
+                                                                    cursor: notifySubmitting ? 'not-allowed' : 'pointer',
+                                                                    opacity: notifySubmitting ? 0.6 : 1,
+                                                                    whiteSpace: 'nowrap',
+                                                                }}
+                                                            >
+                                                                {notifySubmitting ? 'Sending…' : 'Notify Me'}
+                                                            </button>
+                                                        </form>
+                                                        {notifyError && (
+                                                            <p style={{ color: '#eb5757', fontSize: 12, marginTop: 8, marginBottom: 0 }}>
+                                                                {notifyError}
+                                                            </p>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </div>
+                                        </>
                                     )}
                                 </div>
 

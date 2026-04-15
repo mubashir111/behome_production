@@ -79,11 +79,14 @@ export default function Cart() {
                 setCartItems(response.data);
                 const nextSubtotal = calculateTotal(response.data);
                 await syncCoupon(nextSubtotal);
-                if (response.data.length === 0) {
-                    apiFetch('/frontend/product/popular-products')
-                        .then(r => setSuggestions((r?.data ?? r ?? []).slice(0, 4)))
-                        .catch(() => {});
-                }
+                // Load suggestions for both empty cart (you may like) and filled cart (upsell)
+                apiFetch('/frontend/product/popular-products')
+                    .then(r => {
+                        const cartProductIds = new Set((response.data as any[]).map((i: any) => i.product?.id ?? i.product_id));
+                        const filtered = (r?.data ?? r ?? []).filter((p: any) => !cartProductIds.has(p.id));
+                        setSuggestions(filtered.slice(0, 4));
+                    })
+                    .catch(() => {});
             } else {
                 setError('Failed to load cart');
             }
@@ -254,6 +257,7 @@ export default function Cart() {
                 <div className="container-fluid">
                     <div className="content-layout-wrapper">
                         {cartItems.length > 0 ? (
+                            <>
                             <div className="row align-items-start">
                                 <div className="col-lg-8 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
 
@@ -482,6 +486,40 @@ export default function Cart() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Upsell — You might also like */}
+                            {suggestions.length > 0 && (
+                                <div style={{ marginTop: 56, paddingTop: 40, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                                    <p style={{ margin: '0 0 24px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}>You might also like</p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
+                                        {suggestions.map((product: any) => {
+                                            const img = (product.cover || product.image || '').trim() || '/images/demo-decor-store-product-01.jpg';
+                                            const price = product.discounted_price || product.currency_price || '';
+                                            return (
+                                                <a key={product.id} href={`/product/${product.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                                                    <div style={{ background: 'rgba(15,15,25,0.95)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.2s' }}
+                                                        onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(197,160,89,0.3)')}
+                                                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                                                        <div style={{ aspectRatio: '4/3', overflow: 'hidden', background: 'rgba(255,255,255,0.03)' }}>
+                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                            <img src={img} alt={product.name}
+                                                                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.35s ease' }}
+                                                                onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.05)'; }}
+                                                                onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)'; }}
+                                                                onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/demo-decor-store-product-01.jpg'; }} />
+                                                        </div>
+                                                        <div style={{ padding: '14px 16px' }}>
+                                                            <p style={{ margin: '0 0 6px', color: '#fff', fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
+                                                            {price && <p style={{ margin: 0, color: 'var(--base-color)', fontWeight: 700, fontSize: 13 }}>{price}</p>}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                            </>
                         ) : (
                             <div>
                                 {/* Empty state */}

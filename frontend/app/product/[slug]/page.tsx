@@ -31,6 +31,50 @@ export async function generateMetadata(
     }
 }
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-    return <ProductPageClient params={params} />;
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+    let jsonLd: object | null = null;
+    try {
+        const res = await fetch(`${SERVER_API_URL}/v1/products/${params.slug}`, {
+            headers: { 'x-api-key': API_KEY, Accept: 'application/json' },
+            next: { revalidate: 60 },
+        });
+        if (res.ok) {
+            const json = await res.json();
+            const p = json?.data;
+            if (p) {
+                const price    = p.sale_price ?? p.price ?? 0;
+                const currency = p.currency_code ?? 'AED';
+                const inStock  = (p.stock ?? 0) > 0;
+                jsonLd = {
+                    '@context': 'https://schema.org/',
+                    '@type': 'Product',
+                    name: p.name,
+                    description: (p.details ?? p.description ?? '').replace(/<[^>]*>/g, '').slice(0, 5000),
+                    image: p.cover ? [p.cover] : undefined,
+                    sku: p.sku ?? undefined,
+                    brand: p.brand ? { '@type': 'Brand', name: p.brand } : undefined,
+                    offers: {
+                        '@type': 'Offer',
+                        url: `${SITE_URL}/product/${params.slug}`,
+                        priceCurrency: currency,
+                        price: parseFloat(price),
+                        availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                        itemCondition: 'https://schema.org/NewCondition',
+                    },
+                };
+            }
+        }
+    } catch { /* non-critical — skip */ }
+
+    return (
+        <>
+            {jsonLd && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                />
+            )}
+            <ProductPageClient params={params} />
+        </>
+    );
 }
