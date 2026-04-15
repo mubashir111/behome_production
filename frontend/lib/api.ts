@@ -42,7 +42,14 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
         throw new Error(errorData.message || `API request failed with status ${response.status}`);
     }
 
-    // Handle empty bodies (e.g. 202 Accepted with no JSON)
+    // Handle empty bodies (204 No Content = genuine success with no payload)
     const text = await response.text();
-    return text ? JSON.parse(text) : { status: true };
+    if (!text) {
+        return response.status === 204 ? { status: true } : null;
+    }
+    try {
+        return JSON.parse(text);
+    } catch {
+        return { status: true };
+    }
 }

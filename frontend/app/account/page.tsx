@@ -425,8 +425,9 @@ function AccountContent() {
         try {
             await apiFetch(`/addresses/${id}`, { method: 'DELETE' });
             setAddresses(prev => prev.filter(a => a.id !== id));
-        } catch (err) {
-            console.error('Failed to delete address:', err);
+            showToast('Address deleted.', 'success');
+        } catch (err: any) {
+            showToast(err.message || 'Failed to delete address. Please try again.', 'error');
         }
     };
 

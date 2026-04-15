@@ -226,6 +226,11 @@ export default function OrderDetail() {
     };
 
     const initiateOnlinePayment = async () => {
+        // Guard: never initiate payment if order is already paid
+        if (order?.payment_status === 5) {
+            showToast('This order has already been paid.', 'error');
+            return;
+        }
         setInitiatingPayment(true);
         try {
             const res = await apiFetch('/payment/initiate', {

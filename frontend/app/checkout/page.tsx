@@ -201,7 +201,7 @@ export default function Checkout() {
             setShippingSettings(settingResponse?.data ?? settingResponse ?? null);
 
             const allGateways: any[] = getAreaList(gatewayResponse);
-            const gateways = allGateways.filter((g: any) => g.status === 5 && g.slug !== 'credit');
+            const gateways = allGateways.filter((g: any) => Number(g.status) === 5 && g.slug !== 'credit');
             setPaymentGateways(gateways);
             if (gateways.length > 0) {
                 setFormData(prev => ({ ...prev, payment_method: String(gateways[0].id) }));
@@ -396,6 +396,11 @@ export default function Checkout() {
                         router.push(`/payment/success?order_id=${orderId}`);
                     }
                 } else {
+                    // Order was created but payment failed — restore coupon so user can retry
+                    const storedCoupon = readStoredCoupon();
+                    if (!storedCoupon && couponId) {
+                        storeCoupon({ code: couponCode, id: couponId, discount: couponDiscount, currencyDiscount: '', symbol: '' });
+                    }
                     setOrderError({
                         message: `Your order was created (ref: #${orderId}) but payment could not be started. ${paymentResponse.message || ''} Please contact support or try again.`.trim(),
                         action: 'payment',

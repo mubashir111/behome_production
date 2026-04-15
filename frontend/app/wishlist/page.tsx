@@ -61,8 +61,9 @@ export default function Wishlist() {
                 showToast(`${product.name} added to cart`, 'success');
                 updateCart();
             } else {
-                // Product likely requires a variation — redirect to product page
-                window.location.href = `/product/${product.slug}`;
+                // Product requires a variation selection — send user to product page with a message
+                showToast('Please select a variant before adding to cart.', 'error');
+                setTimeout(() => { window.location.href = `/product/${product.slug}`; }, 1000);
             }
         } catch (err: any) {
             showToast(err.message || 'An error occurred', 'error');

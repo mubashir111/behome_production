@@ -29,33 +29,52 @@ function PaymentSuccessContent() {
 
     const fetchOrderDetails = (id: string) => {
         apiFetch(`/v1/orders/${id}`)
-            .then(res => { if (res.status && res.data) setOrderDetails(res.data); })
+            .then(res => { if (res?.status && res.data) setOrderDetails(res.data); })
             .catch(() => {});
     };
 
     useEffect(() => {
         if (!orderId) { setState('failed'); setErrorMsg('Missing order ID.'); return; }
 
+        // Abort the request after 20 seconds to prevent hanging forever
+        const controller = new AbortController();
+        const timeoutId  = setTimeout(() => {
+            controller.abort();
+            setState('failed');
+            setErrorMsg('Verification timed out. Please check your orders page or contact support.');
+        }, 20000);
+
+        const cleanup = () => clearTimeout(timeoutId);
+
         if (paymentIntent) {
             apiFetch(`/v1/payment/verify/${orderId}`, {
                 method: 'POST',
                 body: JSON.stringify({ payment_gateway: 'stripe', payment_intent: paymentIntent, redirect_status: redirectStatus }),
-            })
+                signal: controller.signal,
+            } as RequestInit)
                 .then(res => {
-                    if (res.status) {
+                    cleanup();
+                    if (res?.status) {
                         setState('success');
                         window.dispatchEvent(new Event('cart:updated'));
                         fetchOrderDetails(orderId);
                     } else {
                         setState('failed');
-                        setErrorMsg(res.message || 'Payment verification failed.');
+                        setErrorMsg(res?.message || 'Payment verification failed.');
                     }
                 })
-                .catch(err => { setState('failed'); setErrorMsg(err.message || 'Could not reach the server.'); });
+                .catch(err => {
+                    cleanup();
+                    if (err?.name !== 'AbortError') {
+                        setState('failed');
+                        setErrorMsg(err.message || 'Could not reach the server.');
+                    }
+                });
         } else {
-            apiFetch(`/v1/orders/${orderId}`)
+            apiFetch(`/v1/orders/${orderId}`, { signal: controller.signal } as RequestInit)
                 .then(res => {
-                    if (res.status && res.data) {
+                    cleanup();
+                    if (res?.status && res.data) {
                         const isPaid   = res.data.payment_status === 5;
                         const isCod    = ['cashondelivery', 'credit'].some((s: string) =>
                             (res.data.payment_method_name ?? '').toLowerCase().includes(s.replace('cashondelivery', 'cash'))
@@ -74,8 +93,16 @@ function PaymentSuccessContent() {
                         setErrorMsg('Could not find your order. Please contact support.');
                     }
                 })
-                .catch(err => { setState('failed'); setErrorMsg(err.message || 'Could not reach the server.'); });
+                .catch(err => {
+                    cleanup();
+                    if (err?.name !== 'AbortError') {
+                        setState('failed');
+                        setErrorMsg(err.message || 'Could not reach the server.');
+                    }
+                });
         }
+
+        return cleanup;
     }, [orderId, paymentIntent, redirectStatus]);
 
     if (state === 'verifying') {
@@ -139,6 +166,9 @@ function PaymentSuccessContent() {
         const win = window.open('', '_blank');
         if (!win) return;
 
+        // Escape HTML to prevent XSS in invoice
+        const esc = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
         // Address from order_address array
         const addr = (orderDetails?.order_address ?? [])[0] ?? shippingAddress ?? null;
         const addrLines = addr ? [
@@ -147,15 +177,15 @@ function PaymentSuccessContent() {
             addr.address,
             [addr.city, addr.state, addr.zip_code].filter(Boolean).join(', '),
             addr.country,
-        ].filter(Boolean) : [];
+        ].filter(Boolean).map(esc) : [];
 
         // Items — use pre-formatted currency_price fields
         const rows = products.map((item: any) => {
-            const name    = item.product_name || item.product?.name || 'Product';
+            const name    = esc(item.product_name || item.product?.name || 'Product');
             const qty     = item.quantity || 1;
-            const price   = item.currency_price || item.price || '';
-            const total   = item.total_currency_price || item.subtotal_currency_price || '';
-            const variant = item.variation_names ? `<br/><small style="color:#666">${item.variation_names}</small>` : '';
+            const price   = esc(item.currency_price || item.price || '');
+            const total   = esc(item.total_currency_price || item.subtotal_currency_price || '');
+            const variant = item.variation_names ? `<br/><small style="color:#666">${esc(item.variation_names)}</small>` : '';
             return `<tr>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee">${name}${variant}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:center">${qty}</td>
@@ -207,9 +237,9 @@ function PaymentSuccessContent() {
             <div><div class="brand">Behome</div><div style="font-size:12px;color:#777;margin-top:4px">Premium Architectural Decor &amp; Furniture</div></div>
             <div class="invoice-meta">
                 <strong>INVOICE</strong>
-                Order #${orderId}<br/>
-                Date: ${date}<br/>
-                ${orderDetails?.payment_method_name ? 'Payment: ' + orderDetails.payment_method_name + '<br/>' : ''}
+                Order #${esc(orderId)}<br/>
+                Date: ${esc(date)}<br/>
+                ${orderDetails?.payment_method_name ? 'Payment: ' + esc(orderDetails.payment_method_name) + '<br/>' : ''}
                 <span class="paid-badge" style="background:${paidColor}22;color:${paidColor};border:1px solid ${paidColor}44">${isPaid}</span>
             </div>
         </div>
