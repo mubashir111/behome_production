@@ -27,7 +27,7 @@ class SimpleProductResource extends JsonResource
             'cover'             => $this->cover,
             'flash_sale'        => $this->add_to_flash_sale == Ask::YES,
             'is_offer'          => Carbon::now()->between($this->offer_start_date, $this->offer_end_date),
-            'discounted_price'  => AppLibrary::currencyAmountFormat($price - (($price / 100) * $this->discount)),
+            'discounted_price'  => AppLibrary::currencyAmountFormat(max(0, $price - $this->discount)),
             'rating_star'       => $this->rating_star,
             'rating_star_count' => (int) $this->rating_star_count,
             'wishlist'          => (bool)$this->wishlist,

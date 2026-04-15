@@ -66,16 +66,20 @@ class ProductController extends Controller
             $products = $query->withSum('productStocks', 'quantity')->paginate($request->get('per_page', 12));
 
             $products->through(function ($product) {
+                $isOffer = $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now();
+                $finalPrice = $isOffer ? max(0, $product->selling_price - $product->discount) : $product->selling_price;
+                
                 return [
                     'id'                  => $product->id,
                     'name'                => $product->name,
                     'slug'                => $product->slug,
                     'sku'                 => $product->sku,
-                    'price'               => number_format((float) $product->selling_price, 2, '.', ''),
-                    'discounted_price'    => AppLibrary::currencyAmountFormat((float) ($product->selling_price - $product->discount)),
+                    'price'               => number_format((float) $finalPrice, 2, '.', ''),
+                    'discounted_price'    => AppLibrary::currencyAmountFormat((float) $finalPrice),
                     'currency_price'      => AppLibrary::currencyAmountFormat((float) $product->selling_price),
+                    'old_price'           => number_format((float) $product->selling_price, 2, '.', ''),
                     'cover'               => $product->getFirstMediaUrl('product') ? $product->cover : null,
-                    'is_offer'            => $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now(),
+                    'is_offer'            => $isOffer,
                     'product_category_id' => $product->product_category_id,
                     'category_slug'       => $product->category?->slug,
                     'brand_slug'          => $product->brand?->slug,
@@ -100,6 +104,8 @@ class ProductController extends Controller
             $isOffer = $product->offer_start_date && $product->offer_end_date
                 && $product->offer_start_date < now() && $product->offer_end_date > now();
 
+            $finalPrice = $isOffer ? max(0, $product->selling_price - $product->discount) : $product->selling_price;
+
             $data = [
                 'id'             => $product->id,
                 'name'           => $product->name,
@@ -109,15 +115,24 @@ class ProductController extends Controller
                 'details'        => $product->details,
                 'additional_info'=> $product->additional_info,
                 'shipping_and_return' => $product->shipping_and_return,
-                'price'          => number_format((float) $product->selling_price, 2, '.', ''),
-                'old_price'      => number_format((float) ($product->selling_price + $product->discount), 2, '.', ''),
+                'price'          => number_format((float) $finalPrice, 2, '.', ''),
+                'old_price'      => number_format((float) $product->selling_price, 2, '.', ''),
                 'is_offer'       => $isOffer,
                 'stock'          => (int) ($product->product_stocks_sum_quantity ?? 0),
                 'can_purchasable'=> $product->can_purchasable,
                 'images'         => $product->images,
                 'category'       => $product->category,
                 'brand'          => $product->brand,
-                'variations'     => $product->variations,
+                'variations'     => $product->variations->map(fn($v) => [
+                    'id'                          => $v->id,
+                    'product_attribute_id'        => $v->product_attribute_id,
+                    'product_attribute_option_id' => $v->product_attribute_option_id,
+                    'sku'                         => $v->sku,
+                    'price'                       => number_format((float) ($isOffer ? max(0, $v->price - $product->discount) : $v->price), 2, '.', ''),
+                    'old_price'                   => number_format((float) $v->price, 2, '.', ''),
+                    'stock'                       => (int) $v->stockItems()->sum('quantity'),
+                    'media'                       => $v->getMedia('variant')->map(fn($m) => ['url' => $m->getUrl(), 'original_url' => $m->getUrl()]),
+                ]),
                 'reviews'        => $product->reviews->map(fn($r) => [
                     'id'         => $r->id,
                     'name'       => $r->user?->name ?? 'Customer',

@@ -325,7 +325,7 @@ export default function Checkout() {
                 sku: item.sku || '',
                 price: item.price,
                 quantity: item.quantity,
-                discount: 0,
+                discount: item.discount_amount || 0,
                 total_tax: item.tax || 0,
                 subtotal: item.subtotal,
                 total: item.total,
@@ -712,10 +712,18 @@ export default function Checkout() {
                                                             <div>
                                                                 <span className="text-white fw-500">{item.product?.name} <span style={{ color: 'rgba(255,255,255,0.4)' }}>×{item.quantity}</span></span>
                                                                 {item.variation_names && <span className="fs-12 d-block text-gray">{item.variation_names}</span>}
+                                                                {item.old_price > item.price && (
+                                                                    <div className="fs-11 mt-1">
+                                                                        <del className="text-white/30 me-2">{formatAmount(item.old_price)}</del>
+                                                                        <span className="text-base-color fw-600">Save {formatAmount(item.discount_amount)}</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="text-white">{formatAmount(parseFloat(item.total))}</td>
+                                                    <td className="text-white">
+                                                        {formatAmount(parseFloat(item.total))}
+                                                    </td>
                                                 </tr>
                                             ))}
                                             <tr>

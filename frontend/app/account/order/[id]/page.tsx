@@ -268,6 +268,104 @@ export default function OrderDetail() {
     );
 
     const statusColor = STATUS_COLORS[order.status as number] || '#888';
+
+    const printInvoice = () => {
+        const win = window.open('', '_blank');
+        if (!win) return;
+
+        // Address: API returns order_address as array
+        const addr = (order.order_address ?? [])[0] ?? null;
+        const addrLines = addr ? [
+            addr.full_name ?? addr.name,
+            addr.phone,
+            addr.address,
+            [addr.city, addr.state, addr.zip_code].filter(Boolean).join(', '),
+            addr.country,
+        ].filter(Boolean) : [];
+
+        // Products: use pre-formatted currency_price fields from API
+        const products: any[] = order.order_products ?? [];
+        const rows = products.map((item: any) => {
+            const name    = item.product_name || 'Product';
+            const qty     = item.quantity || 1;
+            const price   = item.currency_price || item.price || '';
+            const total   = item.total_currency_price || item.subtotal_currency_price || '';
+            const variant = item.variation_names ? `<br/><small style="color:#666">${item.variation_names}</small>` : '';
+            return `<tr>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee">${name}${variant}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:center">${qty}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right">${price}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:600">${total}</td>
+            </tr>`;
+        }).join('');
+
+        // Totals: use pre-formatted _currency_price fields
+        const totalsRows = [
+            { label: 'Subtotal', value: order.subtotal_currency_price },
+            order.tax_currency_price && order.tax_currency_price !== '0.00' && { label: 'Tax', value: order.tax_currency_price },
+            order.shipping_charge_currency_price && order.shipping_charge_currency_price !== '0.00' && { label: 'Shipping', value: order.shipping_charge_currency_price },
+            order.discount > 0 && { label: 'Discount', value: order.discount_currency_price, negative: true },
+        ].filter(Boolean).map((row: any) =>
+            `<tr><td style="padding:6px 12px;text-align:right;color:#555">${row.label}</td>
+             <td style="padding:6px 12px;text-align:right">${row.negative ? '-' : ''}${row.value}</td></tr>`
+        ).join('');
+
+        const date = order.order_datetime || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        const isPaid = order.payment_status_name || (order.payment_status === 5 ? 'Paid' : 'Unpaid');
+        const paidColor = isPaid === 'Paid' ? '#16a34a' : '#dc2626';
+
+        win.document.write(`<!DOCTYPE html><html><head><title>Invoice #${order.order_serial_no}</title>
+        <style>
+            *{box-sizing:border-box;margin:0;padding:0}
+            body{font-family:Arial,sans-serif;font-size:14px;color:#222;padding:40px;max-width:780px;margin:0 auto}
+            .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid #111}
+            .brand{font-size:24px;font-weight:700;letter-spacing:-0.5px}
+            .invoice-meta{text-align:right;color:#555;font-size:13px;line-height:1.8}
+            .invoice-meta strong{color:#111;font-size:16px;display:block;margin-bottom:4px}
+            .paid-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px}
+            .addresses{display:flex;gap:40px;margin-bottom:32px}
+            .address-block{flex:1}
+            .address-block h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:8px}
+            .address-block p{color:#333;line-height:1.7;font-size:13px}
+            table{width:100%;border-collapse:collapse;margin-bottom:0}
+            thead th{background:#111;color:#fff;padding:10px 12px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:0.06em}
+            thead th:nth-child(2){text-align:center}thead th:nth-child(3),thead th:nth-child(4){text-align:right}
+            .totals-table{margin-left:auto;width:280px;margin-top:0;border-top:2px solid #111}
+            .totals-table td{font-size:13px;color:#333}
+            .grand-total td{font-size:15px;font-weight:700;color:#111;padding-top:10px!important;border-top:1px solid #ddd}
+            .footer{margin-top:48px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#999;text-align:center;line-height:1.8}
+            @media print{body{padding:20px}button{display:none!important}}
+        </style></head><body>
+        <div class="header">
+            <div><div class="brand">Behome</div><div style="font-size:12px;color:#777;margin-top:4px">Premium Architectural Decor &amp; Furniture</div></div>
+            <div class="invoice-meta">
+                <strong>INVOICE</strong>
+                Order #${order.order_serial_no}<br/>
+                Date: ${date}<br/>
+                ${order.payment_method_name ? 'Payment: ' + order.payment_method_name + '<br/>' : ''}
+                <span class="paid-badge" style="background:${paidColor}22;color:${paidColor};border:1px solid ${paidColor}44">${isPaid}</span>
+            </div>
+        </div>
+        ${addrLines.length ? `<div class="addresses"><div class="address-block"><h4>Deliver to</h4><p>${addrLines.join('<br/>')}</p></div></div>` : ''}
+        <table>
+            <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <table class="totals-table">
+            <tbody>
+                ${totalsRows}
+                <tr class="grand-total">
+                    <td style="padding:10px 12px;text-align:right">Total</td>
+                    <td style="padding:10px 12px;text-align:right">${order.total_currency_price}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="footer">Thank you for shopping with Behome &nbsp;·&nbsp; For support visit behome.co.uk/contact</div>
+        <script>window.onload=function(){window.print();}<\/script>
+        </body></html>`);
+        win.document.close();
+    };
+
     // Instant cancel: only COD/credit, pending, and not yet paid
     const isOnlinePayment = order.payment_status === 5; // payment_status 5 = Paid (always online)
     const canInstantCancel = order.status === 1 && !isOnlinePayment && !order.cancellation_requested;
@@ -329,6 +427,9 @@ export default function OrderDetail() {
                                     <span className="badge px-15px py-8px fs-13 fw-600 border-radius-4px text-nowrap" style={{ background: `${statusColor}22`, color: statusColor, border: `1px solid ${statusColor}44`, marginRight: '20px' }}>
                                         {order.status_name || STATUS_NAMES[order.status] || 'Unknown'}
                                     </span>
+                                    <button onClick={printInvoice} className="btn btn-small btn-round-edge px-20px text-nowrap" style={{ background: 'rgba(197,160,89,0.1)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--base-color)', fontSize: 13 }}>
+                                        <i className="feather icon-feather-download me-1"></i> Invoice
+                                    </button>
                                     <button onClick={() => setShowMessages(m => !m)} className="btn btn-small btn-round-edge px-20px text-nowrap" style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', fontSize: 13 }}>
                                         <i className="feather icon-feather-message-circle me-1"></i> {showMessages ? 'Hide' : 'Message'} Support
                                     </button>

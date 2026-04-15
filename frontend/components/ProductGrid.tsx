@@ -12,6 +12,7 @@ interface Product {
     discounted_price?: string;
     is_offer: boolean;
     category?: { name: string };
+    stock?: number;
 }
 
 interface ProductGridProps {

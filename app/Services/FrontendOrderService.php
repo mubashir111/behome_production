@@ -143,6 +143,7 @@ class FrontendOrderService
                     foreach ($products as $p) {
                         // FETCH FROM SERVER TO PREVENT PRICE MANIPULATION
                         $product = Product::findOrFail($p->product_id);
+                        $isOffer = $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now();
                         $variation = null;
                         if ($p->variation_id > 0) {
                             $variation = ProductVariation::findOrFail($p->variation_id);
@@ -151,6 +152,10 @@ class FrontendOrderService
                         } else {
                             $price = $product->selling_price;
                             $sku = $product->sku;
+                        }
+
+                        if ($isOffer) {
+                            $price = max(0, $price - $product->discount);
                         }
 
                         // Calculate server-side totals
@@ -165,6 +170,9 @@ class FrontendOrderService
 
                         $itemTotal = $itemSubtotal + $itemTotalTax;
 
+                        $unitDiscount = $isOffer ? $product->discount : 0;
+                        $itemTotalDiscount = $unitDiscount * $p->quantity;
+
                         $stockId = Stock::create([
                             'product_id'      => $p->product_id,
                             'model_type'      => Order::class,
@@ -175,7 +183,7 @@ class FrontendOrderService
                             'sku'             => $sku,
                             'price'           => $price,
                             'quantity'        => -$p->quantity,
-                            'discount'        => 0, // In this system discount seems handled differently or not yet implement for direct item
+                            'discount'        => $itemTotalDiscount,
                             'tax'             => number_format($itemTotalTax, (int)config('app.currency_decimal_point'), '.', ''),
                             'subtotal'        => $itemSubtotal,
                             'total'           => $itemTotal,
@@ -206,15 +214,40 @@ class FrontendOrderService
                 $this->order->order_serial_no = date('dmy') . $this->order->id;
                 $this->order->setCustomerNote($request->reason);
                 
-                // Final server-side total verification for the Order record itself
-                $this->order->load('orderProducts');
-                $totalTax = $this->order->orderProducts->sum('tax');
-                $totalSubtotal = $this->order->orderProducts->sum('subtotal');
-                $totalAmount = $this->order->orderProducts->sum('total');
-                
-                $this->order->tax = $totalTax;
-                $this->order->subtotal = $totalSubtotal;
-                $this->order->total = $totalAmount;
+                $finalTotalTax = 0;
+                $finalSubtotal = 0;
+                $finalTotalAmount = 0;
+
+                foreach ($products as $p) {
+                    $product = Product::findOrFail($p->product_id);
+                    $isOffer = $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now();
+                    
+                    if ($p->variation_id > 0) {
+                        $variation = ProductVariation::findOrFail($p->variation_id);
+                        $price = $variation->price;
+                    } else {
+                        $price = $product->selling_price;
+                    }
+
+                    if ($isOffer) {
+                        $price = max(0, $price - $product->discount);
+                    }
+
+                    $itemSubtotal = $price * $p->quantity;
+                    $itemTotalTax = 0;
+                    $productTaxes = $product->taxes()->with('tax')->get();
+                    foreach ($productTaxes as $pt) {
+                        $itemTotalTax += ($itemSubtotal * $pt->tax->tax_rate) / 100;
+                    }
+
+                    $finalTotalTax += $itemTotalTax;
+                    $finalSubtotal += $itemSubtotal;
+                    $finalTotalAmount += ($itemSubtotal + $itemTotalTax);
+                }
+
+                $this->order->tax = $finalTotalTax;
+                $this->order->subtotal = $finalSubtotal;
+                $this->order->total = $finalTotalAmount + $this->order->shipping_charge - $this->order->discount;
                 
                 $this->order->save();
 

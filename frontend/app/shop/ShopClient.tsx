@@ -451,7 +451,7 @@ function ShopContent() {
                                                         <a href={`/product/${product.slug}`} style={{ flexShrink: 0, width: 110, position: 'relative', display: 'block' }}>
                                                             <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={110} height={130} unoptimized style={{ width: 110, height: 130, objectFit: 'cover', borderRadius: 4 }} />
                                                             {product.stock === 0 && (
-                                                                <span style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(239,68,68,0.9)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Out of Stock</span>
+                                                                <span style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(10,10,15,0.85)', border: '1px solid rgba(197,160,89,0.45)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, letterSpacing: '0.04em', textTransform: 'uppercase', backdropFilter: 'blur(4px)' }}>Out of Stock</span>
                                                             )}
                                                         </a>
                                                         <div className="flex-grow-1">
@@ -462,7 +462,7 @@ function ShopContent() {
                                                                 ) : <span>{product.currency_price}</span>}
                                                             </div>
                                                             {product.stock > 0 && product.stock <= 5 && (
-                                                                <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>
+                                                                <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: 'var(--base-color)' }}>
                                                                     <i className="feather icon-feather-alert-circle" style={{ fontSize: 11, marginRight: 4 }}></i>
                                                                     Only {product.stock} left
                                                                 </p>
@@ -482,10 +482,10 @@ function ShopContent() {
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
                                                             {product.stock === 0 && (
-                                                                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(239,68,68,0.88)', backdropFilter: 'blur(4px)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', textTransform: 'uppercase', zIndex: 2, pointerEvents: 'none' }}>Out of Stock</span>
+                                                                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.45)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', textTransform: 'uppercase', zIndex: 2, pointerEvents: 'none' }}>Out of Stock</span>
                                                             )}
                                                             {product.stock > 0 && product.stock <= 5 && (
-                                                                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(245,158,11,0.9)', backdropFilter: 'blur(4px)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', zIndex: 2, pointerEvents: 'none' }}>Only {product.stock} left</span>
+                                                                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', zIndex: 2, pointerEvents: 'none' }}>Only {product.stock} left</span>
                                                             )}
                                                             <div className="shop-hover d-flex justify-content-center">
                                                                 <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
@@ -505,7 +505,7 @@ function ShopContent() {
                                                                 ) : <span>{product.currency_price}</span>}
                                                             </div>
                                                             {product.stock > 0 && product.stock <= 5 && (
-                                                                <p style={{ margin: '6px 0 0', fontSize: 11, fontWeight: 700, color: '#f59e0b' }}>
+                                                                <p style={{ margin: '6px 0 0', fontSize: 11, fontWeight: 700, color: 'var(--base-color)' }}>
                                                                     <i className="feather icon-feather-alert-circle" style={{ fontSize: 10, marginRight: 3 }}></i>
                                                                     Only {product.stock} left
                                                                 </p>

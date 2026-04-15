@@ -20,6 +20,7 @@ interface Product {
     wishlist?: boolean;
     rating_star?: number;
     rating_star_count?: number;
+    stock?: number;
 }
 
 interface ProductCardProps {
@@ -75,7 +76,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
     return (
         <>
         <div className="shop-box pb-25px">
-            <div className="shop-image">
+            <div className="shop-image" style={{ position: 'relative' }}>
                 <a href={`/product/${product.slug}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img alt={product.name} src={imageSrc} style={{ width: '100%', height: 'auto' }}
@@ -83,6 +84,13 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                     {product.is_offer && <span className="lable hot">Offer</span>}
                     <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                 </a>
+                {/* Stock badges */}
+                {product.stock === 0 && (
+                    <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.45)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', textTransform: 'uppercase', zIndex: 2, pointerEvents: 'none' }}>Out of Stock</span>
+                )}
+                {product.stock != null && product.stock > 0 && product.stock <= 5 && (
+                    <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', zIndex: 2, pointerEvents: 'none' }}>Only {product.stock} left</span>
+                )}
                 <div className="shop-hover d-flex justify-content-center">
                     <WishlistButton
                         productId={product.id}
@@ -92,7 +100,9 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                         onMessage={(msg, type) => showToast(msg, type)}
                     />
                     <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"
-                        onClick={handleAddToCart} title="Add to cart">
+                        onClick={handleAddToCart} title="Add to cart"
+                        disabled={product.stock === 0}
+                        style={{ opacity: product.stock === 0 ? 0.4 : 1, cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}>
                         <i className="feather icon-feather-shopping-bag fs-15"></i>
                     </button>
                     <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"
@@ -125,6 +135,12 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                         <span>{product.currency_price}</span>
                     )}
                 </div>
+                {product.stock != null && product.stock > 0 && product.stock <= 5 && (
+                    <p style={{ margin: '6px 0 0', fontSize: 11, fontWeight: 700, color: 'var(--base-color)' }}>
+                        <i className="feather icon-feather-alert-circle" style={{ fontSize: 10, marginRight: 3 }}></i>
+                        Only {product.stock} left
+                    </p>
+                )}
             </div>
         </div>
 

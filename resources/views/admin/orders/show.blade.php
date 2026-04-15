@@ -46,6 +46,13 @@
             <p class="admin-page-subtitle">Placed on {{ $order->created_at->format('M d, Y \a\t h:i A') }}</p>
         </div>
         <div class="flex items-center gap-3">
+            <button type="button" onclick="printInvoice()"
+                class="px-5 py-2.5 bg-white text-indigo-600 border border-indigo-200 text-sm font-semibold rounded-xl hover:bg-indigo-50 transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+                Print Invoice
+            </button>
             <button type="button"
                 onclick="confirmSubmit('del-order-detail', { title: 'Archive Order', message: 'This order will be archived and hidden from the main list. You can restore it later from Archived Orders.', confirmText: 'Yes, Archive', type: 'danger' })"
                 class="px-5 py-2.5 bg-white text-rose-600 border border-rose-200 text-sm font-semibold rounded-xl hover:bg-rose-50 transition flex items-center gap-2">
@@ -506,4 +513,188 @@
     </div>
     @endif
 </div>
+
+@php
+    $invoiceItems = $order->orderProducts->map(function($item) {
+        return [
+            'name'      => $item->product?->name ?? 'N/A',
+            'variation' => $item->variation_names ?? '',
+            'price'     => (float) $item->price,
+            'discount'  => (float) $item->discount,
+            'quantity'  => abs($item->quantity),
+            'total'     => (float) $item->total,
+        ];
+    })->values();
+    $invoiceAddr = $order->address->first() ?: $order->outletAddress;
+    $invoicePayStatus = $isPaid ? 'Paid' : ($isCod ? 'Pay on Delivery' : 'Unpaid');
+@endphp
+
+<script>
+function printInvoice() {
+    const d = {
+        orderNo:    @json($order->order_serial_no),
+        date:       @json($order->created_at->format('F j, Y')),
+        customer:   @json($order->user?->name ?? 'Guest'),
+        email:      @json($order->user?->email ?? ''),
+        phone:      @json($order->user?->phone ?? ''),
+        addrName:   @json($invoiceAddr ? ($invoiceAddr->full_name ?? $invoiceAddr->name ?? '') : ''),
+        addrPhone:  @json($invoiceAddr ? trim(($invoiceAddr->country_code ?? '') . ' ' . ($invoiceAddr->phone ?? '')) : ''),
+        addrStreet: @json($invoiceAddr?->address ?? ''),
+        addrCity:   @json($invoiceAddr?->city ?? ''),
+        addrState:  @json($invoiceAddr?->state ?? ''),
+        addrZip:    @json($invoiceAddr?->zip_code ?? ''),
+        addrCountry:@json($invoiceAddr?->country ?? ''),
+        items:      @json($invoiceItems),
+        subtotal:   @json(number_format((float)$order->subtotal, 2)),
+        shipping:   @json(number_format((float)$order->shipping_charge, 2)),
+        discount:   @json(number_format((float)$order->discount, 2)),
+        tax:        @json(number_format((float)$order->tax, 2)),
+        total:      @json(number_format((float)$order->total, 2)),
+        currency:   @json($currencySymbol),
+        method:     @json($gwName),
+        payStatus:  @json($invoicePayStatus),
+        isPaid:     @json($isPaid),
+        isCod:      @json($isCod),
+    };
+
+    const addr = [d.addrName, d.addrPhone, d.addrStreet,
+                  [d.addrCity, d.addrState, d.addrZip].filter(Boolean).join(', '),
+                  d.addrCountry].filter(Boolean).join('<br>');
+
+    const rows = d.items.map(it => {
+        const hasDiscount = it.discount > 0;
+        const basePrice = (it.price * it.quantity) + it.discount;
+        return `
+        <tr>
+            <td style="padding:10px 8px;border-bottom:1px solid #f1f5f9;">
+                <div style="font-weight:600;color:#1e293b;">${it.name}</div>
+                ${it.variation ? `<div style="font-size:11px;color:#94a3b8;margin-top:2px;">${it.variation}</div>` : ''}
+                ${hasDiscount ? `<div style="font-size:10px;color:#dc2626;font-weight:600;margin-top:2px;">Discount Applied: -${d.currency}${it.discount.toFixed(2)}</div>` : ''}
+            </td>
+            <td style="padding:10px 8px;border-bottom:1px solid #f1f5f9;text-align:center;color:#64748b;">${it.quantity}</td>
+            <td style="padding:10px 8px;border-bottom:1px solid #f1f5f9;text-align:right;color:#64748b;">
+                ${hasDiscount ? `<del style="font-size:11px;opacity:0.6;margin-right:4px;">${d.currency}${(basePrice/it.quantity).toFixed(2)}</del>` : ''}
+                ${d.currency}${it.price.toFixed(2)}
+            </td>
+            <td style="padding:10px 8px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#1e293b;">${d.currency}${it.total.toFixed(2)}</td>
+        </tr>`;
+    }).join('');
+
+    const discountRow = parseFloat(d.discount) > 0
+        ? `<tr><td colspan="3" style="text-align:right;padding:6px 8px;color:#64748b;">Discount</td><td style="text-align:right;padding:6px 8px;color:#dc2626;font-weight:600;">-${d.currency}${d.discount}</td></tr>`
+        : '';
+    const taxRow = parseFloat(d.tax) > 0
+        ? `<tr><td colspan="3" style="text-align:right;padding:6px 8px;color:#64748b;">Tax</td><td style="text-align:right;padding:6px 8px;color:#1e293b;">${d.currency}${d.tax}</td></tr>`
+        : '';
+
+    const payBadgeColor = d.isPaid ? '#16a34a' : (d.isCod ? '#b45309' : '#dc2626');
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #${d.orderNo}</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; color:#1e293b; background:#fff; padding:40px; font-size:13px; }
+        @media print {
+            body { padding:20px; }
+            .no-print { display:none !important; }
+        }
+        .inv-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:36px; padding-bottom:24px; border-bottom:2px solid #e2e8f0; }
+        .inv-brand { font-size:24px; font-weight:800; color:#1e293b; letter-spacing:-0.5px; }
+        .inv-brand span { color:#6366f1; }
+        .inv-meta { text-align:right; }
+        .inv-meta .inv-title { font-size:20px; font-weight:700; color:#6366f1; margin-bottom:4px; }
+        .inv-meta .inv-no { font-size:13px; color:#64748b; }
+        .inv-meta .inv-date { font-size:12px; color:#94a3b8; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:32px; }
+        .info-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px; }
+        .info-box h3 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#94a3b8; margin-bottom:10px; }
+        .info-box p { line-height:1.7; color:#475569; font-size:13px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:0; }
+        thead th { background:#f8fafc; padding:10px 8px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#94a3b8; border-bottom:2px solid #e2e8f0; }
+        thead th:nth-child(2) { text-align:center; }
+        thead th:nth-child(3), thead th:nth-child(4) { text-align:right; }
+        .totals-table td { padding:5px 8px; }
+        .totals-sep { border-top:2px solid #e2e8f0; }
+        .total-row td { font-size:15px; font-weight:800; color:#6366f1; padding:10px 8px !important; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+        .footer { margin-top:40px; padding-top:20px; border-top:1px solid #e2e8f0; text-align:center; color:#94a3b8; font-size:11px; }
+        .print-btn { display:block; margin:0 auto 24px; padding:10px 28px; background:#6366f1; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">Print / Save as PDF</button>
+
+    <div class="inv-header">
+        <div>
+            <div class="inv-brand">Be<span>home</span></div>
+            <div style="margin-top:6px;color:#64748b;font-size:12px;line-height:1.6;">Premium Decor &amp; Luxury Furniture</div>
+        </div>
+        <div class="inv-meta">
+            <div class="inv-title">INVOICE</div>
+            <div class="inv-no">#${d.orderNo}</div>
+            <div class="inv-date">${d.date}</div>
+            <div style="margin-top:8px;">
+                <span class="badge" style="background:${payBadgeColor}20;color:${payBadgeColor};border:1px solid ${payBadgeColor}40;">${d.payStatus}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="info-box">
+            <h3>Billed To</h3>
+            <p><strong>${d.customer}</strong></p>
+            ${d.email ? `<p>${d.email}</p>` : ''}
+            ${d.phone ? `<p>${d.phone}</p>` : ''}
+        </div>
+        <div class="info-box">
+            <h3>Ship To</h3>
+            <p>${addr || '<em style="color:#94a3b8;">No address on file</em>'}</p>
+        </div>
+    </div>
+
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:24px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th style="text-align:center;">Qty</th>
+                    <th style="text-align:right;">Unit Price</th>
+                    <th style="text-align:right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;">
+        <table class="totals-table" style="width:280px;">
+            <tbody>
+                <tr><td style="text-align:right;padding:6px 8px;color:#64748b;">Subtotal</td><td style="text-align:right;padding:6px 8px;">${d.currency}${d.subtotal}</td></tr>
+                <tr><td style="text-align:right;padding:6px 8px;color:#64748b;">Shipping</td><td style="text-align:right;padding:6px 8px;">${d.currency}${d.shipping}</td></tr>
+                ${discountRow}${taxRow}
+                <tr class="total-row totals-sep"><td style="text-align:right;">Total</td><td style="text-align:right;">${d.currency}${d.total}</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:28px;padding:14px 18px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:12px;color:#0369a1;font-weight:600;">Payment Method</span>
+        <span style="font-size:13px;color:#0369a1;font-weight:700;">${d.method}</span>
+    </div>
+
+    <div class="footer">
+        <p>Thank you for your order — Behome Premium Decor &amp; Luxury Furniture</p>
+        <p style="margin-top:4px;">This invoice was generated on ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}.</p>
+    </div>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=860,height=1000');
+    win.document.write(html);
+    win.document.close();
+}
+</script>
 @endsection

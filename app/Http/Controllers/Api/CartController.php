@@ -22,27 +22,38 @@ class CartController extends Controller
                 ->with(['product.taxes.tax', 'variation'])
                 ->get();
 
-            // Recalculate tax from current product tax rates
+            // Recalculate prices and taxes from current product offer/tax rates
             foreach ($cartItems as $item) {
+                $product = $item->product;
+                if (!$product) continue;
+
+                $isOffer = $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now();
+                $basePrice = $item->variation ? $item->variation->price : $product->selling_price;
+                $currentPrice = $isOffer ? (float) max(0, $basePrice - $product->discount) : (float) $basePrice;
+
                 $taxRate = 0;
-                if ($item->product) {
-                    foreach ($item->product->taxes as $productTax) {
-                        if ($productTax->tax) {
-                            $taxRate += (float) $productTax->tax->tax_rate;
-                        }
+                foreach ($product->taxes as $productTax) {
+                    if ($productTax->tax) {
+                        $taxRate += (float) $productTax->tax->tax_rate;
                     }
                 }
-                $taxPerUnit = round(($item->price * $taxRate) / 100, (int) config('app.currency_decimal_point'));
-                $subtotal   = $item->price * $item->quantity;
-                $tax        = $taxPerUnit * $item->quantity;
-                $total      = $subtotal + $tax;
 
-                if ($item->tax != $tax || $item->subtotal != $subtotal || $item->total != $total) {
+                $subtotal = $currentPrice * $item->quantity;
+                $tax      = round(($subtotal * $taxRate) / 100, (int) config('app.currency_decimal_point'));
+                $total    = $subtotal + $tax;
+
+                if ($item->price != $currentPrice || $item->tax != $tax || $item->subtotal != $subtotal || $item->total != $total) {
+                    $item->price    = $currentPrice;
                     $item->tax      = $tax;
                     $item->subtotal = $subtotal;
                     $item->total    = $total;
                     $item->save();
                 }
+
+                // Append for JSON response
+                $item->old_price = (float) $basePrice;
+                $item->discount_amount = (float) ($isOffer ? $product->discount : 0);
+                $item->discount_percentage = $basePrice > 0 ? round(($item->discount_amount / $basePrice) * 100) : 0;
             }
 
             return $this->successResponse($cartItems, 'Cart retrieved successfully');
@@ -61,6 +72,7 @@ class CartController extends Controller
 
         try {
             $product = Product::with(['taxes.tax'])->findOrFail($request->product_id);
+            $isOffer = $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now();
             $price = $product->selling_price;
             $sku = $product->sku;
             $variation_names = '';
@@ -72,6 +84,10 @@ class CartController extends Controller
                 if ($variation->productAttribute && $variation->productAttributeOption) {
                     $variation_names = $variation->productAttribute->name . ': ' . $variation->productAttributeOption->name;
                 }
+            }
+
+            if ($isOffer) {
+                $price = max(0, $price - $product->discount);
             }
 
             // Calculate tax from product tax rates

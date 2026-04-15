@@ -293,7 +293,7 @@ class OrderService
                     $order->status = $request->status;
                     $order->save();
                     AuditLogger::orderStatusChanged($order, $oldStatus, $request->status, $request->reason ?? null);
-                    $this->sendOrderStatusNotification($order, $request->status);
+                    $this->sendOrderStatusNotification($order, (int) $request->status);
                 }
             } else {
                 if ($request->status == OrderStatus::REJECTED || $request->status == OrderStatus::CANCELED) {
@@ -324,7 +324,7 @@ class OrderService
                 $order->status = $request->status;
                 $order->save();
                 AuditLogger::orderStatusChanged($order, $oldStatus, $request->status, $request->reason ?? null);
-                $this->sendOrderStatusNotification($order, $request->status);
+                $this->sendOrderStatusNotification($order, (int) $request->status);
             }
             return $order;
         } catch (Exception $exception) {
@@ -333,7 +333,7 @@ class OrderService
         }
     }
 
-    private function sendOrderStatusNotification(Order $order, OrderStatus $status): void
+    private function sendOrderStatusNotification(Order $order, int $status): void
     {
         if (!$order->user_id) return;
 
@@ -343,7 +343,6 @@ class OrderService
             OrderStatus::DELIVERED  => ['title' => 'Order Delivered',     'body' => 'Your order #:no has been delivered. Enjoy!',               'icon' => 'gift',    'color' => '#22c55e'],
             OrderStatus::CANCELED   => ['title' => 'Order Cancelled',     'body' => 'Your order #:no has been cancelled.',                      'icon' => 'x',       'color' => '#ef4444'],
             OrderStatus::REJECTED   => ['title' => 'Order Rejected',      'body' => 'Unfortunately your order #:no was rejected.',              'icon' => 'warning', 'color' => '#f97316'],
-            OrderStatus::RETURNED   => ['title' => 'Return Processed',    'body' => 'Your return for order #:no has been processed.',           'icon' => 'return',  'color' => '#8b5cf6'],
         ];
 
         if (!isset($map[$status])) return;

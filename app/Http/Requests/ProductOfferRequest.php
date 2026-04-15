@@ -26,7 +26,7 @@ class ProductOfferRequest extends FormRequest
     {
         return [
             'add_to_flash_sale' => ['required', 'numeric', 'max:24'],
-            'discount'          => ['required', 'numeric', 'max:100', new IniAmount()],
+            'discount'          => ['required', 'numeric', new IniAmount()],
             'offer_start_date'  => ['required', 'string', 'max:190'],
             'offer_end_date'    => ['required', 'string', 'max:190'],
         ];

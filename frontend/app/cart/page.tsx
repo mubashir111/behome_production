@@ -285,7 +285,15 @@ export default function Cart() {
                                                             <a className="text-white fw-500 d-block lh-initial" href={`/product/${item.product?.slug}`}>{item.product?.name}</a>
                                                             {item.variation_names && <span className="fs-14 d-block">{item.variation_names}</span>}
                                                         </td>
-                                                        <td className="product-price" data-title="Price">{formatAmount(parseFloat(item.price))}</td>
+                                                        <td className="product-price" data-title="Price">
+                                                            {item.old_price > item.price && (
+                                                                <>
+                                                                    <del className="fs-13 text-white/40 me-2 lh-initial">{formatAmount(parseFloat(item.old_price))}</del>
+                                                                    <br />
+                                                                </>
+                                                            )}
+                                                            {formatAmount(parseFloat(item.price))}
+                                                        </td>
                                                         <td className="product-quantity" data-title="Quantity">
                                                             <div className="quantity" style={{ opacity: updatingItems.has(item.id) ? 0.4 : 1, transition: 'opacity 0.2s ease' }}>
                                                                 <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
@@ -341,6 +349,9 @@ export default function Cart() {
 
                                                     {/* Unit price */}
                                                     <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+                                                        {item.old_price > item.price && (
+                                                            <del style={{ marginRight: 8, opacity: 0.6 }}>{formatAmount(parseFloat(item.old_price))}</del>
+                                                        )}
                                                         {formatAmount(parseFloat(item.price))} each
                                                     </span>
 
