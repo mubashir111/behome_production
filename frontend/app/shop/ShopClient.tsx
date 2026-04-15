@@ -10,6 +10,7 @@ import { useToast } from '@/components/ToastProvider';
 import { useCart } from '@/components/CartProvider';
 import { useSettings } from '@/components/SettingsProvider';
 import { useAuthModal } from '@/context/AuthModalContext';
+import QuickViewModal from '@/components/QuickViewModal';
 
 
 function ShopContent() {
@@ -22,6 +23,7 @@ function ShopContent() {
     const initialPage = Number.parseInt(searchParams.get('page') || '1', 10);
 
     const [products, setProducts] = useState<any[]>([]);
+    const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
     const { settings, formatAmount } = useSettings();
 
     const PRICE_RANGES = (() => {
@@ -213,6 +215,7 @@ function ShopContent() {
                 : /* 4 */ 'row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4';
 
     return (
+        <>
         <main>
             <section className="page-shell page-shell-tight ps-6 pe-6 lg-ps-3 lg-pe-3 sm-ps-0 sm-pe-0">
                 <div className="container-fluid">
@@ -384,9 +387,9 @@ function ShopContent() {
                                                                 <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)}>
                                                                     <i className="feather icon-feather-shopping-bag fs-15"></i>
                                                                 </button>
-                                                                <a className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom" href={`/product/${product.slug}`} aria-label="View Product">
+                                                                <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => setQuickViewSlug(product.slug)} aria-label="Quick view">
                                                                     <i className="feather icon-feather-eye fs-15"></i>
-                                                                </a>
+                                                                </button>
                                                             </div>
                                                         </div>
                                                         <div className="shop-footer pt-20px text-center">
@@ -521,6 +524,11 @@ function ShopContent() {
                 </div>
             )}
         </main>
+
+        {quickViewSlug && (
+            <QuickViewModal slug={quickViewSlug} onClose={() => setQuickViewSlug(null)} />
+        )}
+    </>
     );
 }
 

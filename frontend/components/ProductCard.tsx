@@ -1,10 +1,11 @@
 'use client';
 
-import Image from 'next/image';
+import { useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import WishlistButton from './WishlistButton';
 import { useToast } from './ToastProvider';
 import { useAuthModal } from '@/context/AuthModalContext';
+import QuickViewModal from './QuickViewModal';
 
 interface Product {
     id: number;
@@ -30,6 +31,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, showCategory = false, onAddToCart }: ProductCardProps) {
     const { showToast, showCartToast } = useToast();
     const { openAuthModal } = useAuthModal();
+    const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
 
     const handleAddToCart = async () => {
         if (onAddToCart) {
@@ -54,9 +56,10 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
             });
 
             if (response.status) {
+                const img = product.image || product.cover || '';
                 showCartToast({
                     name: product.name,
-                    image: product.image || product.cover,
+                    image: img.includes('/images/default/') ? undefined : img,
                     price: product.discounted_price || product.currency_price
                 });
             } else {
@@ -67,13 +70,16 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
         }
     };
 
-    const imageSrc = product.cover || product.image || "/images/demo-decor-store-product-01.jpg";
+    const imageSrc = (product.cover || product.image || '').trim() || "/images/demo-decor-store-product-01.jpg";
 
     return (
+        <>
         <div className="shop-box pb-25px">
             <div className="shop-image">
                 <a href={`/product/${product.slug}`}>
-                    <Image alt={product.name} src={imageSrc} width={640} height={720} unoptimized style={{ width: '100%', height: 'auto' }} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img alt={product.name} src={imageSrc} style={{ width: '100%', height: 'auto' }}
+                        onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/demo-decor-store-product-01.jpg'; }} />
                     {product.is_offer && <span className="lable hot">Offer</span>}
                     <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                 </a>
@@ -89,11 +95,10 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                         onClick={handleAddToCart} title="Add to cart">
                         <i className="feather icon-feather-shopping-bag fs-15"></i>
                     </button>
-                    <a className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom"
-                        data-bs-placement="top" data-bs-toggle="tooltip"
-                        href={`/product/${product.slug}`} title="Quick view">
+                    <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"
+                        onClick={() => setQuickViewSlug(product.slug)} title="Quick view">
                         <i className="feather icon-feather-eye fs-15"></i>
-                    </a>
+                    </button>
                 </div>
             </div>
             <div className="shop-footer pt-20px text-center">
@@ -122,5 +127,10 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                 </div>
             </div>
         </div>
+
+        {quickViewSlug && (
+            <QuickViewModal slug={quickViewSlug} onClose={() => setQuickViewSlug(null)} />
+        )}
+    </>
     );
 }

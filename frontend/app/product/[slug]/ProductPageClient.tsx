@@ -11,6 +11,7 @@ import { useToast } from '@/components/ToastProvider';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCurrency } from '@/components/SettingsProvider';
 import { useAuthModal } from '@/context/AuthModalContext';
+import RecentlyViewed, { recordRecentlyViewed } from '@/components/RecentlyViewed';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -137,6 +138,16 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                     const p = productResponse.data;
                     setProduct(p);
                     setReviews(p.reviews || []);
+                    recordRecentlyViewed({
+                        id: p.id,
+                        name: p.name,
+                        slug: p.slug,
+                        cover: p.image || (p.images?.[0]) || p.cover || '',
+                        currency_price: p.currency_price || p.formatted_price || '',
+                        discounted_price: p.discounted_price,
+                        is_offer: !!p.is_offer,
+                        category: p.category,
+                    });
 
                     // Fetch variations
                     try {
@@ -999,6 +1010,8 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                     </div>
                 </section>
             )}
+            {/* ── Recently Viewed ────────────────────────────────────────── */}
+            <RecentlyViewed currentSlug={slug} />
         </main>
     );
 }

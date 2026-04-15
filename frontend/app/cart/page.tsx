@@ -277,14 +277,14 @@ export default function Cart() {
                                                         </td>
                                                         <td className="product-name">
                                                             <a className="text-white fw-500 d-block lh-initial" href={`/product/${item.product?.slug}`}>{item.product?.name}</a>
-                                                            {item.variation_names && <span className="fs-14">{item.variation_names}</span>}
+                                                            {item.variation_names && <span className="fs-14 d-block">{item.variation_names}</span>}
                                                         </td>
                                                         <td className="product-price" data-title="Price">{formatAmount(parseFloat(item.price))}</td>
                                                         <td className="product-quantity" data-title="Quantity">
                                                             <div className="quantity" style={{ opacity: updatingItems.has(item.id) ? 0.4 : 1, transition: 'opacity 0.2s ease' }}>
                                                                 <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
                                                                 <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} />
-                                                                <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id)}>+</button>
+                                                                <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id) || (item.product?.stock != null && item.quantity >= item.product.stock)}>+</button>
                                                             </div>
                                                         </td>
                                                         <td className="product-subtotal" data-title="Total">{formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}</td>
@@ -353,7 +353,7 @@ export default function Cart() {
                                                             </span>
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                disabled={updatingItems.has(item.id)}
+                                                                disabled={updatingItems.has(item.id) || (item.product?.stock != null && item.quantity >= item.product.stock)}
                                                                 type="button"
                                                                 style={{ width: 36, height: 36, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                                                             >+</button>

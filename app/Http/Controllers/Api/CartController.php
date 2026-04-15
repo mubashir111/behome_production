@@ -135,6 +135,14 @@ class CartController extends Controller
 
         try {
             $cartItem = Cart::where('user_id', Auth::id())->with('product.taxes.tax')->findOrFail($id);
+
+            // Validate against available stock
+            if ($cartItem->product && $cartItem->product->stock !== null) {
+                if ($request->quantity > $cartItem->product->stock) {
+                    return $this->errorResponse('Only ' . $cartItem->product->stock . ' items available in stock');
+                }
+            }
+
             $cartItem->quantity = $request->quantity;
             
             // Recalculate tax and totals
