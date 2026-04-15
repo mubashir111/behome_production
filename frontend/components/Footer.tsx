@@ -86,15 +86,30 @@ export default function Footer() {
                     </div>
 
                     <div className="col-4 col-lg-2">
-                        <span className="fs-13 fw-600 text-white d-block mb-15px text-uppercase ls-1px opacity-9">Account</span>
+                        <span className="fs-13 fw-600 text-white d-block mb-15px text-uppercase ls-1px opacity-9">Policies</span>
                         <ul className="footer-link-list">
-                            <li><a href="/account">My account</a></li>
-                            <li><a href="/cart">Orders</a></li>
-                            <li><a href="/checkout">Checkout</a></li>
-                            <li><a href="/wishlist">Wishlist</a></li>
+                            <li><a href="/shipping-policy">Shipping Policy</a></li>
+                            <li><a href="/returns-policy">Returns &amp; Exchanges</a></li>
+                            <li><a href="/privacy-policy">Privacy Policy</a></li>
+                            <li><a href="/faq">FAQs</a></li>
                         </ul>
                     </div>
 
+                </div>
+            </div>
+
+            {/* Policy strip */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '14px 0' }}>
+                <div className="container">
+                    <div className="d-flex flex-wrap justify-content-center gap-3" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+                        <a href="/shipping-policy" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }} className="footer-policy-link">Shipping Policy</a>
+                        <span style={{ opacity: 0.3 }}>·</span>
+                        <a href="/returns-policy" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }} className="footer-policy-link">Returns &amp; Exchanges</a>
+                        <span style={{ opacity: 0.3 }}>·</span>
+                        <a href="/privacy-policy" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }} className="footer-policy-link">Privacy Policy</a>
+                        <span style={{ opacity: 0.3 }}>·</span>
+                        <a href="/faq" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }} className="footer-policy-link">FAQs</a>
+                    </div>
                 </div>
             </div>
 

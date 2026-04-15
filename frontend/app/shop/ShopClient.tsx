@@ -502,23 +502,93 @@ function ShopContent() {
             {/* ── Mobile Filter Drawer ── */}
             {showMobileFilters && (
                 <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
-                    <div onClick={() => setShowMobileFilters(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} />
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#141414', borderRadius: '20px 20px 0 0', maxHeight: '85vh', overflowY: 'auto', padding: '0 0 40px', boxShadow: '0 -8px 40px rgba(0,0,0,0.5)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', position: 'sticky', top: 0, background: '#141414', zIndex: 1 }}>
-                            <span style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>Filters</span>
-                            <button onClick={() => setShowMobileFilters(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 24, cursor: 'pointer', lineHeight: 1 }}>×</button>
+                    {/* Backdrop */}
+                    <div onClick={() => setShowMobileFilters(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }} />
+
+                    {/* Sheet */}
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#141414', borderRadius: '20px 20px 0 0', maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 -8px 40px rgba(0,0,0,0.6)' }}>
+
+                        {/* Header — sticky */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+                            <span style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>
+                                Filters
+                                {[categorySlug, brandSlugParam, priceRange].filter(Boolean).length > 0 && (
+                                    <span style={{ marginLeft: 8, background: 'var(--base-color)', color: '#000', borderRadius: '50%', width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+                                        {[categorySlug, brandSlugParam, priceRange].filter(Boolean).length}
+                                    </span>
+                                )}
+                            </span>
+                            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                                {(categorySlug || brandSlugParam || priceRange) && (
+                                    <button onClick={() => { applyShopParams({ category: null, brand: null, page: null }); setPriceRange(null); }} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.5)', fontSize: 12, padding: '4px 10px', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>
+                                        Clear all
+                                    </button>
+                                )}
+                                <button onClick={() => setShowMobileFilters(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 24, cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                            </div>
                         </div>
-                        <div style={{ padding: '20px' }}>
-                            <div style={{ marginBottom: 24 }}>
-                                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Categories</p>
+
+                        {/* Scrollable body */}
+                        <div style={{ overflowY: 'auto', flex: 1, padding: '20px 20px 8px' }}>
+
+                            {/* Categories */}
+                            <div style={{ marginBottom: 28 }}>
+                                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Category</p>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                    <button onClick={() => { applyShopParams({ category: null, page: null }); setShowMobileFilters(false); }} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid', borderColor: !categorySlug ? 'var(--base-color)' : 'rgba(255,255,255,0.15)', background: !categorySlug ? 'rgba(197,160,89,0.12)' : 'transparent', color: !categorySlug ? 'var(--base-color)' : '#fff', fontSize: 13, fontWeight: 500 }}>All</button>
-                                    {categories.map((cat: any) => (
-                                        <button key={cat.id} onClick={() => { applyShopParams({ category: cat.slug, page: null }); setShowMobileFilters(false); }} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid', borderColor: categorySlug === cat.slug ? 'var(--base-color)' : 'rgba(255,255,255,0.15)', background: categorySlug === cat.slug ? 'rgba(197,160,89,0.12)' : 'transparent', color: categorySlug === cat.slug ? 'var(--base-color)' : '#fff', fontSize: 13, fontWeight: 500 }}>{cat.name}</button>
-                                    ))}
+                                    {[{ id: 'all', slug: null, name: 'All' }, ...categories].map((cat: any) => {
+                                        const active = cat.slug === null ? !categorySlug : categorySlug === cat.slug;
+                                        return (
+                                            <button key={cat.id} onClick={() => { applyShopParams({ category: cat.slug, page: null }); setShowMobileFilters(false); }}
+                                                style={{ padding: '8px 16px', borderRadius: 20, border: '1px solid', borderColor: active ? 'var(--base-color)' : 'rgba(255,255,255,0.13)', background: active ? 'rgba(197,160,89,0.12)' : 'transparent', color: active ? 'var(--base-color)' : 'rgba(255,255,255,0.75)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                                                {cat.name}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
-                            <button onClick={() => setShowMobileFilters(false)} style={{ width: '100%', padding: '14px', background: 'var(--base-color)', color: '#0a0a0a', fontWeight: 700, fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer', marginTop: 8 }}>Show Results</button>
+
+                            {/* Brands */}
+                            {brands.length > 0 && (
+                                <div style={{ marginBottom: 28 }}>
+                                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Brand</p>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                        {brands.map((b: any) => {
+                                            const active = brandSlugParam === b.slug;
+                                            return (
+                                                <button key={b.id} onClick={() => { applyShopParams({ brand: active ? null : b.slug, page: null }); setShowMobileFilters(false); }}
+                                                    style={{ padding: '8px 16px', borderRadius: 20, border: '1px solid', borderColor: active ? 'var(--base-color)' : 'rgba(255,255,255,0.13)', background: active ? 'rgba(197,160,89,0.12)' : 'transparent', color: active ? 'var(--base-color)' : 'rgba(255,255,255,0.75)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                                                    {b.name}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Price */}
+                            {PRICE_RANGES.length > 0 && (
+                                <div style={{ marginBottom: 28 }}>
+                                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Price</p>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                        {PRICE_RANGES.map(range => {
+                                            const active = priceRange?.min === range.min && priceRange?.max === range.max;
+                                            return (
+                                                <button key={range.label} onClick={() => setPriceRange(active ? null : range)}
+                                                    style={{ padding: '8px 16px', borderRadius: 20, border: '1px solid', borderColor: active ? 'var(--base-color)' : 'rgba(255,255,255,0.13)', background: active ? 'rgba(197,160,89,0.12)' : 'transparent', color: active ? 'var(--base-color)' : 'rgba(255,255,255,0.75)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                                                    {range.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer CTA — sticky */}
+                        <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+                            <button onClick={() => setShowMobileFilters(false)} style={{ width: '100%', padding: '15px', background: 'var(--base-color)', color: '#0a0a0a', fontWeight: 700, fontSize: 14, border: 'none', borderRadius: 12, cursor: 'pointer' }}>
+                                Show Results {totalProducts > 0 ? `(${totalProducts})` : ''}
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -49,6 +49,7 @@ export default function Checkout() {
     const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
     const [paymentCancelled, setPaymentCancelled] = useState(false);
     const [orderError, setOrderError] = useState<{ message: string; action?: string; orderId?: number } | null>(null);
+    const [guestGate, setGuestGate] = useState(false);
     const paymentSectionRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to payment section when it appears
@@ -427,11 +428,12 @@ export default function Checkout() {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
-            router.push('/account?redirect=/checkout');
+            setGuestGate(true);
+            setLoading(false);
             return;
         }
         fetchCheckoutData();
-    }, [fetchCheckoutData, router]);
+    }, [fetchCheckoutData]);
 
     useEffect(() => {
         const method = Number(shippingSettings?.shipping_setup_method ?? 0);
@@ -462,6 +464,67 @@ export default function Checkout() {
                             </div>
                             <div className="col-lg-5">
                                 <LoadingSkeleton type="card" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        );
+    }
+
+    if (guestGate) {
+        return (
+            <main className="no-layout-pad page-top-100">
+                <section className="page-shell d-flex align-items-center" style={{ minHeight: '70vh' }}>
+                    <div className="container">
+                        <div className="row justify-content-center">
+                            <div className="col-lg-8 col-xl-6">
+                                <div style={{ background: 'rgba(15,15,25,0.97)', border: '1px solid rgba(197,160,89,0.2)', borderRadius: 16, overflow: 'hidden' }}>
+                                    <div style={{ height: 4, background: 'linear-gradient(90deg, var(--base-color), rgba(197,160,89,0.2))' }} />
+                                    <div style={{ padding: '40px 40px 36px' }}>
+                                        <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}>Checkout</p>
+                                        <h2 style={{ margin: '0 0 10px', color: '#fff', fontSize: 'clamp(20px,4vw,26px)', fontWeight: 700 }}>Continue to checkout</h2>
+                                        <p style={{ margin: '0 0 32px', color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 1.6 }}>
+                                            Sign in for faster checkout with saved addresses, order history, and order tracking. Or create a free account in under a minute.
+                                        </p>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                            <a href="/account?redirect=/checkout" style={{
+                                                display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6,
+                                                padding: '18px 20px', background: 'var(--base-color)', borderRadius: 10,
+                                                textDecoration: 'none',
+                                            }}>
+                                                <i className="feather icon-feather-log-in" style={{ fontSize: 20, color: '#000' }}></i>
+                                                <span style={{ color: '#000', fontWeight: 700, fontSize: 14 }}>Sign In</span>
+                                                <span style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12 }}>Use saved address &amp; orders</span>
+                                            </a>
+                                            <a href="/account?tab=register&redirect=/checkout" style={{
+                                                display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6,
+                                                padding: '18px 20px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10,
+                                                textDecoration: 'none',
+                                            }}>
+                                                <i className="feather icon-feather-user-plus" style={{ fontSize: 20, color: '#fff' }}></i>
+                                                <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>Create Account</span>
+                                                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Free &amp; takes 30 seconds</span>
+                                            </a>
+                                        </div>
+
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+                                            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                                            <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>or</span>
+                                            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                                        </div>
+
+                                        <a href="/cart" style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                            padding: '13px 20px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10,
+                                            textDecoration: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 600,
+                                        }}>
+                                            <i className="feather icon-feather-arrow-left" style={{ fontSize: 14 }}></i>
+                                            Back to Cart
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

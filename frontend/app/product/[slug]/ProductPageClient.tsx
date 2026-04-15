@@ -656,6 +656,45 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                     </p>
                                 )}
 
+                                {/* ── Quick Specs ─────────────────────────── */}
+                                {(() => {
+                                    const specs: { icon: string; label: string; value: string }[] = [];
+                                    if (product.weight) specs.push({ icon: 'icon-feather-package', label: 'Weight', value: `${product.weight} kg` });
+                                    if (product.length && product.breadth && product.height) {
+                                        specs.push({ icon: 'icon-feather-maximize', label: 'Dimensions', value: `${product.length} × ${product.breadth} × ${product.height} cm` });
+                                    } else if (product.length && product.breadth) {
+                                        specs.push({ icon: 'icon-feather-maximize', label: 'Dimensions', value: `${product.length} × ${product.breadth} cm` });
+                                    }
+                                    if (product.material) specs.push({ icon: 'icon-feather-layers', label: 'Material', value: product.material });
+                                    if (product.finish) specs.push({ icon: 'icon-feather-droplet', label: 'Finish', value: product.finish });
+                                    // Pull material / finish / size from variation attribute names
+                                    const attrSpecNames = ['material', 'finish', 'size', 'style', 'colour', 'color'];
+                                    Object.entries(attrOptions).forEach(([name, vals]) => {
+                                        const lname = name.toLowerCase();
+                                        if (attrSpecNames.some(s => lname.includes(s)) && vals.length > 0) {
+                                            // Only add if not already in specs
+                                            if (!specs.some(s => s.label.toLowerCase() === lname)) {
+                                                specs.push({ icon: 'icon-feather-tag', label: name, value: vals.join(', ') });
+                                            }
+                                        }
+                                    });
+                                    if (product.sku) specs.push({ icon: 'icon-feather-hash', label: 'SKU', value: product.sku });
+                                    if (specs.length === 0) return null;
+                                    return (
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8, marginBottom: 20 }}>
+                                            {specs.map(({ icon, label, value }) => (
+                                                <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8 }}>
+                                                    <i className={`feather ${icon}`} style={{ fontSize: 13, color: 'var(--base-color)', marginTop: 2, flexShrink: 0 }} />
+                                                    <div style={{ minWidth: 0 }}>
+                                                        <p style={{ margin: 0, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)' }}>{label}</p>
+                                                        <p style={{ margin: 0, fontSize: 12, color: '#fff', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                })()}
+
                                 <div className="mb-20px">
                                     {!canPurchase ? (
                                         <span className="fs-13 fw-700 product-stock-low">
@@ -889,20 +928,49 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
                     {activeTab === 'additional_info' && (
                         <div className="row">
-                            <div className="col-lg-6">
+                            <div className="col-lg-7">
                                 <table className="table border-color-transparent-white-light text-white">
                                     <tbody>
-                                        {product.additional_info && Array.isArray(product.additional_info) && product.additional_info.length > 0 ? (
-                                            product.additional_info.map((info: any, i: number) => (
-                                                <tr key={i}>
-                                                    <th className="fw-600 border-color-transparent-white-light py-15px ps-0 product-info-table-label">{info.label}</th>
-                                                    <td className="border-color-transparent-white-light py-15px opacity-7">{info.value}</td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td className="border-0 ps-0 opacity-5">No additional information available.</td>
+                                        {/* Product fields */}
+                                        {product.weight && (
+                                            <tr><th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label w-40">Weight</th><td className="border-color-transparent-white-light py-12px opacity-7">{product.weight} kg</td></tr>
+                                        )}
+                                        {product.length && product.breadth && (
+                                            <tr><th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label w-40">Dimensions (L×W{product.height ? '×H' : ''})</th><td className="border-color-transparent-white-light py-12px opacity-7">{product.length} × {product.breadth}{product.height ? ` × ${product.height}` : ''} cm</td></tr>
+                                        )}
+                                        {product.material && (
+                                            <tr><th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label">Material</th><td className="border-color-transparent-white-light py-12px opacity-7">{product.material}</td></tr>
+                                        )}
+                                        {product.finish && (
+                                            <tr><th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label">Finish</th><td className="border-color-transparent-white-light py-12px opacity-7">{product.finish}</td></tr>
+                                        )}
+                                        {product.sku && (
+                                            <tr><th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label">SKU</th><td className="border-color-transparent-white-light py-12px opacity-7">{product.sku}</td></tr>
+                                        )}
+                                        {product.category?.name && (
+                                            <tr><th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label">Category</th><td className="border-color-transparent-white-light py-12px opacity-7">{product.category.name}</td></tr>
+                                        )}
+                                        {product.brand?.name && (
+                                            <tr><th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label">Brand</th><td className="border-color-transparent-white-light py-12px opacity-7">{product.brand.name}</td></tr>
+                                        )}
+                                        {/* Variation attributes */}
+                                        {Object.entries(attrOptions).map(([attrName, vals]) => (
+                                            <tr key={attrName}>
+                                                <th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label">{attrName}</th>
+                                                <td className="border-color-transparent-white-light py-12px opacity-7">{(vals as string[]).join(', ')}</td>
                                             </tr>
+                                        ))}
+                                        {/* Legacy additional_info array */}
+                                        {product.additional_info && Array.isArray(product.additional_info) && product.additional_info.map((info: any, i: number) => (
+                                            <tr key={`ai_${i}`}>
+                                                <th className="fw-600 border-color-transparent-white-light py-12px ps-0 product-info-table-label">{info.label}</th>
+                                                <td className="border-color-transparent-white-light py-12px opacity-7">{info.value}</td>
+                                            </tr>
+                                        ))}
+                                        {/* Fallback */}
+                                        {!product.weight && !product.length && !product.material && !product.sku &&
+                                         Object.keys(attrOptions).length === 0 && !(product.additional_info?.length) && (
+                                            <tr><td className="border-0 ps-0 opacity-5" colSpan={2}>No additional information available for this product.</td></tr>
                                         )}
                                     </tbody>
                                 </table>
@@ -915,7 +983,24 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                             {product.shipping_and_return ? (
                                 <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.shipping_and_return.replace(/\n/g, '<br />')) }} />
                             ) : (
-                                <p>No shipping and return information available.</p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                    {[
+                                        { icon: 'icon-feather-truck', title: 'Delivery', body: 'Orders are typically dispatched within 1–3 business days. Delivery times vary by location. You will receive a tracking link once your order ships.' },
+                                        { icon: 'icon-feather-rotate-ccw', title: 'Returns & Exchanges', body: 'We accept returns within 30 days of delivery for unused items in original packaging. Contact our support team to initiate a return.' },
+                                        { icon: 'icon-feather-shield', title: 'Damaged or Faulty Items', body: 'If your item arrives damaged, please contact us within 48 hours with photos and we will arrange a replacement or refund at no cost.' },
+                                    ].map(({ icon, title, body }) => (
+                                        <div key={title} style={{ display: 'flex', gap: 16, padding: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10 }}>
+                                            <i className={`feather ${icon}`} style={{ fontSize: 20, color: 'var(--base-color)', marginTop: 2, flexShrink: 0 }} />
+                                            <div>
+                                                <p style={{ margin: '0 0 6px', color: '#fff', fontWeight: 700, fontSize: 15 }}>{title}</p>
+                                                <p style={{ margin: 0, color: 'rgba(255,255,255,0.6)', fontSize: 14, lineHeight: 1.7 }}>{body}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>
+                                        Questions? <a href="/contact" style={{ color: 'var(--base-color)', textDecoration: 'none' }}>Contact our support team</a>.
+                                    </p>
+                                </div>
                             )}
                         </div>
                     )}
