@@ -7,6 +7,7 @@ import { useSettings } from '@/components/SettingsProvider';
 export default function Footer() {
     const { settings } = useSettings();
     const [pages, setPages] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -19,7 +20,23 @@ export default function Footer() {
                 console.error('Error fetching footer pages:', error);
             }
         };
+        const fetchCategories = async () => {
+            try {
+                const response = await apiFetch('/categories');
+                const cats = Array.isArray(response)
+                    ? response
+                    : Array.isArray(response?.data)
+                        ? response.data
+                        : Array.isArray(response?.data?.data)
+                            ? response.data.data
+                            : [];
+                setCategories(cats.slice(0, 5));
+            } catch (error) {
+                console.error('Error fetching footer categories:', error);
+            }
+        };
         fetchPages();
+        fetchCategories();
     }, []);
 
     return (
@@ -61,10 +78,18 @@ export default function Footer() {
                     <div className="col-4 col-lg-2 offset-lg-1">
                         <span className="fs-13 fw-600 text-white d-block mb-15px text-uppercase ls-1px opacity-9">Categories</span>
                         <ul className="footer-link-list">
-                            <li><a href="/shop">Bed room</a></li>
-                            <li><a href="/shop">Living room</a></li>
-                            <li><a href="/shop">Lighting</a></li>
-                            <li><a href="/shop">Fabric sofa</a></li>
+                            {categories.length > 0 ? (
+                                categories.map((cat) => (
+                                    <li key={cat.id}><a href={`/shop?category=${cat.slug}`}>{cat.name}</a></li>
+                                ))
+                            ) : (
+                                <>
+                                    <li><a href="/shop?category=bed-room">Bed room</a></li>
+                                    <li><a href="/shop?category=living-room">Living room</a></li>
+                                    <li><a href="/shop?category=lighting">Lighting</a></li>
+                                    <li><a href="/shop?category=fabric-sofa">Fabric sofa</a></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 

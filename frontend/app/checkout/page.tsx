@@ -640,7 +640,23 @@ export default function Checkout() {
                                     </div>
                                     <div className="col-md-6 mb-20px">
                                         <label className="mb-10px">Country <span className="text-red">*</span></label>
-                                        <input name="country" value={formData.country} onChange={handleInputChange} className="border-radius-4px input-small" required type="text" />
+                                        <select name="country" value={formData.country} onChange={handleInputChange} className="border-radius-4px input-small" required>
+                                            {[
+                                                'Afghanistan','Albania','Algeria','Argentina','Armenia','Australia','Austria','Azerbaijan',
+                                                'Bahrain','Bangladesh','Belarus','Belgium','Bolivia','Bosnia and Herzegovina','Brazil','Bulgaria',
+                                                'Cambodia','Canada','Chile','China','Colombia','Croatia','Cyprus','Czech Republic',
+                                                'Denmark','Ecuador','Egypt','Estonia','Ethiopia',
+                                                'Finland','France','Georgia','Germany','Ghana','Greece','Guatemala',
+                                                'Hong Kong','Hungary','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy',
+                                                'Japan','Jordan','Kazakhstan','Kenya','Kuwait','Latvia','Lebanon','Libya','Lithuania','Luxembourg',
+                                                'Malaysia','Malta','Mexico','Moldova','Morocco','Myanmar','Nepal','Netherlands',
+                                                'New Zealand','Nigeria','Norway','Oman','Pakistan','Palestine','Panama','Peru','Philippines','Poland','Portugal',
+                                                'Qatar','Romania','Russia','Saudi Arabia','Serbia','Singapore','Slovakia','Slovenia',
+                                                'South Africa','South Korea','Spain','Sri Lanka','Sweden','Switzerland','Syria',
+                                                'Taiwan','Tanzania','Thailand','Tunisia','Turkey','Ukraine','United Arab Emirates',
+                                                'United Kingdom','United States','Uruguay','Uzbekistan','Venezuela','Vietnam','Yemen','Zimbabwe',
+                                            ].map(c => <option key={c} value={c}>{c}</option>)}
+                                        </select>
                                     </div>
                                     <div className="col-12 mb-20px">
                                         <label className="mb-10px">Street address <span className="text-red">*</span></label>
@@ -683,8 +699,21 @@ export default function Checkout() {
                                             {cartItems.map((item) => (
                                                 <tr key={item.id} className="product">
                                                     <td>
-                                                        <span className="text-white fw-500">{item.product?.name} x {item.quantity}</span>
-                                                        {item.variation_names && <span className="fs-12 d-block text-gray">{item.variation_names}</span>}
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                            {item.product?.cover && (
+                                                                /* eslint-disable-next-line @next/next/no-img-element */
+                                                                <img
+                                                                    src={item.product.cover}
+                                                                    alt={item.product?.name}
+                                                                    style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, flexShrink: 0, border: '1px solid rgba(255,255,255,0.08)' }}
+                                                                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                                                                />
+                                                            )}
+                                                            <div>
+                                                                <span className="text-white fw-500">{item.product?.name} <span style={{ color: 'rgba(255,255,255,0.4)' }}>×{item.quantity}</span></span>
+                                                                {item.variation_names && <span className="fs-12 d-block text-gray">{item.variation_names}</span>}
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                     <td className="text-white">{formatAmount(parseFloat(item.total))}</td>
                                                 </tr>

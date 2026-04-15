@@ -24,6 +24,7 @@ function ShopContent() {
 
     const [products, setProducts] = useState<any[]>([]);
     const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
+    const [addingToCartIds, setAddingToCartIds] = useState<Set<number>>(new Set());
     const { settings, formatAmount } = useSettings();
 
     const PRICE_RANGES = (() => {
@@ -76,9 +77,11 @@ function ShopContent() {
 
     /* ── Add to cart ─────────────────────────────────────── */
     const addToCart = async (product: any) => {
+        if (addingToCartIds.has(product.id)) return;
+        const token = localStorage.getItem('token');
+        if (!token) { openAuthModal(() => addToCart(product)); return; }
+        setAddingToCartIds(prev => new Set(prev).add(product.id));
         try {
-            const token = localStorage.getItem('token');
-            if (!token) { openAuthModal(() => addToCart(product)); return; }
             const res = await apiFetch('/cart', {
                 method: 'POST',
                 body: JSON.stringify({ product_id: product.id, quantity: 1, variation_id: null }),
@@ -91,6 +94,8 @@ function ShopContent() {
             }
         } catch (err: any) {
             showToast(err.message || 'An error occurred', 'error');
+        } finally {
+            setAddingToCartIds(prev => { const s = new Set(prev); s.delete(product.id); return s; });
         }
     };
 
@@ -463,7 +468,7 @@ function ShopContent() {
                                                                 </p>
                                                             )}
                                                             <div className="d-flex gap-2">
-                                                                <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)} disabled={product.stock === 0}>{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</button>
+                                                                <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)} disabled={product.stock === 0 || addingToCartIds.has(product.id)} style={{ opacity: addingToCartIds.has(product.id) ? 0.7 : 1 }}>{product.stock === 0 ? 'Out of Stock' : addingToCartIds.has(product.id) ? 'Adding…' : 'Add to Cart'}</button>
                                                                 <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-35px h-35px text-white d-flex align-items-center justify-content-center rounded-circle border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
                                                             </div>
                                                         </div>
@@ -484,8 +489,8 @@ function ShopContent() {
                                                             )}
                                                             <div className="shop-hover d-flex justify-content-center">
                                                                 <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
-                                                                <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)} disabled={product.stock === 0}>
-                                                                    <i className="feather icon-feather-shopping-bag fs-15"></i>
+                                                                <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)} disabled={product.stock === 0 || addingToCartIds.has(product.id)} style={{ opacity: addingToCartIds.has(product.id) ? 0.6 : 1 }}>
+                                                                    <i className={`feather ${addingToCartIds.has(product.id) ? 'icon-feather-loader' : 'icon-feather-shopping-bag'} fs-15`}></i>
                                                                 </button>
                                                                 <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => setQuickViewSlug(product.slug)} aria-label="Quick view">
                                                                     <i className="feather icon-feather-eye fs-15"></i>

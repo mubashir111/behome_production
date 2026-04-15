@@ -505,10 +505,10 @@ export default async function Home() {
                 We use cookies to enhance your browsing experience, serve personalised content, and analyse traffic. By clicking "Allow cookies" you consent to our use of cookies.
             </div>
             <div className="cookie-btn">
-                <a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/shop">
+                <a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/privacy-policy">
                     <span><span className="btn-double-text" data-text="Cookie policy">Cookie policy</span></span>
                 </a>
-                <a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="" href="/shop">
+                <a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="">
                     <span><span className="btn-double-text" data-text="Allow cookies">Allow cookies</span></span>
                 </a>
             </div>

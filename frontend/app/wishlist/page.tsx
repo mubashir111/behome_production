@@ -5,13 +5,18 @@ import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ToastProvider';
+import { useCart } from '@/components/CartProvider';
 
 export default function Wishlist() {
     const router = useRouter();
+    const { showToast } = useToast();
+    const { updateCart } = useCart();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [wishlistItems, setWishlistItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [addingToCart, setAddingToCart] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -42,6 +47,26 @@ export default function Wishlist() {
             console.error('Failed to fetch wishlist:', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const addToCart = async (product: any) => {
+        setAddingToCart(prev => new Set(prev).add(product.id));
+        try {
+            const res = await apiFetch('/cart', {
+                method: 'POST',
+                body: JSON.stringify({ product_id: product.id, quantity: 1, variation_id: null }),
+            });
+            if (res.status) {
+                showToast(`${product.name} added to cart`, 'success');
+                updateCart();
+            } else {
+                showToast(res.message || 'Failed to add to cart', 'error');
+            }
+        } catch (err: any) {
+            showToast(err.message || 'An error occurred', 'error');
+        } finally {
+            setAddingToCart(prev => { const s = new Set(prev); s.delete(product.id); return s; });
         }
     };
 
@@ -196,10 +221,15 @@ export default function Wishlist() {
                                                         <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                     </a>
                                                     <div className="shop-hover d-flex justify-content-center">
-                                                        <a className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom"
-                                                            href="/cart" title="Go to cart">
-                                                            <i className="feather icon-feather-shopping-bag fs-15"></i>
-                                                        </a>
+                                                        <button
+                                                            onClick={() => addToCart(product)}
+                                                            disabled={addingToCart.has(product.id)}
+                                                            title="Add to cart"
+                                                            className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0"
+                                                            style={{ cursor: addingToCart.has(product.id) ? 'not-allowed' : 'pointer', opacity: addingToCart.has(product.id) ? 0.6 : 1 }}
+                                                        >
+                                                            <i className={`feather ${addingToCart.has(product.id) ? 'icon-feather-loader' : 'icon-feather-shopping-bag'} fs-15`}></i>
+                                                        </button>
                                                         <a className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom"
                                                             href={`/product/${product.slug}`} title="View product">
                                                             <i className="feather icon-feather-eye fs-15"></i>

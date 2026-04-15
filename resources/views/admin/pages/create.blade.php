@@ -46,8 +46,9 @@
 
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Content</label>
-                <textarea name="content" rows="10"
-                    class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300">{{ old('content') }}</textarea>
+                <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                <textarea name="content" id="content-hidden" style="display:none;">{{ old('content') }}</textarea>
+                <div id="quill-editor" style="min-height:300px; font-size:14px; background:#fff; border-radius:0 0 8px 8px;"></div>
             </div>
 
             <div class="flex items-center justify-between pt-2">
@@ -63,4 +64,38 @@
         </div>
     </form>
 </div>
+<style>
+#quill-editor .ql-editor { min-height: 260px; font-size: 14px; line-height: 1.7; color: #1e293b; }
+.ql-toolbar.ql-snow { border-radius: 8px 8px 0 0; border-color: #e2e8f0; background: #f8fafc; }
+.ql-container.ql-snow { border-color: #e2e8f0; border-radius: 0 0 8px 8px; }
+</style>
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+(function () {
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ header: [1, 2, 3, 4, false] }],
+                [{ font: [] }, { size: ['small', false, 'large', 'huge'] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ color: [] }, { background: [] }],
+                [{ list: 'ordered' }, { list: 'bullet' }],
+                [{ align: [] }],
+                ['link'],
+                ['clean']
+            ]
+        }
+    });
+
+    var existing = document.getElementById('content-hidden').value;
+    if (existing) {
+        quill.clipboard.dangerouslyPasteHTML(existing);
+    }
+
+    document.querySelector('form').addEventListener('submit', function () {
+        document.getElementById('content-hidden').value = quill.root.innerHTML;
+    });
+})();
+</script>
 @endsection

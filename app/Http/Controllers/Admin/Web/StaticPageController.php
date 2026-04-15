@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin\Web;
 use App\Http\Controllers\Controller;
 use App\Models\StaticPage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class StaticPageController extends Controller
 {
@@ -86,7 +85,6 @@ class StaticPageController extends Controller
 
     private function buildSections(Request $request, string $slug): array
     {
-
         if ($slug === 'contact') {
             $phones = array_filter(array_map('trim', explode("\n", $request->input('phones', ''))));
             $emails = array_filter(array_map('trim', explode("\n", $request->input('emails', ''))));
@@ -96,6 +94,60 @@ class StaticPageController extends Controller
                 'emails'        => array_values($emails),
                 'careers_email' => $request->input('careers_email', ''),
                 'map_query'     => $request->input('map_query', ''),
+            ];
+        }
+
+        if ($slug === 'about') {
+            // Build features array from parallel arrays
+            $numbers      = $request->input('feature_number', []);
+            $years        = $request->input('feature_year', []);
+            $featureTitles = $request->input('feature_title', []);
+            $featureDescs  = $request->input('feature_desc', []);
+            $features = [];
+            foreach ($numbers as $i => $num) {
+                if (empty($num) && empty($featureTitles[$i] ?? '')) continue;
+                $features[] = [
+                    'number'      => $num,
+                    'year'        => $years[$i] ?? '',
+                    'title'       => $featureTitles[$i] ?? '',
+                    'description' => $featureDescs[$i] ?? '',
+                ];
+            }
+
+            // Build stats array
+            $statValues = $request->input('stat_value', []);
+            $statLabels = $request->input('stat_label', []);
+            $stats = [];
+            foreach ($statValues as $i => $val) {
+                if (empty($val)) continue;
+                $stats[] = ['value' => $val, 'label' => $statLabels[$i] ?? ''];
+            }
+
+            // Build team array
+            $teamNames  = $request->input('team_name', []);
+            $teamRoles  = $request->input('team_role', []);
+            $teamImages = $request->input('team_image', []);
+            $teamDescs  = $request->input('team_desc', []);
+            $team = [];
+            foreach ($teamNames as $i => $name) {
+                if (empty($name)) continue;
+                $team[] = [
+                    'name'        => $name,
+                    'role'        => $teamRoles[$i] ?? '',
+                    'image'       => $teamImages[$i] ?? '',
+                    'description' => $teamDescs[$i] ?? '',
+                ];
+            }
+
+            return [
+                'hero' => [
+                    'title'       => $request->input('hero_title', ''),
+                    'subtitle'    => $request->input('hero_subtitle', ''),
+                    'description' => $request->input('hero_description', ''),
+                ],
+                'features' => $features,
+                'stats'    => $stats,
+                'team'     => $team,
             ];
         }
 
