@@ -95,6 +95,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
     const [product, setProduct] = useState<any>(null);
     const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+    const [popularProducts, setPopularProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
@@ -184,11 +185,15 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                         setSelected(defaults);
                     } catch { /* no variations */ }
 
-                    // Fetch related
-                    if (p.category?.slug) {
-                        const rel = await apiFetch(`/products?category_slug=${p.category.slug}&per_page=4`);
-                        setRelatedProducts((rel?.data?.data || []).filter((r: any) => r.slug !== slug));
-                    }
+                    // Fetch related + popular in parallel
+                    const [rel, pop] = await Promise.all([
+                        p.category?.slug
+                            ? apiFetch(`/products?category_slug=${p.category.slug}&per_page=4`)
+                            : Promise.resolve(null),
+                        apiFetch('/frontend/product/popular-products'),
+                    ]);
+                    if (rel) setRelatedProducts((rel?.data?.data || []).filter((r: any) => r.slug !== slug));
+                    setPopularProducts((pop?.data || []).filter((r: any) => r.slug !== slug).slice(0, 4));
 
                     // Check wishlist status
                     const token = localStorage.getItem('token');
@@ -534,7 +539,19 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                 )}
 
                                 <div className="flex-grow-1 position-relative order-1 order-md-2">
-                                    <div className="product-img-frame">
+                                    <div className="product-img-frame" style={{ overflow: 'hidden', cursor: 'zoom-in' }}
+                                        onMouseMove={e => {
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                            const y = ((e.clientY - rect.top) / rect.height) * 100;
+                                            const img = e.currentTarget.querySelector('.product-main-img') as HTMLElement;
+                                            if (img) { img.style.transformOrigin = `${x}% ${y}%`; img.style.transform = 'scale(1.5)'; }
+                                        }}
+                                        onMouseLeave={e => {
+                                            const img = e.currentTarget.querySelector('.product-main-img') as HTMLElement;
+                                            if (img) { img.style.transform = 'scale(1)'; }
+                                        }}
+                                    >
                                         <Image
                                             alt={`${product.name} ${safeActiveImageIndex + 1}`}
                                             src={activeImage}
@@ -542,6 +559,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                             height={1200}
                                             unoptimized
                                             className="product-main-img"
+                                            style={{ transition: 'transform 0.2s ease' }}
                                         />
 
                                         {galleryImages.length > 1 && (
@@ -768,6 +786,20 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                         >
                                             Buy Now
                                         </button>
+
+                                        {/* Trust badges */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 4 }}>
+                                            {[
+                                                { icon: 'icon-feather-lock',       label: 'Secure Payment'  },
+                                                { icon: 'icon-feather-rotate-ccw', label: '30-Day Returns'  },
+                                                { icon: 'icon-feather-truck',      label: 'Free Delivery'   },
+                                            ].map(({ icon, label }) => (
+                                                <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '10px 6px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                                                    <i className={`feather ${icon}`} style={{ fontSize: 15, color: 'var(--base-color)' }} />
+                                                    <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textAlign: 'center', letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.3 }}>{label}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1010,6 +1042,21 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                     </div>
                 </section>
             )}
+            {/* ── Popular Products ───────────────────────────────────────── */}
+            {popularProducts.length > 0 && (
+                <section className="page-shell page-shell-tight pt-0">
+                    <div className="container">
+                        <div className="row justify-content-center mb-25px">
+                            <div className="col-lg-5 text-center">
+                                <span className="text-uppercase fs-13 ls-2px fw-600 opacity-6">Trending now</span>
+                                <h4 className="alt-font text-white fw-700 mt-5px mb-0">Popular picks</h4>
+                            </div>
+                        </div>
+                        <ProductGrid products={popularProducts} showCategory />
+                    </div>
+                </section>
+            )}
+
             {/* ── Recently Viewed ────────────────────────────────────────── */}
             <RecentlyViewed currentSlug={slug} />
         </main>
