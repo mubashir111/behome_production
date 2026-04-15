@@ -67,6 +67,10 @@ function ShopContent() {
     const [naIndex, setNaIndex] = useState(0);
     const lastFetchedUrl = useRef<string | null>(null);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const suggestDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const suggestContainerRef = useRef<HTMLDivElement>(null);
 
     const { updateCart } = useCart();
 
@@ -200,6 +204,33 @@ function ShopContent() {
         return pages;
     })();
 
+    /* ── Search suggestions (debounced) ─────────────────── */
+    useEffect(() => {
+        if (suggestDebounce.current) clearTimeout(suggestDebounce.current);
+        const q = searchInput.trim();
+        if (q.length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
+        suggestDebounce.current = setTimeout(() => {
+            apiFetch(`/products?search=${encodeURIComponent(q)}&per_page=6`)
+                .then(data => {
+                    const list: any[] = data?.data?.data || [];
+                    setSuggestions(list);
+                    setShowSuggestions(list.length > 0);
+                })
+                .catch(() => { setSuggestions([]); setShowSuggestions(false); });
+        }, 280);
+        return () => { if (suggestDebounce.current) clearTimeout(suggestDebounce.current); };
+    }, [searchInput]);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (suggestContainerRef.current && !suggestContainerRef.current.contains(e.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
     /* ── New arrivals slider (1 at a time) ───────────────── */
     const naPrev = () => setNaIndex(i => (i - 1 + latestProducts.length) % latestProducts.length);
     const naNext = () => setNaIndex(i => (i + 1) % latestProducts.length);
@@ -225,17 +256,42 @@ function ShopContent() {
                         <div className="col-xxl-10 col-lg-9 ps-5 md-ps-15px md-mb-60px">
 
                             {/* ── Mobile search bar ── */}
-                            <form className="d-flex d-md-none gap-2 mb-15px w-100" onSubmit={submitSearch} role="search">
-                                <input
-                                    type="search" name="search" autoComplete="off" spellCheck={false}
-                                    className="form-control form-control-sm flex-grow-1"
-                                    placeholder="Search products…"
-                                    value={searchInput}
-                                    onChange={e => setSearchInput(e.target.value)}
-                                    style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.14)' }}
-                                />
-                                <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Search</button>
-                            </form>
+                            <div className="d-md-none mb-15px w-100 position-relative">
+                                <form className="d-flex gap-2 w-100" onSubmit={e => { setShowSuggestions(false); submitSearch(e); }} role="search">
+                                    <input
+                                        type="search" name="search" autoComplete="off" spellCheck={false}
+                                        className="form-control form-control-sm flex-grow-1"
+                                        placeholder="Search products…"
+                                        value={searchInput}
+                                        onChange={e => setSearchInput(e.target.value)}
+                                        onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                                        style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.14)' }}
+                                    />
+                                    <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Search</button>
+                                </form>
+                                {showSuggestions && suggestions.length > 0 && (
+                                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 6, background: 'rgba(18,18,28,0.98)', border: '1px solid rgba(197,160,89,0.2)', borderRadius: 10, boxShadow: '0 16px 40px rgba(0,0,0,0.5)', zIndex: 9999, overflow: 'hidden' }}>
+                                        {suggestions.map((s: any) => (
+                                            <a key={s.id} href={`/product/${s.slug}`} onClick={() => setShowSuggestions(false)}
+                                                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <div style={{ width: 36, height: 36, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.04)' }}>
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img src={s.cover || '/images/demo-decor-store-product-01.jpg'} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                </div>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <p style={{ margin: 0, color: '#fff', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</p>
+                                                    <p style={{ margin: 0, color: 'var(--base-color)', fontSize: 12, fontWeight: 600 }}>{s.is_offer ? s.discounted_price : s.currency_price}</p>
+                                                </div>
+                                            </a>
+                                        ))}
+                                        <button onClick={() => { setShowSuggestions(false); submitSearch({ preventDefault: () => {} } as any); }}
+                                            style={{ width: '100%', padding: '10px 14px', background: 'rgba(197,160,89,0.08)', border: 'none', color: 'var(--base-color)', fontSize: 12, fontWeight: 700, cursor: 'pointer', textAlign: 'left', letterSpacing: '0.04em' }}>
+                                            <i className="feather icon-feather-search" style={{ marginRight: 8, fontSize: 12 }}></i>
+                                            See all results for &ldquo;{searchInput}&rdquo;
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* ── Mobile filter + sort bar ── */}
                             <div className="d-flex d-md-none align-items-center gap-2 mb-20px">
@@ -279,17 +335,46 @@ function ShopContent() {
                                         </button>
                                     ))}
                                 </div>
-                                <form className="d-flex flex-grow-1 gap-2 align-items-center" style={{ maxWidth: 380 }} onSubmit={submitSearch}>
-                                    <input
-                                        type="search"
-                                        placeholder="Search products…"
-                                        value={searchInput}
-                                        onChange={e => setSearchInput(e.target.value)}
-                                        className="form-control form-control-sm"
-                                        style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)' }}
-                                    />
-                                    <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Search</button>
-                                </form>
+                                <div ref={suggestContainerRef} className="d-flex flex-grow-1 gap-2 align-items-center position-relative" style={{ maxWidth: 380 }}>
+                                    <form className="d-flex flex-grow-1 gap-2 align-items-center" onSubmit={e => { setShowSuggestions(false); submitSearch(e); }}>
+                                        <input
+                                            type="search"
+                                            placeholder="Search products…"
+                                            value={searchInput}
+                                            autoComplete="off"
+                                            onChange={e => setSearchInput(e.target.value)}
+                                            onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                                            className="form-control form-control-sm"
+                                            style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)' }}
+                                        />
+                                        <button type="submit" className="btn btn-base-color btn-small btn-rounded text-dark-gray" style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Search</button>
+                                    </form>
+                                    {showSuggestions && suggestions.length > 0 && (
+                                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 6, background: 'rgba(18,18,28,0.98)', border: '1px solid rgba(197,160,89,0.2)', borderRadius: 10, boxShadow: '0 16px 40px rgba(0,0,0,0.5)', zIndex: 9999, overflow: 'hidden' }}>
+                                            {suggestions.map((s: any) => (
+                                                <a key={s.id} href={`/product/${s.slug}`} onClick={() => setShowSuggestions(false)}
+                                                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.15s' }}
+                                                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                                                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                                                >
+                                                    <div style={{ width: 36, height: 36, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.04)' }}>
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img src={s.cover || '/images/demo-decor-store-product-01.jpg'} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    </div>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <p style={{ margin: 0, color: '#fff', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</p>
+                                                        <p style={{ margin: 0, color: 'var(--base-color)', fontSize: 12, fontWeight: 600 }}>{s.is_offer ? s.discounted_price : s.currency_price}</p>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                            <button onClick={() => { setShowSuggestions(false); submitSearch({ preventDefault: () => {} } as any); }}
+                                                style={{ width: '100%', padding: '10px 14px', background: 'rgba(197,160,89,0.08)', border: 'none', color: 'var(--base-color)', fontSize: 12, fontWeight: 700, cursor: 'pointer', textAlign: 'left', letterSpacing: '0.04em' }}>
+                                                <i className="feather icon-feather-search" style={{ marginRight: 8, fontSize: 12 }}></i>
+                                                See all results for &ldquo;{searchInput}&rdquo;
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="ms-auto d-flex align-items-center gap-3">
                                     {!loading && totalProducts > 0 && <span className="text-white opacity-6 fs-13">{products.length} of {totalProducts} results</span>}
                                     <select
@@ -358,33 +443,48 @@ function ShopContent() {
                                             <div key={product.id} className="col mb-45px">
                                                 {viewMode === 'list' ? (
                                                     <div className="shop-box d-flex align-items-center gap-4 pb-20px" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                                                        <a href={`/product/${product.slug}`} style={{ flexShrink: 0, width: 110 }}>
+                                                        <a href={`/product/${product.slug}`} style={{ flexShrink: 0, width: 110, position: 'relative', display: 'block' }}>
                                                             <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={110} height={130} unoptimized style={{ width: 110, height: 130, objectFit: 'cover', borderRadius: 4 }} />
+                                                            {product.stock === 0 && (
+                                                                <span style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(239,68,68,0.9)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Out of Stock</span>
+                                                            )}
                                                         </a>
                                                         <div className="flex-grow-1">
                                                             <a className="text-white fs-16 fw-600 d-block mb-5px text-truncate" href={`/product/${product.slug}`}>{product.name}</a>
-                                                            <div className="fw-500 fs-15 mb-15px">
+                                                            <div className="fw-500 fs-15 mb-8px">
                                                                 {product.is_offer ? (
                                                                     <><del className="me-5px opacity-6">{product.currency_price}</del><span style={{ color: 'var(--base-color)' }}>{product.discounted_price}</span></>
                                                                 ) : <span>{product.currency_price}</span>}
                                                             </div>
+                                                            {product.stock > 0 && product.stock <= 5 && (
+                                                                <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>
+                                                                    <i className="feather icon-feather-alert-circle" style={{ fontSize: 11, marginRight: 4 }}></i>
+                                                                    Only {product.stock} left
+                                                                </p>
+                                                            )}
                                                             <div className="d-flex gap-2">
-                                                                <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)}>Add to Cart</button>
+                                                                <button className="btn btn-base-color btn-small btn-rounded text-dark-gray" onClick={() => addToCart(product)} disabled={product.stock === 0}>{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</button>
                                                                 <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-35px h-35px text-white d-flex align-items-center justify-content-center rounded-circle border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
                                                             </div>
                                                         </div>
                                                     </div>
                                                 ) : (
                                                     <div className="shop-box pb-25px">
-                                                        <div className="shop-image">
+                                                        <div className="shop-image" style={{ position: 'relative' }}>
                                                             <a href={`/product/${product.slug}`}>
                                                                 <Image alt={product.name} src={product.cover || '/images/demo-decor-store-product-01.jpg'} width={640} height={720} unoptimized style={{ width: '100%', height: 'auto' }} />
                                                                 {product.is_offer && <span className="lable hot">Offer</span>}
                                                                 <div className="product-overlay bg-gradient-extra-midium-gray-transparent"></div>
                                                             </a>
+                                                            {product.stock === 0 && (
+                                                                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(239,68,68,0.88)', backdropFilter: 'blur(4px)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', textTransform: 'uppercase', zIndex: 2, pointerEvents: 'none' }}>Out of Stock</span>
+                                                            )}
+                                                            {product.stock > 0 && product.stock <= 5 && (
+                                                                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(245,158,11,0.9)', backdropFilter: 'blur(4px)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', zIndex: 2, pointerEvents: 'none' }}>Only {product.stock} left</span>
+                                                            )}
                                                             <div className="shop-hover d-flex justify-content-center">
                                                                 <WishlistButton productId={product.id} initialInWishlist={Boolean(product.wishlist)} className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onRequireAuth={() => openAuthModal()} onMessage={(m, t) => showToast(m, t)} />
-                                                                <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)}>
+                                                                <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => addToCart(product)} disabled={product.stock === 0}>
                                                                     <i className="feather icon-feather-shopping-bag fs-15"></i>
                                                                 </button>
                                                                 <button className="bg-dark-gray w-45px h-45px text-white d-flex flex-column align-items-center justify-content-center rounded-circle ms-5px me-5px box-shadow-medium-bottom border-0" onClick={() => setQuickViewSlug(product.slug)} aria-label="Quick view">
@@ -399,6 +499,12 @@ function ShopContent() {
                                                                     <><del className="me-5px opacity-6">{product.currency_price}</del><span style={{ color: 'var(--base-color)' }}>{product.discounted_price}</span></>
                                                                 ) : <span>{product.currency_price}</span>}
                                                             </div>
+                                                            {product.stock > 0 && product.stock <= 5 && (
+                                                                <p style={{ margin: '6px 0 0', fontSize: 11, fontWeight: 700, color: '#f59e0b' }}>
+                                                                    <i className="feather icon-feather-alert-circle" style={{ fontSize: 10, marginRight: 3 }}></i>
+                                                                    Only {product.stock} left
+                                                                </p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )}
