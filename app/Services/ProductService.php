@@ -123,11 +123,25 @@ class ProductService
 
                 if ($request->tags) {
                     $tagItems = json_decode($request->tags, true);
-                    foreach ($tagItems as $tagItem) {
-                        ProductTag::create([
-                            'product_id' => $this->product->id,
-                            'name'       => $tagItem['text']
-                        ]);
+                    if (is_array($tagItems)) {
+                        foreach ($tagItems as $tagItem) {
+                            if (isset($tagItem['text'])) {
+                                ProductTag::create([
+                                    'product_id' => $this->product->id,
+                                    'name'       => $tagItem['text']
+                                ]);
+                            }
+                        }
+                    } else {
+                        $tagItems = explode(',', $request->tags);
+                        foreach ($tagItems as $tagItem) {
+                            if (!empty(trim($tagItem))) {
+                                ProductTag::create([
+                                    'product_id' => $this->product->id,
+                                    'name'       => trim($tagItem)
+                                ]);
+                            }
+                        }
                     }
                 }
 
@@ -186,11 +200,25 @@ class ProductService
                 if ($request->tags) {
                     $product->tags()->delete();
                     $tagItems = json_decode($request->tags, true);
-                    foreach ($tagItems as $tagItem) {
-                        ProductTag::create([
-                            'product_id' => $product->id,
-                            'name'       => $tagItem['text']
-                        ]);
+                    if (is_array($tagItems)) {
+                        foreach ($tagItems as $tagItem) {
+                            if (isset($tagItem['text'])) {
+                                ProductTag::create([
+                                    'product_id' => $product->id,
+                                    'name'       => $tagItem['text']
+                                ]);
+                            }
+                        }
+                    } else {
+                        $tagItems = explode(',', $request->tags);
+                        foreach ($tagItems as $tagItem) {
+                            if (!empty(trim($tagItem))) {
+                                ProductTag::create([
+                                    'product_id' => $product->id,
+                                    'name'       => trim($tagItem)
+                                ]);
+                            }
+                        }
                     }
                 }
 

@@ -363,6 +363,28 @@
         .admin-page-subtitle{font-size:13.5px;color:#94a3b8;margin:3px 0 0}
         .admin-card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:24px}
         .admin-section-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid #f1f5f9}
+
+        /* Premium Price Input with Hiding Currency Icon */
+        .price-input-wrapper { position: relative; display: block; width: 100%; }
+        .price-input { padding-left: 55px !important; transition: all 0.3s ease; }
+        .price-input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 13px;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            z-index: 10;
+        }
+        .price-input:focus + .price-input-icon,
+        .price-input:not(:placeholder-shown) + .price-input-icon {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
         /* Tables */
         .admin-table-card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden}
         .admin-table-wrap{overflow-x:auto}

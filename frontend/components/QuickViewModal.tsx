@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
 import { useToast } from './ToastProvider';
 import { useAuthModal } from '@/context/AuthModalContext';
@@ -20,7 +19,7 @@ interface Product {
     name: string;
     slug: string;
     cover?: string;
-    image?: string;   // SimpleProductDetailsResource returns 'image'
+    image?: string;
     images?: string[];
     currency_price: string;
     discounted_price?: string;
@@ -74,14 +73,12 @@ export default function QuickViewModal({ slug, onClose }: QuickViewModalProps) {
             .finally(() => setLoading(false));
     }, [slug]);
 
-    // Close on Escape
     useEffect(() => {
         const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, [onClose]);
 
-    // Lock body scroll
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = ''; };
@@ -120,105 +117,219 @@ export default function QuickViewModal({ slug, onClose }: QuickViewModalProps) {
             onClick={e => { if (e.target === e.currentTarget) onClose(); }}
             style={{
                 position: 'fixed', inset: 0, zIndex: 99999,
-                background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)',
+                background: 'rgba(5, 5, 10, 0.85)', backdropFilter: 'blur(10px)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '12px',
+                padding: '16px',
             }}
         >
-            <div style={{
-                background: 'rgba(15,15,25,0.98)',
-                border: '1px solid rgba(197,160,89,0.2)',
-                borderRadius: 16,
-                width: '100%', maxWidth: 860,
-                maxHeight: '95vh',
-                overflow: 'hidden',
-                display: 'flex', flexDirection: 'column',
-                boxShadow: '0 32px 80px rgba(0,0,0,0.7)',
-            }}>
+            <style>{`
+                @keyframes qvAppear {
+                    from { opacity: 0; transform: scale(0.96) translateY(20px); }
+                    to { opacity: 1; transform: scale(1) translateY(0); }
+                }
+                .qv-modal {
+                    animation: qvAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                    background: linear-gradient(145deg, rgba(20, 20, 25, 0.98), rgba(28, 28, 35, 0.98));
+                    border: 1px solid rgba(197, 160, 89, 0.25);
+                    border-radius: 20px;
+                    width: 100%; 
+                    max-width: 940px;
+                    max-height: 90vh;
+                    overflow: hidden;
+                    display: flex; 
+                    flex-direction: column;
+                    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+                }
+                .qv-body {
+                    display: grid;
+                    grid-template-columns: 1.1fr 1fr;
+                    overflow: auto;
+                    flex: 1;
+                }
+                .qv-img-container {
+                    padding: 24px;
+                    background: rgba(255, 255, 255, 0.02);
+                }
+                .qv-img-box {
+                    border-radius: 12px;
+                    overflow: hidden;
+                    aspect-ratio: 1/1;
+                    position: relative;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                }
+                .qv-details-wrap {
+                    padding: 40px 48px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+                .qv-kicker {
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #C5A059;
+                    text-transform: uppercase;
+                    letter-spacing: 0.2em;
+                }
+                .qv-title {
+                    margin: 0;
+                    color: #fff;
+                    font-family: serif;
+                    font-size: clamp(24px, 5vw, 36px);
+                    font-weight: 400;
+                    line-height: 1.1;
+                }
+                .qv-price {
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: #fff;
+                    display: flex;
+                    align-items: baseline;
+                    gap: 12px;
+                }
+                .qv-btn-primary {
+                    flex: 1;
+                    padding: 14px 24px;
+                    background: linear-gradient(to right, #C5A059, #b38d45);
+                    border: none;
+                    border-radius: 10px;
+                    color: #000;
+                    font-size: 13px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    text-transform: uppercase;
+                    letter-spacing: 0.1em;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    white-space: nowrap;
+                    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.2);
+                }
+                .qv-btn-primary:hover:not(:disabled) {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(197, 160, 89, 0.3);
+                    filter: brightness(1.1);
+                }
+                .qv-btn-secondary {
+                    padding: 14px 20px;
+                    border: 1px solid rgba(255,255,255,0.15);
+                    border-radius: 10px;
+                    color: rgba(255,255,255,0.8);
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.3s ease;
+                }
+                .qv-btn-secondary:hover {
+                    background: rgba(255,255,255,0.05);
+                    border-color: rgba(255,255,255,0.3);
+                    color: #fff;
+                }
+                .qv-chip {
+                    padding: 8px 16px;
+                    border-radius: 8px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                @media (max-width: 768px) {
+                    .qv-body { grid-template-columns: 1fr; }
+                    .qv-details-wrap { padding: 24px; gap: 20px; }
+                    .qv-action-row { flex-direction: column !important; align-items: stretch !important; }
+                    .qv-btn-primary { width: 100%; justify-content: center; }
+                    .qv-qty-selector { width: 100% !important; justify-content: center; }
+                    .qv-footer-row { flex-direction: column; gap: 16px; align-items: flex-start !important; }
+                }
+            `}</style>
+
+            <div className="qv-modal">
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Quick View</span>
-                    <button onClick={onClose} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.6)', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, lineHeight: 1 }}>×</button>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Product Discovery</span>
+                    <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>×</button>
                 </div>
 
                 {/* Body */}
-                <div style={{ overflow: 'auto', flex: 1, padding: '16px' }}>
+                <div className="qv-body">
                     {loading && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
-                            <span>Loading…</span>
-                        </div>
-                    )}
-
-                    {!loading && !product && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
-                            <span>Product not found.</span>
+                        <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, color: 'rgba(255,255,255,0.3)' }}>
+                            <div style={{ width: 40, height: 40, border: '3px solid rgba(197,160,89,0.2)', borderTopColor: '#C5A059', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                         </div>
                     )}
 
                     {!loading && product && (
                         <>
-                        <style>{`
-                            @media (max-width: 600px) {
-                                .qv-grid { grid-template-columns: 1fr !important; }
-                                .qv-img { max-height: 220px !important; aspect-ratio: 16/9 !important; }
-                            }
-                        `}</style>
-                        <div className="qv-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                            {/* Image */}
-                            <div className="qv-img" style={{ borderRadius: 12, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', aspectRatio: '4/5', position: 'relative' }}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src={product.image || product.cover || (product.images?.[0]) || '/images/demo-decor-store-product-01.jpg'}
-                                    alt={product.name}
-                                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                                />
+                            {/* Image Section */}
+                            <div className="qv-img-container">
+                                <div className="qv-img-box">
+                                    <img
+                                        src={product.image || product.cover || (product.images?.[0]) || '/images/demo-decor-store-product-01.jpg'}
+                                        alt={product.name}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                    {product.is_offer && (
+                                        <span style={{ position: 'absolute', top: 16, left: 16, background: '#C5A059', color: '#000', fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Special Offer</span>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Details */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                {product.category && (
-                                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--base-color)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{product.category.name}</span>
-                                )}
-                                <h2 style={{ margin: 0, color: '#fff', fontSize: 'clamp(16px, 4vw, 22px)', fontWeight: 700, lineHeight: 1.3 }}>{product.name}</h2>
-
-                                {/* Rating */}
-                                {(product.rating_star_count ?? 0) > 0 && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                        {[1,2,3,4,5].map(i => (
-                                            <i key={i} className={`bi ${i <= Math.round(product.rating_star ?? 0) ? 'bi-star-fill' : 'bi-star'}`}
-                                                style={{ fontSize: 13, color: i <= Math.round(product.rating_star ?? 0) ? '#f59e0b' : 'rgba(255,255,255,0.2)' }} />
-                                        ))}
-                                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginLeft: 4 }}>({product.rating_star_count})</span>
-                                    </div>
-                                )}
-
-                                {/* Price */}
-                                <div style={{ fontSize: 22, fontWeight: 700 }}>
-                                    {product.is_offer ? (
-                                        <span>
-                                            <del style={{ fontSize: 14, color: 'rgba(255,255,255,0.35)', marginRight: 8 }}>{product.currency_price}</del>
-                                            <span style={{ color: 'var(--base-color)' }}>{product.discounted_price}</span>
-                                        </span>
-                                    ) : (
-                                        <span style={{ color: '#fff' }}>{product.currency_price}</span>
+                            {/* Details Section */}
+                            <div className="qv-details-wrap">
+                                <div>
+                                    {product.category && <div className="qv-kicker">{product.category.name}</div>}
+                                    <h2 className="qv-title">{product.name}</h2>
+                                    
+                                    {(product.rating_star_count ?? 0) > 0 && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
+                                            <div style={{ display: 'flex', gap: 3 }}>
+                                                {[1,2,3,4,5].map(i => (
+                                                    <i key={i} className={`bi ${i <= Math.round(product.rating_star ?? 0) ? 'bi-star-fill' : 'bi-star'}`}
+                                                        style={{ fontSize: 12, color: i <= Math.round(product.rating_star ?? 0) ? '#C5A059' : 'rgba(255,255,255,0.1)' }} />
+                                                ))}
+                                            </div>
+                                            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>({product.rating_star_count} reviews)</span>
+                                        </div>
                                     )}
                                 </div>
 
-                                {/* Short description */}
+                                <div className="qv-price">
+                                    {product.is_offer ? (
+                                        <>
+                                            <span style={{ color: '#C5A059' }}>{product.discounted_price}</span>
+                                            <del style={{ fontSize: 16, color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>{product.currency_price}</del>
+                                        </>
+                                    ) : (
+                                        <span>{product.currency_price}</span>
+                                    )}
+                                </div>
+
                                 {product.short_description && (
-                                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{product.short_description}</p>
+                                    <p style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, fontWeight: 300 }}>
+                                        {product.short_description}
+                                    </p>
                                 )}
 
                                 {/* Variations */}
                                 {Object.entries(options).map(([attr, vals]) => (
                                     <div key={attr}>
-                                        <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{attr}</p>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                        <p style={{ margin: '0 0 12px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{attr}</p>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                                             {vals.map(val => {
                                                 const selected = selectedOptions[attr] === val;
                                                 return (
                                                     <button key={val} onClick={() => setSelectedOptions(prev => ({ ...prev, [attr]: val }))}
-                                                        style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: selected ? '1px solid var(--base-color)' : '1px solid rgba(255,255,255,0.12)', background: selected ? 'rgba(197,160,89,0.15)' : 'transparent', color: selected ? 'var(--base-color)' : 'rgba(255,255,255,0.6)', transition: 'all 0.2s' }}>
+                                                        className="qv-chip"
+                                                        style={{
+                                                            border: selected ? '2px solid #C5A059' : '1px solid rgba(255,255,255,0.1)',
+                                                            background: selected ? 'rgba(197, 160, 89, 0.1)' : 'rgba(255,255,255,0.03)',
+                                                            color: selected ? '#C5A059' : 'rgba(255,255,255,0.7)',
+                                                        }}>
                                                         {val}
                                                     </button>
                                                 );
@@ -227,40 +338,38 @@ export default function QuickViewModal({ slug, onClose }: QuickViewModalProps) {
                                     </div>
                                 ))}
 
-                                {/* Qty — hidden when out of stock */}
-                                {product.stock !== 0 && (
-                                <div>
-                                    <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Quantity</p>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, width: 'fit-content', overflow: 'hidden' }}>
-                                        <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 38, height: 38, background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                                        <span style={{ width: 42, textAlign: 'center', color: '#fff', fontSize: 14, fontWeight: 600 }}>{qty}</span>
-                                        <button onClick={() => setQty(q => Math.min(product.stock ?? 99, q + 1))} style={{ width: 38, height: 38, background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                                {/* Add to Cart Row */}
+                                <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                    <div className="qv-action-row" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                        {product.stock !== 0 && (
+                                            <div className="qv-qty-selector" style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 44, height: 44, background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 20 }}>−</button>
+                                                <span style={{ minWidth: 40, textAlign: 'center', color: '#fff', fontSize: 15, fontWeight: 700 }}>{qty}</span>
+                                                <button onClick={() => setQty(q => Math.min(product.stock ?? 99, q + 1))} style={{ width: 44, height: 44, background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 20 }}>+</button>
+                                            </div>
+                                        )}
+                                        
+                                        <button onClick={handleAddToCart} disabled={addingToCart || product.stock === 0} className="qv-btn-primary">
+                                            <i className="feather icon-feather-shopping-bag" style={{ fontSize: 16 }} />
+                                            {product.stock === 0 ? 'Out of Stock' : addingToCart ? 'Wait...' : 'Add to Collection'}
+                                        </button>
+                                    </div>
+
+                                    <div className="qv-footer-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <a href={`/product/${product.slug}`} className="qv-btn-secondary">
+                                            <i className="feather icon-feather-external-link" />
+                                            Explore Full Details
+                                        </a>
+
+                                        {product.stock !== undefined && (
+                                            <div style={{ fontSize: 12, fontWeight: 600, color: product.stock <= 0 ? '#ff5555' : product.stock <= 3 ? '#ffaa00' : '#4ade80', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', boxShadow: '0 0 8px currentColor' }} />
+                                                {product.stock <= 0 ? 'Unavailable' : product.stock <= 3 ? `Limited Stock` : 'Stock Available'}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                )}
-
-                                {/* Actions */}
-                                <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-                                    <button onClick={handleAddToCart} disabled={addingToCart || product.stock === 0}
-                                        style={{ flex: 1, padding: '12px 20px', background: product.stock === 0 ? 'rgba(255,255,255,0.08)' : 'var(--base-color)', border: product.stock === 0 ? '1px solid rgba(255,255,255,0.1)' : 'none', borderRadius: 8, color: product.stock === 0 ? 'rgba(255,255,255,0.3)' : '#000', fontSize: 13, fontWeight: 700, cursor: (addingToCart || product.stock === 0) ? 'not-allowed' : 'pointer', opacity: addingToCart ? 0.7 : 1, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                        {product.stock === 0 ? 'Out of Stock' : addingToCart ? 'Adding…' : 'Add to Cart'}
-                                    </button>
-                                    <a href={`/product/${product.slug}`}
-                                        style={{ padding: '12px 16px', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-                                        <i className="feather icon-feather-external-link" style={{ fontSize: 13 }} />
-                                        Full Page
-                                    </a>
-                                </div>
-
-                                {/* Stock */}
-                                {product.stock !== undefined && (
-                                    <p style={{ margin: 0, fontSize: 12, color: product.stock === 0 ? '#f87171' : product.stock <= 3 ? '#f59e0b' : '#4ade80' }}>
-                                        <i className={`feather ${product.stock === 0 ? 'icon-feather-x-circle' : product.stock <= 3 ? 'icon-feather-alert-circle' : 'icon-feather-check-circle'}`} style={{ marginRight: 5 }} />
-                                        {product.stock === 0 ? 'Out of stock' : product.stock <= 3 ? `Only ${product.stock} left!` : 'In stock'}
-                                    </p>
-                                )}
                             </div>
-                        </div>
                         </>
                     )}
                 </div>

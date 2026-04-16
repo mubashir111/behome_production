@@ -175,7 +175,7 @@
 
 @push('scripts')
 <script>
-    const CURRENCY_SYMBOL = '{{ env('CURRENCY_SYMBOL', '₹') }}';
+    const CURRENCY_SYMBOL = '{{ config('app.currency_symbol') }}';
     // Pre-load existing items
     let poItems = [];
     
@@ -289,12 +289,13 @@
                         <div class="text-[11px] text-slate-500 font-mono mt-0.5">SKU: ${item.sku || 'N/A'}</div>
                     </td>
                     <td class="px-4 py-4">
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">${CURRENCY_SYMBOL}</span>
+                        <div class="price-input-wrapper">
                             <input type="number" step="0.01" value="${item.price}" 
+                                placeholder=" "
                                 onchange="updateItemDetails('${item.uid}', 'price', this.value)" 
                                 onkeyup="updateItemDetails('${item.uid}', 'price', this.value)"
-                                class="w-24 pl-6 pr-2 py-1.5 text-sm border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono">
+                                class="price-input w-32 pr-2 py-1.5 text-sm border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono">
+                            <span class="price-input-icon">${CURRENCY_SYMBOL}</span>
                         </div>
                     </td>
                     <td class="px-4 py-4">

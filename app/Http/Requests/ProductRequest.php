@@ -86,7 +86,7 @@ class ProductRequest extends FormRequest
             'details'                    => ['nullable', 'string'],
             'additional_info'            => ['nullable', 'string'],
             'shipping_and_return'        => ['nullable', 'string', 'max:5000'],
-            'tags'                       => ['nullable', 'json'],
+            'tags'                       => ['nullable', 'string'],
             'discount'                   => ['nullable', 'numeric', 'min:0'],
             'offer_start_date'           => ['nullable', 'date'],
             'offer_end_date'             => ['nullable', 'date', 'after_or_equal:offer_start_date'],

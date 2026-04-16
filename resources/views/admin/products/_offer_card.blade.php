@@ -84,6 +84,7 @@
 @push('scripts')
 <script>
 function updateOfferPreview() {
+    const currencyBase = "{{ config('app.currency_symbol') }}";
     const sellingPriceInput = document.getElementById('selling_price');
     const discountInput     = document.getElementById('discount');
     const startInput        = document.getElementById('offer_start_date');
@@ -103,8 +104,8 @@ function updateOfferPreview() {
     const offerPrice = Math.max(0, sellingPrice - discount);
     const pct = sellingPrice > 0 ? Math.round((discount / sellingPrice) * 100) : 0;
 
-    originalEl.textContent = '£' + sellingPrice.toFixed(2);
-    finalEl.textContent    = '£' + offerPrice.toFixed(2) + (pct > 0 ? ' (' + pct + '% off)' : '');
+    originalEl.textContent = currencyBase + ' ' + sellingPrice.toFixed(2);
+    finalEl.textContent    = currencyBase + ' ' + offerPrice.toFixed(2) + (pct > 0 ? ' (' + pct + '% off)' : '');
 
     // Status badge
     const now   = new Date();

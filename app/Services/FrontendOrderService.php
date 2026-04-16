@@ -143,20 +143,26 @@ class FrontendOrderService
                     foreach ($products as $p) {
                         // FETCH FROM SERVER TO PREVENT PRICE MANIPULATION
                         $product = Product::findOrFail($p->product_id);
-                        $isOffer = $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now();
+                        
+                        // --- Stock Validation ---
                         $variation = null;
                         if ($p->variation_id > 0) {
                             $variation = ProductVariation::findOrFail($p->variation_id);
-                            $price = $variation->price;
+                            $availableStock = $variation->stockItems()->sum('quantity');
                             $sku = $variation->sku;
+                            $price = $variation->price;
                         } else {
-                            $price = $product->selling_price;
+                            $availableStock = $product->stockItems()->sum('quantity');
                             $sku = $product->sku;
+                            $price = $product->selling_price;
                         }
 
-                        if ($isOffer) {
-                            $price = max(0, $price - $product->discount);
+                        if ($availableStock < $p->quantity) {
+                            throw new Exception("The product '{$product->name}' is currently low on stock (Only {$availableStock} left). Please update your cart.", 422);
                         }
+                        // --- End Stock Validation ---
+
+                        $isOffer = $product->offer_start_date && $product->offer_end_date && $product->offer_start_date < now() && $product->offer_end_date > now();
 
                         // Calculate server-side totals
                         $itemSubtotal = $price * $p->quantity;

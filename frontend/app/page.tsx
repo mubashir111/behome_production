@@ -26,7 +26,7 @@ export default async function Home() {
         apiFetch('/frontend/product-category', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
         apiFetch('/products?per_page=8&sort=popular', { next: { revalidate: 3600 } }).catch(() => ({ data: { data: [] } })),
         apiFetch('/products?per_page=8', { next: { revalidate: 3600 } }).catch(() => ({ data: { data: [] } })),
-        apiFetch('/frontend/promotion', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
+        apiFetch('/frontend/promotion?status=5', { next: { revalidate: 30 } }).catch(() => ({ data: [] })),
         apiFetch('/frontend/benefit', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
         apiFetch('/frontend/product-brand', { next: { revalidate: 3600 } }).catch(() => ({ data: [] })),
         apiFetch('/products?per_page=10&sort=offer', { next: { revalidate: 3600 } }).catch(() => ({ data: { data: [] } })),
@@ -44,10 +44,12 @@ export default async function Home() {
     const latestProducts = (latestData?.data?.data || latestData?.data || []).slice(0, 8);
     const featuredProducts = popularProducts.slice(0, 3);
 
-    const promotions = (promotionsData.data || []).map((p: any) => ({
-        ...p,
-        image: p.preview || p.cover || '',
-    }));
+    const promotions = (promotionsData.data || [])
+        .filter((p: any) => p.status === 5)
+        .map((p: any) => ({
+            ...p,
+            image: p.preview || p.cover || '',
+        }));
     const featurePromo = promotions.find((p: any) => p.type === 15);
 
     // Map Dynamic Promotions Grid (declared first so featuredOffer can reference it)

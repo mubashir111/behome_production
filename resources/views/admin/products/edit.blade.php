@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 <style>
     #crop-image-element { max-width: 100%; display: block; }
+
+
     .crop-area-wrapper {
         min-height: 300px;
         max-height: calc(90vh - 200px);
@@ -560,22 +562,24 @@
                     <div class="p-6 space-y-5">
                         <div class="space-y-1.5">
                             <label for="selling_price" class="text-sm font-medium text-slate-700">Selling Price</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <span class="text-slate-400 font-bold text-xs">$</span>
-                                </div>
+                            <div class="price-input-wrapper">
                                 <input type="number" step="0.01" name="selling_price" id="selling_price" value="{{ number_format($p_selling_price, 2, '.', '') }}" required
-                                       class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm font-bold">
+                                       placeholder=" "
+                                       class="price-input w-full peer pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm font-bold">
+                                <span class="price-input-icon">
+                                    {{ config('app.currency_symbol') }}
+                                </span>
                             </div>
                         </div>
                         <div class="space-y-1.5">
                             <label for="buying_price" class="text-sm font-medium text-slate-700">Cost per Item</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <span class="text-slate-400 font-bold text-xs">$</span>
-                                </div>
+                            <div class="price-input-wrapper">
                                 <input type="number" step="0.01" name="buying_price" id="buying_price" value="{{ number_format($p_buying_price, 2, '.', '') }}" required
-                                       class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm">
+                                       placeholder=" "
+                                       class="price-input w-full peer pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm">
+                                <span class="price-input-icon">
+                                    {{ config('app.currency_symbol') }}
+                                </span>
                             </div>
                             <p class="text-[10px] text-slate-400">Not visible to customers.</p>
                         </div>
@@ -761,9 +765,12 @@
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-slate-700 block">Price Constraint (Optional)</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3 text-slate-500 text-sm">$</span>
-                        <input type="number" id="variant-price" placeholder="0.00" step="0.01" min="0" class="w-full pl-6 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm">
+                    <div class="price-input-wrapper">
+                        <input type="number" id="variant-price" placeholder=" " step="0.01" min="0" 
+                               class="price-input peer w-full pr-4 py-3 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm">
+                        <span class="price-input-icon">
+                            {{ config('app.currency_symbol') }}
+                        </span>
                     </div>
                 </div>
                 <div class="space-y-2">

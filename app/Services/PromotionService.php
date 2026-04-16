@@ -93,6 +93,8 @@ class PromotionService
     /**
      * @throws Exception
      */
+    public function update(PromotionRequest $request, Promotion $promotion): Promotion
+    {
         return DB::transaction(function () use ($request, $promotion) {
             try {
                 $promotion->update($request->validated() + ['slug' => Str::slug($request->name)]);
@@ -107,19 +109,22 @@ class PromotionService
                 throw new Exception($exception->getMessage(), 422);
             }
         });
+    }
 
     /**
      * @throws Exception
      */
+    public function destroy(Promotion $promotion): void
+    {
         try {
             DB::transaction(function() use ($promotion) {
                 $name = $promotion->name;
                 $id   = $promotion->id;
-                
+
                 $promotion->promotionProducts()->delete();
                 $promotion->clearMediaCollection('promotion');
                 $promotion->delete();
-                
+
                 \App\Models\AdminNotification::record('warning', 'Promotion Deleted', "Promotion '{$name}' (ID #{$id}) was deleted by " . (auth()->user()->name ?? 'Admin'));
             });
         } catch (Exception $exception) {
