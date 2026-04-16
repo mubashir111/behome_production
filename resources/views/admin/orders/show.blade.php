@@ -377,10 +377,9 @@
                                 @endif
                             </p>
                         </div>
-                        <form method="POST" action="{{ route('admin.orders.issue-refund', $order) }}"
-                              onsubmit="return confirm('Issue refund of {{ $currencySymbol }}{{ number_format($order->total, 2) }} to this customer? This cannot be undone.')">
+                        <form id="issue-refund-form" method="POST" action="{{ route('admin.orders.issue-refund', $order) }}">
                             @csrf
-                            <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition">
+                            <button type="button" onclick="confirmSubmit('issue-refund-form', { title: 'Issue Refund', message: 'Issue refund of {{ $currencySymbol }}{{ number_format($order->total, 2) }} to this customer? This cannot be undone.', confirmText: 'Yes, Issue Refund', type: 'warning' })" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
                                 Issue Refund — {{ $currencySymbol }}{{ number_format($order->total, 2) }}
                                 @if($isStripePayment) (Stripe → Card) @else (Wallet Credit) @endif

@@ -24,18 +24,20 @@ class UnitRequest extends FormRequest
      */
     public function rules(): array
     {
+        $unitId = $this->route('unit') instanceof \App\Models\Unit ? $this->route('unit')->id : $this->route('unit');
+
         return [
             'name'        => [
                 'required',
                 'string',
                 'max:190',
-                Rule::unique("units", "name")->ignore($this->route('unit.id'))
+                Rule::unique("units", "name")->ignore($unitId)
             ],
             'code'              => [
                 'required',
                 'string',
                 'max:20',
-                Rule::unique("units", "code")->ignore($this->route('unit.id'))
+                Rule::unique("units", "code")->ignore($unitId)
             ],
             'status' => ['required', 'numeric'],
         ];

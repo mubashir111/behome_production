@@ -85,7 +85,7 @@ class OrderController extends Controller
     {
         try {
             $sendEmail = $request->has('send_email');
-        $this->orderService->changeStatus($order, $request, false, $sendEmail);
+            $this->orderService->changeStatus($order, $request, false, $sendEmail);
             return back()->with('success', 'Order status updated successfully.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -105,7 +105,7 @@ class OrderController extends Controller
     public function archived()
     {
         $orders = Order::onlyTrashed()
-            ->with(['user', 'transaction'])
+            ->with(['user', 'transaction', 'orderProducts'])
             ->latest('deleted_at')
             ->paginate(20);
         $currencySymbol = config('app.currency_symbol');
@@ -147,11 +147,11 @@ class OrderController extends Controller
 
         if ($request->has('send_email') && $order->user && $order->user->email) {
             try {
-                \Illuminate\Support\Facades\Mail::to($order->user->email)->send(
+                \Illuminate\Support\Facades\Mail::to($order->user->email)->queue(
                     new \App\Mail\OrderReplyMail($order, $request->message)
                 );
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error("Failed to send order reply email: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error("Failed to queue order reply email: " . $e->getMessage());
             }
         }
 
@@ -185,26 +185,28 @@ class OrderController extends Controller
                     'payment_intent' => $transaction->transaction_no,
                 ]);
 
-                \App\Models\Transaction::create([
-                    'order_id'       => $order->id,
-                    'transaction_no' => $stripeRefund->id,
-                    'amount'         => $order->total,
-                    'payment_method' => 'stripe',
-                    'sign'           => '-',
-                    'type'           => 'cash_back',
-                ]);
+                \Illuminate\Support\Facades\DB::transaction(function () use ($order, $stripeRefund) {
+                    \App\Models\Transaction::create([
+                        'order_id'       => $order->id,
+                        'transaction_no' => $stripeRefund->id,
+                        'amount'         => $order->total,
+                        'payment_method' => 'stripe',
+                        'sign'           => '-',
+                        'type'           => 'cash_back',
+                    ]);
 
-                \App\Services\AuditLogger::refundStageChanged($order, \App\Enums\RefundStatus::REFUND_ISSUED, (float) $order->total);
+                    \App\Services\AuditLogger::refundStageChanged($order, \App\Enums\RefundStatus::REFUND_ISSUED, (float) $order->total);
 
-                // Notify the customer via the order message thread
-                $formatted = number_format((float) $order->total, 2);
-                $currency  = config('app.currency_symbol', 'AED');
-                $order->messages()->create([
-                    'user_id'     => auth()->id(),
-                    'sender_type' => 'admin',
-                    'message'     => "Your refund of {$currency} {$formatted} has been processed and will be returned to your card within 5–10 business days.\n\nReference: {$stripeRefund->id}",
-                    'is_read'     => false,
-                ]);
+                    // Notify the customer via the order message thread
+                    $formatted = number_format((float) $order->total, 2);
+                    $currency  = config('app.currency_symbol', 'AED');
+                    $order->messages()->create([
+                        'user_id'     => auth()->id(),
+                        'sender_type' => 'admin',
+                        'message'     => "Your refund of {$currency} {$formatted} has been processed and will be returned to your card within 5–10 business days.\n\nReference: {$stripeRefund->id}",
+                        'is_read'     => false,
+                    ]);
+                });
 
                 return back()->with('success', "Stripe refund of {$order->total} issued successfully. The customer will see it on their card within 5–10 business days.");
             } catch (\Exception $e) {

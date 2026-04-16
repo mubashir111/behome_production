@@ -66,53 +66,87 @@ class ProductBrandService
      */
     public function store(ProductBrandRequest $request)
     {
-        try {
-            $productBrand = ProductBrand::create($request->validated() + ['slug' => Str::slug($request->name)]);
-            if ($request->image) {
-                $productBrand->addMediaFromRequest('image')->toMediaCollection('product-brand');
+        return DB::transaction(function () use ($request) {
+            try {
+                $slug = Str::slug($request->name);
+                $base = $slug;
+                $i    = 1;
+                while (ProductBrand::where('slug', $slug)->exists()) {
+                    $slug = "{$base}-{$i}";
+                    $i++;
+                }
+
+                $productBrand = ProductBrand::create($request->validated() + ['slug' => $slug]);
+                
+                if ($request->hasFile('image')) {
+                    $productBrand->addMediaFromRequest('image')->toMediaCollection('product-brand');
+                }
+
+                \App\Models\AdminNotification::record('info', 'Brand Created', "Brand '{$productBrand->name}' was created by " . (auth()->user()->name ?? 'Admin'));
+
+                return $productBrand;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $productBrand;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function update(ProductBrandRequest $request, ProductBrand $productBrand): ProductBrand
     {
-        try {
-            $productBrand->update($request->validated() + ['slug' => Str::slug($request->name)]);
-            if ($request->image) {
-                $productBrand->clearMediaCollection('product-brand');
-                $productBrand->addMediaFromRequest('image')->toMediaCollection('product-brand');
+        return DB::transaction(function () use ($request, $productBrand) {
+            try {
+                $slug = $productBrand->slug;
+                if ($productBrand->name !== $request->name) {
+                    $slug = Str::slug($request->name);
+                    $base = $slug;
+                    $i    = 1;
+                    while (ProductBrand::where('slug', $slug)->where('id', '!=', $productBrand->id)->exists()) {
+                        $slug = "{$base}-{$i}";
+                        $i++;
+                    }
+                }
+
+                $productBrand->update($request->validated() + ['slug' => $slug]);
+                
+                if ($request->hasFile('image')) {
+                    $productBrand->clearMediaCollection('product-brand');
+                    $productBrand->addMediaFromRequest('image')->toMediaCollection('product-brand');
+                }
+
+                \App\Models\AdminNotification::record('info', 'Brand Updated', "Brand '{$productBrand->name}' (ID #{$productBrand->id}) was updated by " . (auth()->user()->name ?? 'Admin'));
+
+                return $productBrand;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $productBrand;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function destroy(ProductBrand $productBrand)
     {
         try {
-            $checkProduct = $productBrand->products->whereNull('deleted_at');
-            if (!blank($checkProduct)) {
-                $productBrand->delete();
-            } else {
-                DB::statement('SET FOREIGN_KEY_CHECKS=0');
-                $productBrand->delete();
-                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+            // Check ALL products (active + inactive) — the products() relationship scopes to active only,
+            // so using it would miss inactive products and cause a FK constraint violation on delete.
+            $productCount = \App\Models\Product::where('product_brand_id', $productBrand->id)->count();
+            if ($productCount > 0) {
+                throw new Exception("Cannot delete brand: It is linked to {$productCount} product(s). Please reassign or remove them first.", 422);
             }
+
+            $name = $productBrand->name;
+            $id   = $productBrand->id;
+
+            DB::transaction(function () use ($productBrand) {
+                $productBrand->clearMediaCollection('product-brand');
+                $productBrand->delete();
+            });
+
+            \App\Models\AdminNotification::record('warning', 'Brand Deleted', "Brand '{$name}' (ID #{$id}) was deleted by " . (auth()->user()->name ?? 'Admin'));
+
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception(QueryExceptionLibrary::message($exception), 422);
+            Log::info("Brand deletion error: " . $exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
         }
     }
 

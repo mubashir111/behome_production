@@ -434,9 +434,11 @@ export default function OrderDetail() {
                                     <span className="badge px-15px py-8px fs-13 fw-600 border-radius-4px text-nowrap" style={{ background: `${statusColor}22`, color: statusColor, border: `1px solid ${statusColor}44`, marginRight: '20px' }}>
                                         {order.status_name || STATUS_NAMES[order.status] || 'Unknown'}
                                     </span>
-                                    <button onClick={printInvoice} className="btn btn-small btn-round-edge px-20px text-nowrap" style={{ background: 'rgba(197,160,89,0.1)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--base-color)', fontSize: 13 }}>
-                                        <i className="feather icon-feather-download me-1"></i> Invoice
-                                    </button>
+                                    {order.status !== 15 && order.status !== 20 && (
+                                        <button onClick={printInvoice} className="btn btn-small btn-round-edge px-20px text-nowrap" style={{ background: 'rgba(197,160,89,0.1)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--base-color)', fontSize: 13 }}>
+                                            <i className="feather icon-feather-download me-1"></i> Invoice
+                                        </button>
+                                    )}
                                     <button onClick={() => setShowMessages(m => !m)} className="btn btn-small btn-round-edge px-20px text-nowrap" style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', fontSize: 13 }}>
                                         <i className="feather icon-feather-message-circle me-1"></i> {showMessages ? 'Hide' : 'Message'} Support
                                     </button>

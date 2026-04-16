@@ -61,6 +61,7 @@ class StaticPageController extends Controller
     {
         $data = $request->validate([
             'title'               => 'required|string|max:255',
+            'slug'                => $page->is_system ? 'nullable' : 'required|string|max:255|regex:/^[a-z0-9\-]+$/|unique:static_pages,slug,' . $page->id,
             'content'             => 'nullable|string',
             'meta_title'          => 'nullable|string|max:255',
             'meta_description'    => 'nullable|string|max:500',
@@ -71,14 +72,34 @@ class StaticPageController extends Controller
         // Build sections JSON from request depending on page slug
         $sections = $this->buildSections($request, $page->slug);
 
-        $page->update([
+        // Handle team image uploads specifically if present
+        if ($page->slug === 'about' && $request->hasFile('team_image_file')) {
+            $files = $request->file('team_image_file');
+            foreach ($files as $index => $file) {
+                if ($file && isset($sections['team'][$index])) {
+                    $path = $file->store('pages', 'public');
+                    $sections['team'][$index]['image'] = '/storage/' . $path;
+                }
+            }
+        }
+
+        $updateData = [
             'title'            => $data['title'],
             'content'          => $data['content'] ?? null,
             'sections'         => $sections,
             'meta_title'       => $data['meta_title'] ?? null,
             'meta_description' => $data['meta_description'] ?? null,
             'is_active'        => $request->boolean('is_active'),
-        ]);
+        ];
+
+        // Only update slug if it's NOT a system page
+        if (!$page->is_system && isset($data['slug'])) {
+            $updateData['slug'] = $data['slug'];
+        }
+
+        $page->update($updateData);
+
+        \App\Models\AdminNotification::record('info', 'Page Updated', "Static page '{$page->title}' was modified by " . (auth()->user()->name ?? 'Admin'));
 
         return redirect()->route('admin.pages.edit', $page)->with('success', 'Page updated successfully.');
     }

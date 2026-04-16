@@ -949,26 +949,33 @@
 
     // Delete variant
     async function deleteVariant(variationId) {
-        if (!confirm('Are you sure you want to delete this variant?')) return;
-        try {
-            const response = await fetch(`/admin/products/${productId}/variations/destroy/${variationId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${window.localStorage.getItem('auth_token') || ''}`,
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                credentials: 'include'
-            });
-            if (response.ok) {
-                showToast('Variant deleted successfully', 'success');
-                loadVariants();
+        showConfirm({
+            title: 'Delete Variant',
+            message: 'Are you sure you want to delete this variant? This action cannot be undone.',
+            confirmText: 'Yes, Delete',
+            type: 'danger',
+            onConfirm: async () => {
+                try {
+                    const response = await fetch(`/admin/products/${productId}/variations/destroy/${variationId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${window.localStorage.getItem('auth_token') || ''}`,
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        showToast('Variant deleted successfully', 'success');
+                        loadVariants();
+                    }
+                } catch (error) {
+                    console.error('Error deleting variant:', error);
+                    showToast('Error deleting variant', 'error');
+                }
             }
-        } catch (error) {
-            console.error('Error deleting variant:', error);
-            showToast('Error deleting variant', 'error');
-        }
+        });
     }
 
     // Handle color attribute change
@@ -1319,10 +1326,16 @@
     };
 
     window.removeBlock = function(index) {
-        if(confirm('Are you sure?')) {
-            blocksData.splice(index, 1);
-            renderBlocks();
-        }
+        showConfirm({
+            title: 'Remove Content Block',
+            message: 'Are you sure you want to remove this content block? You will need to save the product to persist this change.',
+            confirmText: 'Yes, Remove',
+            type: 'danger',
+            onConfirm: () => {
+                blocksData.splice(index, 1);
+                renderBlocks();
+            }
+        });
     };
 
     window.moveBlock = function(index, direction) {
@@ -1615,26 +1628,32 @@
     };
 
     window.deleteGalleryImage = function(url) {
-        if (confirm('Are you sure you want to delete this image?')) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = url;
-            
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-            form.appendChild(csrfToken);
-            
-            const methodField = document.createElement('input');
-            methodField.type = 'hidden';
-            methodField.name = '_method';
-            methodField.value = 'DELETE';
-            form.appendChild(methodField);
-            
-            document.body.appendChild(form);
-            form.submit();
-        }
+        showConfirm({
+            title: 'Delete Image',
+            message: 'Are you sure you want to delete this image from the gallery? This action is permanent.',
+            confirmText: 'Yes, Delete',
+            type: 'danger',
+            onConfirm: () => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+                
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'DELETE';
+                form.appendChild(methodField);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     };
 </script>
 

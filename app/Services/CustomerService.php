@@ -58,23 +58,25 @@ class CustomerService
     public function store(CustomerRequest $request)
     {
         try {
-            DB::transaction(function () use ($request) {
+            return DB::transaction(function () use ($request) {
                 $this->user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'phone' => $request->phone,
-                    'username' => $this->username($request->email),
-                    'password' => bcrypt($request->password),
+                    'name'              => $request->name,
+                    'email'             => $request->email,
+                    'phone'             => $request->phone,
+                    'username'          => $this->username($request->email),
+                    'password'          => bcrypt($request->password),
                     'email_verified_at' => now(),
-                    'status' => $request->status,
-                    'country_code' => $request->country_code,
-                    'is_guest' => Ask::NO,
+                    'status'            => $request->status,
+                    'country_code'      => $request->country_code,
+                    'is_guest'          => Ask::NO,
                 ]);
                 $this->user->assignRole(EnumRole::CUSTOMER);
+                
+                \App\Models\AdminNotification::record('info', 'Customer Registered', "Customer '{$this->user->name}' was registered by " . (auth()->user()->name ?? 'Admin'));
+                
+                return $this->user;
             });
-            return $this->user;
         } catch (Exception $exception) {
-            DB::rollBack();
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -87,24 +89,23 @@ class CustomerService
     {
         try {
             if (!in_array(EnumRole::CUSTOMER, $this->blockRoles)) {
-                DB::transaction(function () use ($customer, $request) {
-                    $this->user = $customer;
-                    $this->user->name = $request->name;
-                    $this->user->email = $request->email;
-                    $this->user->phone = $request->phone;
-                    $this->user->status = $request->status;
-                    $this->user->country_code = $request->country_code;
+                return DB::transaction(function () use ($customer, $request) {
+                    $oldName = $customer->name;
+                    $customer->update($request->validated());
+                    
                     if ($request->password) {
-                        $this->user->password = Hash::make($request->password);
+                        $customer->password = Hash::make($request->password);
+                        $customer->save();
                     }
-                    $this->user->save();
+                    
+                    \App\Models\AdminNotification::record('info', 'Customer Updated', "Customer profile for '{$oldName}' was updated by " . (auth()->user()->name ?? 'Admin'));
+                    
+                    return $customer;
                 });
-                return $this->user;
             } else {
                 throw new Exception(trans('all.message.permission_denied'), 422);
             }
         } catch (Exception $exception) {
-            DB::rollBack();
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -133,11 +134,20 @@ class CustomerService
     public function destroy(User $customer)
     {
         try {
-            if (!in_array(EnumRole::CUSTOMER, $this->blockRoles) && $customer->id != 2) {
+            // ID 2 is the seeded root super-admin account — never allow it to be deleted here.
+            if (!in_array(EnumRole::CUSTOMER, $this->blockRoles) && $customer->id !== 2) {
                 if ($customer->hasRole(EnumRole::CUSTOMER)) {
-                    DB::transaction(function () use ($customer) {
+                    return DB::transaction(function () use ($customer) {
+                        // Safeguard: Check for active orders or wallet balance
+                        if ($customer->orders()->exists()) {
+                            throw new Exception('Cannot delete customer: They have an existing order history. Consider deactivating them instead.', 422);
+                        }
+
+                        $name = $customer->name;
                         $customer->addresses()->delete();
                         $customer->delete();
+                        
+                        \App\Models\AdminNotification::record('warning', 'Customer Removed', "Customer '{$name}' was permanently removed by " . (auth()->user()->name ?? 'Admin'));
                     });
                 } else {
                     throw new Exception(trans('all.message.permission_denied'), 422);
@@ -146,9 +156,8 @@ class CustomerService
                 throw new Exception(trans('all.message.permission_denied'), 422);
             }
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            DB::rollBack();
-            throw new Exception(QueryExceptionLibrary::message($exception), 422);
+            Log::info("Customer deletion error: " . $exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
         }
     }
 

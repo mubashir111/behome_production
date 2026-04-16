@@ -106,7 +106,21 @@ class ProductService
                 if (isset($validated['details']) && is_string($validated['details'])) {
                     $validated['details'] = json_decode($validated['details'], true);
                 }
-                $this->product = Product::create($validated + ['slug' => Str::slug($request->name), 'variation_price' => $request->selling_price]);
+
+                // Slug uniqueness check
+                $slug = Str::slug($request->name);
+                $base = $slug;
+                $count = 1;
+                while (Product::where('slug', $slug)->exists()) {
+                    $slug = "{$base}-{$count}";
+                    $count++;
+                }
+
+                $this->product = Product::create($validated + [
+                    'slug'            => $slug,
+                    'variation_price' => $request->selling_price
+                ]);
+
                 if ($request->tags) {
                     $tagItems = json_decode($request->tags, true);
                     foreach ($tagItems as $tagItem) {
@@ -131,11 +145,12 @@ class ProductService
                         $this->product->addMedia($image)->toMediaCollection('product');
                     }
                 }
+
+                \App\Models\AdminNotification::record('info', 'Product Added', "New product '{$this->product->name}' was added by " . (auth()->user()->name ?? 'Admin'));
             });
             return $this->product;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -154,7 +169,19 @@ class ProductService
                 if (isset($validated['details']) && is_string($validated['details'])) {
                     $validated['details'] = json_decode($validated['details'], true);
                 }
-                $product->update($validated + ['slug' => Str::slug($request->name)]);
+
+                if ($product->name !== $request->name) {
+                    $slug = Str::slug($request->name);
+                    $base = $slug;
+                    $count = 1;
+                    while (Product::where('slug', $slug)->where('id', '!=', $product->id)->exists()) {
+                        $slug = "{$base}-{$count}";
+                        $count++;
+                    }
+                    $validated['slug'] = $slug;
+                }
+
+                $product->update($validated);
 
                 if ($request->tags) {
                     $product->tags()->delete();
@@ -175,9 +202,7 @@ class ProductService
                             'tax_id'     => $tax
                         ]);
                     }
-                }
-
-                if (!$request->tax_id) {
+                } elseif (!$request->tax_id) {
                     $product->taxes()->delete();
                 }
 
@@ -187,23 +212,21 @@ class ProductService
                     }
                 }
 
-                if ($product->variations) {
-                    $this->product = Product::find($product->id);
-                    $checkMinPrice = $product->variations->min('price');
+                if ($product->variations()->exists()) {
+                    $checkMinPrice = $product->variations()->min('price');
                     if ($checkMinPrice) {
-                        $this->product->variation_price = $checkMinPrice;
-                        $this->product->save();
+                        $product->variation_price = $checkMinPrice;
+                        $product->save();
                     }
                 }
 
-                if (!$this->product) {
-                    $this->product = $product->fresh(['media']);
-                }
+                $this->product = $product->fresh(['media']);
+                
+                \App\Models\AdminNotification::record('info', 'Product Updated', "Product '{$product->name}' was updated by " . (auth()->user()->name ?? 'Admin'));
             });
             return $this->product;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -225,7 +248,7 @@ class ProductService
             return $this->product;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -252,7 +275,7 @@ class ProductService
             return $this->product;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), (int) ($exception->getCode() ?: 422));
         }
     }
@@ -264,14 +287,74 @@ class ProductService
     {
         try {
             DB::transaction(function () use ($product) {
-                if ($product->productTaxes) {
-                    $product->productTaxes()->delete();
+                // Deletion Guard: Prevent deleting products that have unfulfilled orders
+                $unfulfilledCount = $product->productOrders()
+                    ->whereHasMorph('model', [\App\Models\Order::class], function($query) {
+                        $query->whereIn('status', [
+                            \App\Enums\OrderStatus::PENDING,
+                            \App\Enums\OrderStatus::CONFIRMED,
+                            \App\Enums\OrderStatus::ON_THE_WAY
+                        ]);
+                    })->count();
+
+                if ($unfulfilledCount > 0) {
+                    throw new Exception("Cannot delete product: It is currently part of {$unfulfilledCount} unfulfilled order(s). Please process or cancel those orders first.", 422);
                 }
+
+                $name = $product->name;
+
+                // For soft-delete, we only trigger $product->delete()
+                // Associated records (variations, media, etc.) remain intact so restoration is possible.
                 $product->delete();
+                
+                \App\Models\AdminNotification::record('warning', 'Product Archived', "Product '{$name}' was archived (soft-deleted) by " . (auth()->user()->name ?? 'Admin'));
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+            throw new Exception($exception->getMessage(), 422);
+        }
+    }
+
+    /**
+     * Permanently delete a product and all its child records.
+     * This cannot be undone. Always check for dependencies first.
+     *
+     * @throws Exception
+     */
+    public function forceDestroy(Product $product): void
+    {
+        try {
+            // Security: Only Super Admin (Role ID 1) can permanently delete records
+            if (auth()->user()?->myrole !== 1) {
+                throw new Exception("Unauthorized: Only super admins can permanently delete products.", 403);
+            }
+
+            DB::transaction(function () use ($product) {
+                $name = $product->name;
+
+                if ($product->productTaxes) {
+                    $product->productTaxes()->delete();
+                }
+                
+                if ($product->tags) {
+                    $product->tags()->delete();
+                }
+
+                if ($product->variations()->exists()) {
+                    $product->variations()->delete();
+                }
+
+                // Delete physical media files to prevent storage bloat
+                foreach ($product->getMedia('product') as $media) {
+                    $media->delete();
+                }
+
+                $product->forceDelete();
+                
+                \App\Models\AdminNotification::record('danger', 'Product Permanently Deleted', "Product '{$name}' was permanently removed by " . (auth()->user()->name ?? 'Admin'));
+            });
+        } catch (Exception $exception) {
+            Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -412,7 +495,7 @@ class ProductService
             return Product::find($product->id);
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
         }
     }
 
@@ -432,7 +515,7 @@ class ProductService
             });
             return $this->product;
         } catch (Exception $exception) {
-            DB::rollBack();
+
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }

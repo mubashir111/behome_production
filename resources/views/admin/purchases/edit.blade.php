@@ -103,8 +103,8 @@
                                 @foreach($products as $prod)
                                     @if($prod->variations && $prod->variations->count() > 0)
                                         @foreach($prod->variations as $var)
-                                            <option value="{{ $prod->id }}" data-is-variation="true" data-item-id="{{ $var->id }}" data-variation-names="{{ $var->product_attribute_name }} {{ $var->product_attribute_option_name }}" data-sku="{{ $var->sku }}" data-price="{{ $var->price > 0 ? $var->price : ($prod->buying_price ?: 0) }}" data-name="{{ $prod->name }} ({{ $var->product_attribute_name ?: 'Variant' }}: {{ $var->product_attribute_option_name ?: 'Option' }})">
-                                                {{ $prod->name }} ({{ $var->product_attribute_name ?: 'Variant' }}: {{ $var->product_attribute_option_name ?: 'Option' }})
+                                            <option value="{{ $prod->id }}" data-is-variation="true" data-item-id="{{ $var->id }}" data-variation-names="{{ $var->productAttribute?->name }} {{ $var->productAttributeOption?->name }}" data-sku="{{ $var->sku }}" data-price="{{ $var->price > 0 ? $var->price : ($prod->buying_price ?: 0) }}" data-name="{{ $prod->name }} ({{ $var->productAttribute?->name ?: 'Variant' }}: {{ $var->productAttributeOption?->name ?: 'Option' }})">
+                                                {{ $prod->name }} ({{ $var->productAttribute?->name ?: 'Variant' }}: {{ $var->productAttributeOption?->name ?: 'Option' }})
                                             </option>
                                         @endforeach
                                     @else
@@ -209,7 +209,7 @@
         const opt = sel.options[sel.selectedIndex];
         
         if (!opt || opt.value === '') {
-            alert('Please select a product first');
+            showAlert({ title: 'Select Product', message: 'Please select a product from the dropdown first.', type: 'warning' });
             return;
         }
 
@@ -338,7 +338,7 @@
 
     function submitPurchase() {
         if(poItems.length === 0) {
-            alert('Please add at least one line item to the purchase order.');
+            showAlert({ title: 'No Items', message: 'Please add at least one line item to the purchase order before saving.', type: 'warning' });
             return;
         }
         

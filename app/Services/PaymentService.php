@@ -86,12 +86,11 @@ class PaymentService
             return $this->transaction;
         } catch (Exception $exception) {
             Log::error('PaymentService::payment failed — ' . $exception->getMessage());
-            DB::rollBack();
             throw new Exception($exception->getMessage(), 422);
         }
     }
 
-    public function cashBack($order, $gatewaySlug, $transactionNo = null)
+    public function cashBack($order, $gatewaySlug)
     {
         // Idempotency: skip if refund already issued for this order
         $existing = Transaction::where(['order_id' => $order->id, 'type' => 'cash_back'])->first();
@@ -137,20 +136,28 @@ class PaymentService
         }
 
         // ── Other gateways (COD, credit, PayPal, etc.): credit wallet ───
-        $transaction = Transaction::create([
-            'order_id'       => $order->id,
-            'transaction_no' => $refundTxNo,
-            'amount'         => $order->total,
-            'payment_method' => $gatewaySlug,
-            'sign'           => '-',
-            'type'           => 'cash_back'
-        ]);
+        // Both writes must succeed together — wrap in a transaction so a failed
+        // save() cannot leave a transaction record without the matching balance update.
+        $transaction = \Illuminate\Support\Facades\DB::transaction(function () use ($order, $refundTxNo, $gatewaySlug) {
+            $transaction = Transaction::create([
+                'order_id'       => $order->id,
+                'transaction_no' => $refundTxNo,
+                'amount'         => $order->total,
+                'payment_method' => $gatewaySlug,
+                'sign'           => '-',
+                'type'           => 'cash_back'
+            ]);
 
-        $user = User::find($order->user_id);
-        if ($user) {
+            $user = User::find($order->user_id);
+            if (!$user) {
+                Log::error("PaymentService::cashBack — user {$order->user_id} not found for order {$order->id}. Wallet not credited.");
+                throw new \Exception("User not found — cannot credit wallet for order {$order->id}.");
+            }
             $user->balance = ($user->balance + $order->total);
             $user->save();
-        }
+
+            return $transaction;
+        });
 
         return $transaction;
     }

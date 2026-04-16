@@ -24,12 +24,14 @@ class ProductBrandRequest extends FormRequest
      */
     public function rules(): array
     {
+        $brandId = $this->route('brand') instanceof \App\Models\ProductBrand ? $this->route('brand')->id : $this->route('brand');
+
         return [
             'name'        => [
                 'required',
                 'string',
                 'max:190',
-                Rule::unique("product_brands", "name")->ignore($this->route('productBrand.id'))
+                Rule::unique("product_brands", "name")->ignore($brandId)
             ],
             'description' => ['nullable', 'string', 'max:900'],
             'status'      => ['required', 'numeric', 'max:24'],

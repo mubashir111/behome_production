@@ -54,10 +54,6 @@ class ProductController extends Controller
 
     public function store(\App\Http\Requests\ProductRequest $request)
     {
-        $validatedData = $request->validate([
-            'discount' => 'nullable|numeric|min:0',
-        ]);
-
         try {
             $this->productService->store($request);
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
@@ -150,11 +146,17 @@ class ProductController extends Controller
             }
 
             $image = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            
+
+            // Use MIME-detected extension, never trust the client-supplied filename.
+            $ext = $image->guessExtension();
+            if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+                return response(['status' => false, 'message' => 'Invalid image type. Allowed: jpg, jpeg, png, webp, gif.'], 422);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $ext;
+
             $directory = public_path('images/products/blocks');
             if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
+                mkdir($directory, 0755, true);
             }
             
             $image->move($directory, $filename);

@@ -57,11 +57,11 @@ class SupplierService
                 if ($request->image) {
                     $this->supplier->addMediaFromRequest('image')->toMediaCollection('supplier');
                 }
+                \App\Models\AdminNotification::record('info', 'Supplier Added', "New supplier '{$this->supplier->name}' ({$this->supplier->company}) was added by " . (auth()->user()->name ?? 'Admin'));
             });
             return $this->supplier;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -73,27 +73,19 @@ class SupplierService
     {
         try {
             DB::transaction(function () use ($supplier, $request) {
-                $this->supplier               = $supplier;
-                $this->supplier->company      = $request->company;
-                $this->supplier->name         = $request->name;
-                $this->supplier->email        = $request->email;
-                $this->supplier->phone        = $request->phone;
-                $this->supplier->country_code = $request->country_code;
-                $this->supplier->address      = $request->address;
-                $this->supplier->country      = $request->country;
-                $this->supplier->state        = $request->state;
-                $this->supplier->city         = $request->city;
-                $this->supplier->zip_code     = $request->zip_code;
-                $this->supplier->save();
+                $oldName = $supplier->name;
+                $supplier->update($request->validated());
+                $this->supplier = $supplier;
 
                 if ($request->image) {
                     $this->supplier->clearMediaCollection('supplier');
                     $this->supplier->addMediaFromRequest('image')->toMediaCollection('supplier');
                 }
+                
+                \App\Models\AdminNotification::record('info', 'Supplier Updated', "Supplier '{$oldName}' was updated by " . (auth()->user()->name ?? 'Admin'));
             });
             return $this->supplier;
         } catch (Exception $exception) {
-            DB::rollBack();
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -120,12 +112,20 @@ class SupplierService
     {
         try {
             DB::transaction(function () use ($supplier) {
+                // Safeguard: Check for active stock or purchases
+                if ($supplier->purchases()->exists() || \App\Models\Stock::where('supplier_id', $supplier->id)->exists()) {
+                    throw new Exception('Cannot delete supplier: They have existing purchase history or active stock records.', 422);
+                }
+
+                $name = $supplier->name;
+                $company = $supplier->company;
                 $supplier->delete();
+                
+                \App\Models\AdminNotification::record('warning', 'Supplier Removed', "Supplier '{$name}' ({$company}) was permanently removed by " . (auth()->user()->name ?? 'Admin'));
             });
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            DB::rollBack();
-            throw new Exception(QueryExceptionLibrary::message($exception), 422);
+            Log::info("Supplier deletion error: " . $exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
         }
     }
 }

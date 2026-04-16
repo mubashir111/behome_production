@@ -4,8 +4,27 @@
 
 @if(session('success'))
 <div class="glass border-l-4 border-emerald-500 p-4 mb-6 rounded-2xl flex items-center justify-between">
-    <p class="text-sm font-medium text-emerald-800">{{ session('success') }}</p>
-    <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">
+    <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm font-semibold text-emerald-800">{{ session('success') }}</p>
+    </div>
+    <button onclick="this.parentElement.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+    </button>
+</div>
+@endif
+
+@if(session('error'))
+<div class="glass border-l-4 border-rose-500 p-4 mb-6 rounded-2xl flex items-center justify-between animate-shake">
+    <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <p class="text-sm font-semibold text-rose-800">{{ session('error') }}</p>
+    </div>
+    <button onclick="this.parentElement.parentElement.remove()" class="text-rose-500 hover:text-rose-700">
         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
     </button>
 </div>
@@ -40,8 +59,9 @@
         <div class="mt-3 flex gap-1.5 justify-center">
             <a href="{{ route('admin.brands.edit', $brand) }}" class="px-3 py-1.5 text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all">Edit</a>
             <button type="button"
-                onclick="confirmSubmit('del-brand-{{ $brand->id }}', { title: 'Delete Brand', message: 'Are you sure you want to delete &quot;{{ addslashes($brand->name) }}&quot;? This action cannot be undone.', confirmText: 'Yes, Delete', type: 'danger' })"
-                class="px-3 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-all">
+                class="brand-delete-btn px-3 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-all"
+                data-form="del-brand-{{ $brand->id }}"
+                data-name="{{ $brand->name }}">
                 Del
             </button>
             <form id="del-brand-{{ $brand->id }}" action="{{ route('admin.brands.destroy', $brand) }}" method="POST" style="display:none;">
@@ -62,5 +82,32 @@
 @endsection
 
 @push('scripts')
-<script>adminSearch('brands-search', 'brands-grid');</script>
+<script>
+    adminSearch('brands-search', 'brands-grid');
+
+    document.querySelectorAll('.brand-delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const name = this.dataset.name;
+            const formId = this.dataset.form;
+            
+            showConfirm({
+                title: 'Delete Brand',
+                message: `Are you sure you want to delete the brand "${name}"? This action cannot be undone.`,
+                confirmText: 'Yes, Delete',
+                type: 'danger',
+                onConfirm: () => {
+                    document.getElementById(formId).submit();
+                }
+            });
+        });
+    });
+</script>
+<style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
+    }
+    .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+</style>
 @endpush

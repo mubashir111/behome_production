@@ -57,7 +57,7 @@ class ProductAttributeService
             return $this->productAttribute;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -74,7 +74,7 @@ class ProductAttributeService
             return $productAttribute;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -90,7 +90,7 @@ class ProductAttributeService
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception(QueryExceptionLibrary::message($exception), 422);
         }
     }

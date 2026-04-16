@@ -29,15 +29,15 @@ class OrderMessageWebController extends Controller
 
         $orders = $query->paginate(20)->appends(['filter' => $filter]);
 
-        // Mark all customer messages on the current page as read now that admin has seen them
-        $pageOrderIds = $orders->getCollection()->pluck('id');
-        OrderMessage::whereIn('order_id', $pageOrderIds)
-            ->where('sender_type', 'customer')
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
+        $orders = $query->paginate(20)->appends(['filter' => $filter]);
 
         $unreadCount       = OrderMessage::where('sender_type', 'customer')->where('is_read', false)->count();
-        $cancellationCount = OrderMessage::where('message', 'like', '[CANCELLATION REQUEST]%')->count();
+        $cancellationCount = OrderMessage::where('message', 'like', '[CANCELLATION REQUEST]%')
+            ->whereHas('order', fn($q) => $q->whereIn('status', [
+                \App\Enums\OrderStatus::PENDING,
+                \App\Enums\OrderStatus::CONFIRMED,
+                \App\Enums\OrderStatus::ON_THE_WAY,
+            ]))->count();
 
         // Lightweight poll endpoint — JS checks this for new unread count
         if ($request->get('_poll')) {

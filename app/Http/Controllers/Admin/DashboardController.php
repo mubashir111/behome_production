@@ -19,6 +19,7 @@ final class DashboardController extends Controller
             \App\Enums\OrderStatus::CONFIRMED,
             \App\Enums\OrderStatus::ON_THE_WAY,
         ])->count();
+        // Consistently count all orders (Online + POS) for a true overview
         $total_orders     = \App\Models\Order::count();
         $total_customers  = \App\Models\User::count();
         $total_products   = \App\Models\Product::count();
@@ -31,10 +32,22 @@ final class DashboardController extends Controller
             ->latest()->take(5)->get();
 
         $unread_messages      = \App\Models\OrderMessage::where('sender_type', 'customer')->where('is_read', false)->count();
-        $cancellation_requests = \App\Models\OrderMessage::where('message', 'like', '[CANCELLATION REQUEST]%')->count();
+
+        // Only count cancellation requests on orders that are still active (not yet resolved)
+        $cancellation_requests = \App\Models\OrderMessage::where('message', 'like', '[CANCELLATION REQUEST]%')
+            ->whereHas('order', fn($q) => $q->whereIn('status', [
+                \App\Enums\OrderStatus::PENDING,
+                \App\Enums\OrderStatus::CONFIRMED,
+                \App\Enums\OrderStatus::ON_THE_WAY,
+            ]))
+            ->count();
+
         $recent_messages = \App\Models\Order::with(['user', 'messages' => fn($q) => $q->latest()->limit(1)])
             ->whereHas('messages', fn($q) => $q->where('sender_type', 'customer')->where('is_read', false))
             ->latest()->take(5)->get();
+
+        // Pre-calculate unviewed orders here so the view doesn't need its own query
+        $unviewed_orders = \App\Models\Order::whereNull('admin_viewed_at')->count();
 
         $currencySymbol = config('app.currency_symbol');
 
@@ -57,6 +70,7 @@ final class DashboardController extends Controller
             'unread_messages'       => $unread_messages,
             'cancellation_requests' => $cancellation_requests,
             'recent_messages'       => $recent_messages,
+            'unviewed_orders'       => $unviewed_orders,
         ]);
     }
 }

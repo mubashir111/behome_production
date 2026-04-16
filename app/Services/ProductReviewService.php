@@ -31,7 +31,7 @@ class ProductReviewService
             });
             return $this->productReview;
         } catch (Exception $exception) {
-            DB::rollBack();
+
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -45,7 +45,7 @@ class ProductReviewService
             });
             return $productReview;
         } catch (Exception $exception) {
-            DB::rollBack();
+
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -53,16 +53,10 @@ class ProductReviewService
 
     public function show(ProductReview $productReview): ProductReview
     {
-        try {
-            if ($productReview->user_id === Auth::user()->id) {
-                return $productReview;
-            } else {
-                return  [];
-            }
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
+        if ($productReview->user_id !== Auth::user()->id) {
+            throw new Exception('Unauthorized', 403);
         }
+        return $productReview;
     }
 
     /**

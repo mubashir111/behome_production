@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Web;
 use App\Http\Controllers\Controller;
 use App\Models\FaqItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FaqWebController extends Controller
 {
@@ -31,13 +32,17 @@ class FaqWebController extends Controller
             'is_active'  => 'nullable|boolean',
         ]);
 
-        FaqItem::create([
-            'category'   => $data['category'],
-            'question'   => $data['question'],
-            'answer'     => $data['answer'],
-            'sort_order' => $data['sort_order'] ?? 0,
-            'is_active'  => $request->boolean('is_active', true),
-        ]);
+        DB::transaction(function() use ($data, $request) {
+            FaqItem::create([
+                'category'   => $data['category'],
+                'question'   => $data['question'],
+                'answer'     => $data['answer'],
+                'sort_order' => $data['sort_order'] ?? 0,
+                'is_active'  => $request->boolean('is_active', true),
+            ]);
+
+            \App\Models\AdminNotification::record('info', 'FAQ Item Created', "A new FAQ item was added by " . (auth()->user()->name ?? 'Admin'));
+        });
 
         return redirect()->route('admin.faq.index')->with('success', 'FAQ item created.');
     }
@@ -58,20 +63,27 @@ class FaqWebController extends Controller
             'is_active'  => 'nullable|boolean',
         ]);
 
-        $faq->update([
-            'category'   => $data['category'],
-            'question'   => $data['question'],
-            'answer'     => $data['answer'],
-            'sort_order' => $data['sort_order'] ?? 0,
-            'is_active'  => $request->boolean('is_active'),
-        ]);
+        DB::transaction(function() use ($data, $request, $faq) {
+            $faq->update([
+                'category'   => $data['category'],
+                'question'   => $data['question'],
+                'answer'     => $data['answer'],
+                'sort_order' => $data['sort_order'] ?? 0,
+                'is_active'  => $request->boolean('is_active'),
+            ]);
+
+            \App\Models\AdminNotification::record('info', 'FAQ Item Updated', "An FAQ item was modified by " . (auth()->user()->name ?? 'Admin'));
+        });
 
         return redirect()->route('admin.faq.index')->with('success', 'FAQ item updated.');
     }
 
     public function destroy(FaqItem $faq)
     {
-        $faq->delete();
+        DB::transaction(function() use ($faq) {
+            $faq->delete();
+            \App\Models\AdminNotification::record('warning', 'FAQ Item Deleted', "An FAQ item was removed by " . (auth()->user()->name ?? 'Admin'));
+        });
         return redirect()->route('admin.faq.index')->with('success', 'FAQ item deleted.');
     }
 }

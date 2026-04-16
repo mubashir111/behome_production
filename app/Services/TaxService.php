@@ -53,37 +53,51 @@ class TaxService
      */
     public function store(TaxRequest $request)
     {
-        try {
-            return Tax::create($request->validated());
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        return DB::transaction(function () use ($request) {
+            try {
+                $tax = Tax::create($request->validated());
+                \App\Models\AdminNotification::record('info', 'Tax Created', "Financial tax '{$tax->name}' ({$tax->tax_rate}%) was created by " . (auth()->user()->name ?? 'Admin'));
+                return $tax;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function update(TaxRequest $request, Tax $tax)
     {
-        try {
-            return tap($tax)->update($request->validated());
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        return DB::transaction(function () use ($request, $tax) {
+            try {
+                $oldName = $tax->name;
+                $tax->update($request->validated());
+                \App\Models\AdminNotification::record('info', 'Tax Updated', "Tax '{$oldName}' was updated to '{$tax->name}' by " . (auth()->user()->name ?? 'Admin'));
+                return $tax;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function destroy(Tax $tax): void
     {
         try {
-            $tax->delete();
+            DB::transaction(function () use ($tax) {
+                // Safeguard: Check if used in products or stock
+                if ($tax->products()->exists() || \App\Models\StockTax::where('tax_id', $tax->id)->exists()) {
+                    throw new Exception('Cannot delete tax: It is currently applied to products or existing stock records.', 422);
+                }
+
+                $name = $tax->name;
+                $rate = $tax->tax_rate;
+                $tax->delete();
+
+                \App\Models\AdminNotification::record('warning', 'Tax Deleted', "Tax '{$name}' ({$rate}%) was deleted by " . (auth()->user()->name ?? 'Admin'));
+            });
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception(QueryExceptionLibrary::message($exception), 422);
+            Log::info("Tax deletion error: " . $exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
         }
     }
 

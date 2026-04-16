@@ -81,7 +81,7 @@
         </div>
         <div class="stat-value text-2xl font-bold text-slate-900">{{ number_format($stats['total_orders'] ?? 0) }}</div>
         <div class="stat-label text-sm font-semibold text-slate-800">Total Orders</div>
-        @php $unviewedDash = \App\Models\Order::whereNull('admin_viewed_at')->count(); @endphp
+        @php $unviewedDash = $unviewed_orders; @endphp
         @if($unviewedDash > 0)
         <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 rounded-full">
             <span class="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-pulse"></span>
@@ -138,7 +138,7 @@
             </div>
             <a href="{{ route('admin.returns.index') }}" class="text-xs font-bold text-red-800 bg-red-50 px-2.5 py-1 rounded-full hover:bg-red-100 transition">View all</a>
         </div>
-        <div class="stat-value text-2xl font-bold text-slate-900">{{ number_format($pending_return_list->count()) }}</div>
+        <div class="stat-value text-2xl font-bold text-slate-900">{{ number_format($stats['pending_returns']) }}</div>
         <div class="stat-label text-sm font-semibold text-slate-800">Pending Returns</div>
     </div>
 

@@ -75,8 +75,8 @@ class AuditLogger
             return ['system', null, 'System'];
         }
         $user = Auth::user();
-        // Determine actor type by guard or role
-        $isAdmin = $user->hasRole('admin') || $user->hasRole('super-admin') || request()->is('admin/*');
+        // Determine actor type by role only — never by URL, which changes with context
+        $isAdmin = $user->hasRole('admin') || $user->hasRole('super-admin');
         return [$isAdmin ? 'admin' : 'customer', $user->id, $user->name];
     }
 
@@ -192,18 +192,24 @@ class AuditLogger
         );
     }
 
-    public static function refundStageChanged(Order $order, int $newRefundStatus, float $amount = 0): void
+    public static function refundStageChanged(Order $order, int $newRefundStatus, float $amount = 0, string $gateway = ''): void
     {
         [$type, $id, $name] = self::actor();
         $label = self::$refundStatusLabels[$newRefundStatus] ?? "Stage {$newRefundStatus}";
 
+        $isStripe = strtolower($gateway) === 'stripe';
+        $refundDesc = $isStripe
+            ? "Refund of {$amount} issued. Amount returned to customer's card via Stripe."
+            : "Refund of {$amount} issued. Customer wallet balance credited.";
+
         $descMap = [
             RefundStatus::ITEM_RECEIVED => "Returned item received by warehouse. Proceeding to inspection.",
-            RefundStatus::REFUND_ISSUED => "Refund of {$amount} issued. Customer balance credited.",
+            RefundStatus::REFUND_ISSUED => $refundDesc,
         ];
 
         $meta = ['refund_status' => $newRefundStatus, 'label' => $label];
         if ($amount) $meta['amount'] = $amount;
+        if ($gateway) $meta['gateway'] = $gateway;
 
         self::log(
             $order->id,

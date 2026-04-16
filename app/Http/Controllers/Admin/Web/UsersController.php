@@ -27,7 +27,8 @@ class UsersController extends Controller
     public function store(AdministratorRequest $request, AdministratorService $service)
     {
         try {
-            $service->store($request);
+            $user = $service->store($request);
+            \App\Models\AdminNotification::record('info', 'Admin User Created', "User '{$user->name}' was added to the administration team by " . (auth()->user()->name ?? 'Admin'));
             return redirect()->route('admin.users.index')->with('success', 'Administrator created.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
@@ -44,6 +45,7 @@ class UsersController extends Controller
     {
         try {
             $service->update($request, $user);
+            \App\Models\AdminNotification::record('warning', 'Admin User Updated', "Profile/Privileges for '{$user->name}' were modified by " . (auth()->user()->name ?? 'Admin'));
             return redirect()->route('admin.users.index')->with('success', 'Administrator updated.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());

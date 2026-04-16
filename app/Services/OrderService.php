@@ -69,17 +69,17 @@ class OrderService
                         $last_date
                     );
                 }
-                foreach ($requests as $key => $request) {
+                foreach ($requests as $key => $value) {
                     if (in_array($key, $this->orderFilter)) {
                         if ($key === "status") {
-                            $query->where($key, (int)$request);
+                            $query->where($key, (int)$value);
                         } else {
-                            $query->where($key, 'like', '%' . $request . '%');
+                            $query->where($key, 'like', '%' . $value . '%');
                         }
                     }
 
                     if (in_array($key, $this->exceptFilter)) {
-                        $explodes = explode('|', $request);
+                        $explodes = explode('|', $value);
                         if (is_array($explodes)) {
                             foreach ($explodes as $explode) {
                                 $query->where('order_type', '!=', $explode);
@@ -110,12 +110,12 @@ class OrderService
 
             return Order::where('order_type', "!=", OrderType::POS)->where(function ($query) use ($requests) {
                 $query->where('user_id', auth()->user()->id);
-                foreach ($requests as $key => $request) {
+                foreach ($requests as $key => $value) {
                     if (in_array($key, $this->orderFilter)) {
-                        $query->where($key, 'like', '%' . $request . '%');
+                        $query->where($key, 'like', '%' . $value . '%');
                     }
                     if (in_array($key, $this->exceptFilter)) {
-                        $explodes = explode('|', $request);
+                        $explodes = explode('|', $value);
                         if (is_array($explodes)) {
                             foreach ($explodes as $explode) {
                                 $query->where('status', '!=', $explode);
@@ -146,12 +146,12 @@ class OrderService
 
             return Order::where('order_type', "!=", OrderType::POS)->where(function ($query) use ($requests, $user) {
                 $query->where('user_id', $user->id);
-                foreach ($requests as $key => $request) {
+                foreach ($requests as $key => $value) {
                     if (in_array($key, $this->orderFilter)) {
-                        $query->where($key, 'like', '%' . $request . '%');
+                        $query->where($key, 'like', '%' . $value . '%');
                     }
                     if (in_array($key, $this->exceptFilter)) {
-                        $explodes = explode('|', $request);
+                        $explodes = explode('|', $value);
                         if (is_array($explodes)) {
                             foreach ($explodes as $explode) {
                                 $query->where('status', '!=', $explode);
@@ -231,7 +231,7 @@ class OrderService
             });
             return $this->order;
         } catch (Exception $exception) {
-            DB::rollBack();
+
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -240,39 +240,23 @@ class OrderService
     /**
      * @throws Exception
      */
-    public function show(Order $order, $auth = false): Order|array
+    public function show(Order $order, $auth = false): Order
     {
-        try {
-            if ($auth) {
-                if ($order->user_id == Auth::user()->id) {
-                    return $order;
-                } else {
-                    return [];
-                }
-            } else {
-                return $order;
-            }
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
+        if ($auth && (int) $order->user_id !== (int) Auth::user()->id) {
+            throw new Exception(trans('all.message.permission_denied'), 403);
         }
+        return $order;
     }
 
     /**
      * @throws Exception
      */
-    public function orderDetails(User $user, Order $order): Order|array
+    public function orderDetails(User $user, Order $order): Order
     {
-        try {
-            if ($order->user_id == $user->id) {
-                return $order;
-            } else {
-                return [];
-            }
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
+        if ((int) $order->user_id !== (int) $user->id) {
+            throw new Exception(trans('all.message.permission_denied'), 403);
         }
+        return $order;
     }
 
     /**
@@ -281,52 +265,54 @@ class OrderService
     public function changeStatus(Order $order, OrderStatusRequest $request, $auth = false, $sendEmail = true): Order|array
     {
         try {
-            if ($auth) {
-                if ($order->user_id == Auth::user()->id) {
-                    if ($request->reason) {
-                        $order->setAdminStatusReason($request->reason);
+            return DB::transaction(function () use ($order, $request, $auth, $sendEmail) {
+                if ($auth) {
+                    if ($order->user_id == Auth::user()->id) {
+                        if ($request->reason) {
+                            $order->setAdminStatusReason($request->reason);
+                        }
+                        // Commit status change first so notifications read the correct status from DB
+                        $oldStatus = $order->status;
+                        $order->status = $request->status;
+                        $order->save();
+                        AuditLogger::orderStatusChanged($order, $oldStatus, $request->status, $request->reason ?? null);
+                        $this->sendOrderStatusNotification($order, (int) $request->status);
+                        SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
+                        SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                        SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                     }
-                    SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
-                    SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
-                    SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                } else {
+                    if ($request->status == OrderStatus::REJECTED || $request->status == OrderStatus::CANCELED) {
+                        $request->validate([
+                            'reason' => 'required|max:700',
+                        ]);
+
+                        if ($request->reason) {
+                            $order->setAdminStatusReason($request->reason);
+                        }
+                    }
+
+                    // Clear cancellation request if we are canceling or rejecting
+                    if ($request->status == OrderStatus::CANCELED || $request->status == OrderStatus::REJECTED) {
+                        $payload = $order->reasonPayload();
+                        if (isset($payload['cancellation_requested'])) {
+                            unset($payload['cancellation_requested']);
+                            $order->reason = blank($payload) ? null : json_encode($payload, JSON_UNESCAPED_UNICODE);
+                        }
+                    }
+
+                    // Commit status change FIRST so notifications read the correct status
                     $oldStatus = $order->status;
                     $order->status = $request->status;
                     $order->save();
                     AuditLogger::orderStatusChanged($order, $oldStatus, $request->status, $request->reason ?? null);
                     $this->sendOrderStatusNotification($order, (int) $request->status);
+                    SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
+                    SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                    SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
                 }
-            } else {
-                if ($request->status == OrderStatus::REJECTED || $request->status == OrderStatus::CANCELED) {
-                    $request->validate([
-                        'reason' => 'required|max:700',
-                    ]);
-
-                    if ($request->reason) {
-                        $order->setAdminStatusReason($request->reason);
-                    }
-                    // NOTE: Refund is NOT issued automatically here.
-                    // Admin must explicitly click "Issue Refund" on the order page.
-                }
-
-                // Clear cancellation request if we are canceling or rejecting
-                if ($request->status == OrderStatus::CANCELED || $request->status == OrderStatus::REJECTED) {
-                    $payload = $order->reasonPayload();
-                    if (isset($payload['cancellation_requested'])) {
-                        unset($payload['cancellation_requested']);
-                        $order->reason = blank($payload) ? null : json_encode($payload, JSON_UNESCAPED_UNICODE);
-                    }
-                }
-
-                SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status, 'force' => $sendEmail]);
-                SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
-                SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
-                $oldStatus = $order->status;
-                $order->status = $request->status;
-                $order->save();
-                AuditLogger::orderStatusChanged($order, $oldStatus, $request->status, $request->reason ?? null);
-                $this->sendOrderStatusNotification($order, (int) $request->status);
-            }
-            return $order;
+                return $order;
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
@@ -365,23 +351,25 @@ class OrderService
     public function changePaymentStatus(Order $order, PaymentStatusRequest $request, $auth = false): Order|array
     {
         try {
-            if ($auth) {
-                if ($order->user_id == Auth::user()->id) {
+            return DB::transaction(function () use ($order, $request, $auth) {
+                if ($auth) {
+                    if ($order->user_id == Auth::user()->id) {
+                        $oldPayment = $order->payment_status;
+                        $order->payment_status = $request->payment_status;
+                        $order->save();
+                        AuditLogger::paymentStatusChanged($order, $oldPayment, $request->payment_status);
+                        return $order;
+                    } else {
+                        return [];
+                    }
+                } else {
                     $oldPayment = $order->payment_status;
                     $order->payment_status = $request->payment_status;
                     $order->save();
                     AuditLogger::paymentStatusChanged($order, $oldPayment, $request->payment_status);
                     return $order;
-                } else {
-                    return [];
                 }
-            } else {
-                $oldPayment = $order->payment_status;
-                $order->payment_status = $request->payment_status;
-                $order->save();
-                AuditLogger::paymentStatusChanged($order, $oldPayment, $request->payment_status);
-                return $order;
-            }
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
@@ -427,6 +415,11 @@ class OrderService
     public function forceDestroy(Order $order): void
     {
         try {
+            // Security: Only Super Admin (Role ID 1) can permanently delete records
+            if (auth()->user()?->myrole !== 1) {
+                throw new Exception("Unauthorized: Only super admins can permanently delete orders.", 403);
+            }
+
             DB::transaction(function () use ($order) {
                 if ($order->orderProducts) {
                     $stockIds = $order->orderProducts->pluck('id');
@@ -456,7 +449,6 @@ class OrderService
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
             throw new Exception($exception->getMessage(), 422);
         }
     }

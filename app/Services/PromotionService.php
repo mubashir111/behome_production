@@ -80,11 +80,12 @@ class PromotionService
                 if ($request->image) {
                     $this->promotion->addMedia($request->image)->toMediaCollection('promotion');
                 }
+                \App\Models\AdminNotification::record('info', 'Promotion Created', "Promotion '{$this->promotion->name}' was created by " . (auth()->user()->name ?? 'Admin'));
             });
             return $this->promotion;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -92,29 +93,35 @@ class PromotionService
     /**
      * @throws Exception
      */
-    public function update(PromotionRequest $request, Promotion $promotion): Promotion
-    {
-        try {
-            $promotion->update($request->validated() + ['slug' => Str::slug($request->name)]);
-            if ($request->image) {
-                $promotion->clearMediaCollection('promotion');
-                $promotion->addMedia($request->image)->toMediaCollection('promotion');
+        return DB::transaction(function () use ($request, $promotion) {
+            try {
+                $promotion->update($request->validated() + ['slug' => Str::slug($request->name)]);
+                if ($request->image) {
+                    $promotion->clearMediaCollection('promotion');
+                    $promotion->addMedia($request->image)->toMediaCollection('promotion');
+                }
+                \App\Models\AdminNotification::record('info', 'Promotion Updated', "Promotion '{$promotion->name}' (ID #{$promotion->id}) was updated by " . (auth()->user()->name ?? 'Admin'));
+                return $promotion;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $promotion;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
-    }
+        });
 
     /**
      * @throws Exception
      */
-    public function destroy(Promotion $promotion): void
-    {
         try {
-            $promotion->promotionProducts()->delete();
-            $promotion->delete();
+            DB::transaction(function() use ($promotion) {
+                $name = $promotion->name;
+                $id   = $promotion->id;
+                
+                $promotion->promotionProducts()->delete();
+                $promotion->clearMediaCollection('promotion');
+                $promotion->delete();
+                
+                \App\Models\AdminNotification::record('warning', 'Promotion Deleted', "Promotion '{$name}' (ID #{$id}) was deleted by " . (auth()->user()->name ?? 'Admin'));
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

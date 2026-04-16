@@ -121,12 +121,15 @@ class SettingsController extends Controller
                 'seo_site_title', 'seo_title_separator', 'seo_meta_description',
                 'seo_meta_keywords', 'seo_google_analytics_id', 'seo_google_tag_manager_id', 'seo_robots_txt',
             ]);
-            Settings::group('seo')->set(array_filter($data, fn($v) => !is_null($v)));
+            Settings::group('seo')->set($data); // Removed array_filter to allow empty/null values
             if ($request->hasFile('seo_og_image')) {
                 $setting = \App\Models\ThemeSetting::where('key', 'seo_og_image')->firstOrCreate(['key' => 'seo_og_image', 'value' => 'seo_og_image']);
                 $setting->clearMediaCollection('seo-og-image');
                 $setting->addMediaFromRequest('seo_og_image')->toMediaCollection('seo-og-image');
             }
+            
+            \App\Models\AdminNotification::record('info', 'SEO Settings Updated', 'Global SEO configuration was updated by ' . (auth()->user()->name ?? 'Admin'));
+            
             return back()->with('success', 'SEO settings updated.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
@@ -143,6 +146,7 @@ class SettingsController extends Controller
     {
         try {
             $service->update($request);
+            \App\Models\AdminNotification::record('warning', 'SMTP Settings Updated', 'System mail configuration was modified by ' . (auth()->user()->name ?? 'Admin'));
             return back()->with('success', 'Mail settings updated.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
@@ -179,19 +183,27 @@ class SettingsController extends Controller
                 'google_client_id', 'google_client_secret',
                 'facebook_app_id', 'facebook_app_secret',
             ]);
-            Settings::group('integrations')->set(array_filter($data, fn($v) => !is_null($v)));
+            
+            // Map checkboxes to ensure they are 0 if missing from request
+            $data['stripe_refund_enabled'] = $request->has('stripe_refund_enabled') ? 1 : 0;
+            
+            Settings::group('integrations')->set($data); // Removed array_filter to allow disabling features
 
             // Sync Google keys to .env so services.php and frontend pick them up
             $envEditor = app(\Dipokhalder\EnvEditor\EnvEditor::class);
             $envData = [];
             if ($request->filled('google_client_id'))     $envData['GOOGLE_CLIENT_ID']     = $request->google_client_id;
             if ($request->filled('google_client_secret')) $envData['GOOGLE_CLIENT_SECRET'] = $request->google_client_secret;
+            
             if (!empty($envData)) {
                 $envEditor->addData($envData);
-                \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+                // Hazardous Artisan::call('optimize:clear') removed from web thread.
+                // Recommend manual clearing or targeted config refresh in production.
             }
 
-            return back()->with('success', 'Integration settings updated.');
+            \App\Models\AdminNotification::record('warning', 'Integrations Updated', 'Third-party integration keys (Stripe/Google) were updated by ' . (auth()->user()->name ?? 'Admin'));
+
+            return back()->with('success', 'Integration settings updated. Note: You may need to clear your application cache for changes to take effect everywhere.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }

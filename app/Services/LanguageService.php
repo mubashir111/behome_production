@@ -141,27 +141,32 @@ class LanguageService
     /**
      * @throws Exception
      */
+    /**
+     * @throws Exception
+     */
     public function fileList(Language $language)
     {
         try {
             $i = 0;
             $array = [];
 
-            if (file_exists(base_path("resources/js/languages/{$language->code}.json"))) {
+            $jsonPath = base_path("resources/js/languages/{$language->code}.json");
+            if (file_exists($jsonPath)) {
                 $array[$i] = (object)[
-                    'path' => base_path("resources/js/languages/{$language->code}.json"),
+                    'path' => $jsonPath,
                     'name' => "{$language->code}.json"
                 ];
                 $i++;
             }
 
-            if (file_exists(base_path("lang/{$language->code}"))) {
-                $files = scandir(base_path("lang/{$language->code}"));
+            $langDir = base_path("lang/{$language->code}");
+            if (file_exists($langDir)) {
+                $files = scandir($langDir);
                 if (count($files) > 2) {
                     foreach ($files as $file) {
                         if ($file != '.' && $file != '..') {
                             $array[$i] = (object)[
-                                'path' => base_path("lang/{$language->code}/{$file}"),
+                                'path' => $langDir . DIRECTORY_SEPARATOR . $file,
                                 'name' => $file
                             ];
                             $i++;
@@ -179,16 +184,20 @@ class LanguageService
 
     public function fileText(LanguageFileTextGetRequest $request)
     {
-        if (file_exists($request->path)) {
+        $path = $this->validatePath($request->path);
+
+        if (file_exists($path)) {
             $explodeName = explode('.', $request->name);
-            if ($explodeName > 0) {
+            if (count($explodeName) > 1) {
                 if ($explodeName[1] == 'json') {
-                    include($request->path);
+                    // JSON files are loaded via JS, but if backend needs content:
+                    return json_decode(file_get_contents($path), true);
                 } else {
-                    return include($request->path);
+                    return include($path);
                 }
             }
         }
+        return [];
     }
 
     /**
@@ -197,11 +206,17 @@ class LanguageService
     public function fileTextStore(Request $request): void
     {
         try {
-            $file = fopen($request->x_language_file_path, "rw");
-            $fileContent = file_get_contents($request->x_language_file_path);
+            $path = $this->validatePath($request->x_language_file_path);
+            
+            if (!file_exists($path)) {
+                throw new Exception("Translation file not found at validated path.", 404);
+            }
+
+            $fileContent = file_get_contents($path);
             foreach ($request->all() as $key => $value) {
-                if ($key != 'x_language_file_path' && $key != 'x_language_file_name') {
+                if ($key != 'x_language_file_path' && $key != 'x_language_file_name' && $key != '_token') {
                     $key = str_replace('_', ' ', $key);
+                    // Match both 'key' and "key" formats in PHP lang files or JSON
                     if (strpos($fileContent, "'" . $key . "'") !== false) {
                         $fileContent = str_replace("'" . $key . "'", "\"{$value}\"", $fileContent);
                     } elseif (strpos($fileContent, "\"{$key}\"") !== false) {
@@ -210,11 +225,32 @@ class LanguageService
                 }
             }
 
-            file_put_contents($request->x_language_file_path, $fileContent);
-            fclose($file);
+            // Use LOCK_EX to prevent corruption during concurrent edits
+            file_put_contents($path, $fileContent, LOCK_EX);
+            
+            \App\Models\AdminNotification::record('info', 'Translations Updated', "Language file '{$request->x_language_file_name}' was modified by " . (auth()->user()->name ?? 'Admin'));
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
+            Log::info("Language save error: " . $exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
+    }
+
+    /**
+     * Validates that the requested path is within the allowed translation directories
+     * to prevent Path Traversal and Local File Inclusion attacks.
+     */
+    private function validatePath(string $path): string
+    {
+        $realPath = realpath($path);
+        
+        // Allowed roots
+        $langRoot = realpath(base_path('lang'));
+        $jsRoot   = realpath(base_path('resources/js/languages'));
+
+        if ($realPath && (str_starts_with($realPath, $langRoot) || str_starts_with($realPath, $jsRoot))) {
+            return $realPath;
+        }
+
+        throw new Exception("Security Alert: Unauthorized path access attempted in Language Service.", 403);
     }
 }

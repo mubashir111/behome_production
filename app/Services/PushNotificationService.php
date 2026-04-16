@@ -54,45 +54,54 @@ class PushNotificationService
     public function store(PushNotificationRequest $request): PushNotification
     {
         try {
-            $pushNotification              = new PushNotification();
-            $pushNotification->title       = $request->title;
-            $pushNotification->description = strip_tags($request->description);
-            $pushNotification->role_id     = $request->role_id ?? 0;
-            $pushNotification->user_id     = $request->user_id ?? 0;
-            $pushNotification->save();
+            $pushNotification              = DB::transaction(function () use ($request) {
+                $pn              = new PushNotification();
+                $pn->title       = $request->title;
+                $pn->description = strip_tags($request->description);
+                $pn->role_id     = $request->role_id ?? 0;
+                $pn->user_id     = $request->user_id ?? 0;
+                $pn->save();
 
-            if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                $pushNotification->clearMediaCollection('pushNotifications');
-                $pushNotification->addMediaFromRequest('image')->toMediaCollection('pushNotifications');
-            }
+                if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                    $pn->clearMediaCollection('pushNotifications');
+                    $pn->addMediaFromRequest('image')->toMediaCollection('pushNotifications');
+                }
+                return $pn;
+            });
 
+            // Target Audience Logic
             if ($pushNotification->role_id == 0 && $pushNotification->user_id == 0) {
-                $fcmWebDeviceToken    = User::whereNotNull('web_token')->pluck('web_token')->toArray();
-                $fcmMobileDeviceToken = User::whereNotNull('device_token')->pluck('device_token')->toArray();
+                $fcmWebDeviceToken    = User::whereNotNull('web_token')->select('web_token')->pluck('web_token')->toArray();
+                $fcmMobileDeviceToken = User::whereNotNull('device_token')->select('device_token')->pluck('device_token')->toArray();
             } else {
                 if ($pushNotification->role_id !== 0 && $pushNotification->user_id == 0) {
-                    $fcmWebDeviceToken    = User::role(
-                        $pushNotification->role_id
-                    )->whereNotNull('web_token')->pluck('web_token')->toArray();
-                    $fcmMobileDeviceToken = User::role(
-                        $pushNotification->role_id
-                    )->whereNotNull('device_token')->pluck('device_token')->toArray();
+                    $fcmWebDeviceToken    = User::role($pushNotification->role_id)
+                        ->whereNotNull('web_token')->select('web_token')->pluck('web_token')->toArray();
+                    $fcmMobileDeviceToken = User::role($pushNotification->role_id)
+                        ->whereNotNull('device_token')->select('device_token')->pluck('device_token')->toArray();
                 } else {
-                    $fcmWebDeviceToken    = User::where(['id' => $pushNotification->user_id])->whereNotNull(
-                        'web_token'
-                    )->pluck('web_token')->toArray();
-                    $fcmMobileDeviceToken = User::where(['id' => $pushNotification->user_id])->whereNotNull(
-                        'device_token'
-                    )->pluck('device_token')->toArray();
+                    $fcmWebDeviceToken    = User::where(['id' => $pushNotification->user_id])
+                        ->whereNotNull('web_token')->select('web_token')->pluck('web_token')->toArray();
+                    $fcmMobileDeviceToken = User::where(['id' => $pushNotification->user_id])
+                        ->whereNotNull('device_token')->select('device_token')->pluck('device_token')->toArray();
                 }
             }
 
             $fcmTokenArray = array_merge($fcmWebDeviceToken, $fcmMobileDeviceToken);
-            $firebase      = new FirebaseService();
+            $tokenCount    = count($fcmTokenArray);
+
+            if ($tokenCount > 500) {
+                Log::warning("High-volume push notification broadcast ({$tokenCount} tokens) triggered on web thread by " . (auth()->user()->name ?? 'Admin') . ". Recommendation: Implement Laravel Queues for large audiences.");
+            }
+
+            $firebase = new FirebaseService();
             $firebase->sendNotification($pushNotification, $fcmTokenArray, "promotion");
+            
+            \App\Models\AdminNotification::record('info', 'Push Notification Sent', "Broadcast '{$pushNotification->title}' was sent to {$tokenCount} devices by " . (auth()->user()->name ?? 'Admin'));
+            
             return $pushNotification;
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
+            Log::info("Push notification error: " . $exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -121,7 +130,7 @@ class PushNotificationService
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }

@@ -998,7 +998,7 @@
     // ── Confirm Modal ──────────────────────────────────────────
     let _confirmCallback = null;
 
-    function showConfirm({ title, message, confirmText = 'Confirm', type = 'danger', onConfirm }) {
+    function showConfirm({ title, message, confirmText = 'Confirm', type = 'danger', hideCancel = false, onConfirm }) {
         _confirmCallback = onConfirm;
 
         document.getElementById('confirmTitle').textContent   = title;
@@ -1007,6 +1007,8 @@
 
         const iconEl = document.getElementById('confirmIcon');
         const btnEl  = document.getElementById('confirmBtn');
+        const cancelBtn = document.querySelector('#confirmDialog button[onclick="closeConfirmModal()"]');
+        if (cancelBtn) cancelBtn.style.display = hideCancel ? 'none' : 'block';
 
         const themes = {
             danger:  { bg: '#fef2f2', stroke: '#ef4444', btnBg: '#ef4444' },
@@ -1050,6 +1052,11 @@
     // Helper: confirm then submit a form by id
     function confirmSubmit(formId, options) {
         showConfirm({ ...options, onConfirm: () => document.getElementById(formId).submit() });
+    }
+
+    // Helper: show a simple alert modal
+    function showAlert(options) {
+        showConfirm({ ...options, hideCancel: true, confirmText: options.btnText || 'Got it' });
     }
     </script>
 

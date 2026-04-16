@@ -31,9 +31,17 @@ class PromotionWebController extends Controller
             'image'    => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
         ]);
 
+        $slug = Str::slug($request->name);
+        $base = $slug;
+        $i    = 1;
+        while (Promotion::where('slug', $slug)->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+
         $promotion = Promotion::create([
             'name'     => $request->name,
-            'slug'     => Str::slug($request->name) . rand(100, 999),
+            'slug'     => $slug,
             'subtitle' => $request->subtitle,
             'link'     => $request->link ?? '/shop',
             'type'     => $request->type,
@@ -63,8 +71,20 @@ class PromotionWebController extends Controller
             'image'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
         ]);
 
+        $slug = $promotion->slug;
+        if ($promotion->name !== $request->name) {
+            $slug = \Illuminate\Support\Str::slug($request->name);
+            $base = $slug;
+            $i    = 1;
+            while (Promotion::where('slug', $slug)->where('id', '!=', $promotion->id)->exists()) {
+                $slug = "{$base}-{$i}";
+                $i++;
+            }
+        }
+
         $promotion->update([
             'name'     => $request->name,
+            'slug'     => $slug,
             'subtitle' => $request->subtitle,
             'link'     => $request->link ?? '/shop',
             'type'     => $request->type,
@@ -76,13 +96,24 @@ class PromotionWebController extends Controller
             $promotion->addMedia($request->file('image'))->toMediaCollection('promotion');
         }
 
+        \App\Models\AdminNotification::record('info', 'Promotion Updated', "Promotion '{$promotion->name}' (ID #{$promotion->id}) was updated by " . (auth()->user()->name ?? 'Admin'));
+
         return redirect()->route('admin.promotions.index')->with('success', 'Promotion updated successfully.');
     }
 
     public function destroy(Promotion $promotion)
     {
-        $promotion->clearMediaCollection('promotion');
-        $promotion->delete();
+        $name = $promotion->name;
+        $id   = $promotion->id;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($promotion) {
+            // Delete child rows first to satisfy the FK constraint on promotion_products.promotion_id
+            $promotion->promotionProducts()->delete();
+            $promotion->clearMediaCollection('promotion');
+            $promotion->delete();
+        });
+
+        \App\Models\AdminNotification::record('warning', 'Promotion Deleted', "Promotion '{$name}' (ID #{$id}) was deleted by " . (auth()->user()->name ?? 'Admin'));
 
         if (request()->wantsJson()) {
             return response()->json(['success' => true]);

@@ -293,6 +293,6 @@ class Product extends Model implements HasMedia
 
     public function userReview(): \Illuminate\Database\Eloquent\Relations\hasOne
     {
-        return $this->hasOne(ProductReview::class, 'product_id', 'id')->where('user_id', Auth::user()->id);
+        return $this->hasOne(ProductReview::class, 'product_id', 'id')->where('user_id', Auth::id());
     }
 }

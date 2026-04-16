@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\PaginateRequest;
 use App\Http\Requests\SliderRequest;
@@ -66,16 +67,19 @@ class SliderService
      */
     public function store(SliderRequest $request)
     {
-        try {
-            $slider = Slider::create($request->validated() + ['link' => $request->link]);
-            if ($request->image) {
-                $slider->addMediaFromRequest('image')->toMediaCollection('slider');
+        return DB::transaction(function () use ($request) {
+            try {
+                $slider = Slider::create($request->validated() + ['link' => $request->link]);
+                if ($request->hasFile('image')) {
+                    $slider->addMediaFromRequest('image')->toMediaCollection('slider');
+                }
+                \App\Models\AdminNotification::record('info', 'Slider Created', "Slider '{$slider->title}' was created by " . (auth()->user()->name ?? 'Admin'));
+                return $slider;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $slider;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        });
     }
 
     /**
@@ -83,17 +87,20 @@ class SliderService
      */
     public function update(SliderRequest $request, Slider $slider): Slider
     {
-        try {
-            $slider->update($request->validated() + ['link' => $request->link]);
-            if ($request->image) {
-                $slider->clearMediaCollection('slider');
-                $slider->addMediaFromRequest('image')->toMediaCollection('slider');
+        return DB::transaction(function () use ($request, $slider) {
+            try {
+                $slider->update($request->validated() + ['link' => $request->link]);
+                if ($request->hasFile('image')) {
+                    $slider->clearMediaCollection('slider');
+                    $slider->addMediaFromRequest('image')->toMediaCollection('slider');
+                }
+                \App\Models\AdminNotification::record('info', 'Slider Updated', "Slider '{$slider->title}' (ID #{$slider->id}) was updated by " . (auth()->user()->name ?? 'Admin'));
+                return $slider;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $slider;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        });
     }
 
     /**
@@ -102,7 +109,15 @@ class SliderService
     public function destroy(Slider $slider)
     {
         try {
-            $slider->delete();
+            DB::transaction(function() use ($slider) {
+                $title = $slider->title;
+                $id    = $slider->id;
+                
+                $slider->clearMediaCollection('slider');
+                $slider->delete();
+                
+                \App\Models\AdminNotification::record('warning', 'Slider Deleted', "Slider '{$title}' (ID #{$id}) was deleted by " . (auth()->user()->name ?? 'Admin'));
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

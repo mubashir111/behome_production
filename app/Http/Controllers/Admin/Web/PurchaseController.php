@@ -36,10 +36,19 @@ class PurchaseController extends Controller
     public function create()
     {
         $suppliers = Supplier::all();
-        $products = Product::with('variations', 'productTaxes', 'taxes')
+        // Optimized: Select only necessary fields and only active/purchasable products
+        // Added a limit to prevent memory crash in massive catalogs
+        $products  = Product::select('id', 'name', 'sku', 'buying_price', 'can_purchasable', 'status')
+            ->with(['variations' => function($q) {
+                $q->select('id', 'product_id', 'product_attribute_id', 'product_attribute_option_id', 'price', 'sku')
+                  ->with(['productAttribute:id,name', 'productAttributeOption:id,name']);
+            }, 'productTaxes', 'taxes'])
             ->where('status', \App\Enums\Status::ACTIVE)
             ->where('can_purchasable', \App\Enums\Ask::YES)
+            ->latest()
+            ->limit(500) 
             ->get();
+            
         $taxes = Tax::all();
         
         return view('admin.purchases.create', compact('suppliers', 'products', 'taxes'));
@@ -48,7 +57,10 @@ class PurchaseController extends Controller
     public function store(PurchaseRequest $request)
     {
         try {
-            $this->purchaseService->store($request);
+            $purchase = $this->purchaseService->store($request);
+            
+            \App\Models\AdminNotification::record('info', 'Purchase Created', "New purchase recorded: #{$purchase->reference_no} from " . ($purchase->supplier->name ?? 'Supplier'));
+            
             return redirect()->route('admin.purchases.index')->with('success', 'Purchase recorded successfully.');
         } catch (Exception $exception) {
             return back()->withInput()->with('error', $exception->getMessage());
@@ -64,10 +76,17 @@ class PurchaseController extends Controller
     public function edit(Purchase $purchase)
     {
         $suppliers = Supplier::all();
-        $products = Product::with('variations', 'productTaxes', 'taxes')
+        // Optimized load for edit mode
+        $products = Product::select('id', 'name', 'sku', 'buying_price', 'can_purchasable', 'status')
+            ->with(['variations' => function($q) {
+                $q->select('id', 'product_id', 'product_attribute_id', 'product_attribute_option_id', 'price', 'sku')
+                  ->with(['productAttribute:id,name', 'productAttributeOption:id,name']);
+            }, 'productTaxes', 'taxes'])
             ->where('status', \App\Enums\Status::ACTIVE)
             ->where('can_purchasable', \App\Enums\Ask::YES)
+            ->limit(500)
             ->get();
+            
         $taxes = Tax::all();
         // The edit method on the service might just return the purchase with relations
         $purchase = $this->purchaseService->edit($purchase);

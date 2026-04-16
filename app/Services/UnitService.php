@@ -50,55 +50,52 @@ class UnitService
      */
     public function store(UnitRequest $request): object
     {
-        try {
-            DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request) {
+            try {
                 $this->unit = Unit::create($request->validated());
-            });
-            return $this->unit;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            DB::rollBack();
-            throw new Exception($exception->getMessage(), 422);
-        }
+                \App\Models\AdminNotification::record('info', 'Unit Created', "Measurement unit '{$this->unit->name}' was created by " . (auth()->user()->name ?? 'Admin'));
+                return $this->unit;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function update(UnitRequest $request, Unit $unit): Unit
     {
-        try {
-            DB::transaction(function () use ($request, $unit) {
+        return DB::transaction(function () use ($request, $unit) {
+            try {
+                $oldName = $unit->name;
                 $unit->update($request->validated());
-            });
-            return $unit;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            DB::rollBack();
-            throw new Exception($exception->getMessage(), 422);
-        }
+                \App\Models\AdminNotification::record('info', 'Unit Updated', "Unit '{$oldName}' was updated to '{$unit->name}' by " . (auth()->user()->name ?? 'Admin'));
+                return $unit;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function destroy(Unit $unit): void
     {
         try {
             DB::transaction(function () use ($unit) {
-                $checkProduct = $unit->products->whereNull('deleted_at');
-                if (!blank($checkProduct)) {
-                    $unit->delete();
-                } else {
-                    DB::statement('SET FOREIGN_KEY_CHECKS=0');
-                    $unit->delete();
-                    DB::statement('SET FOREIGN_KEY_CHECKS=1');
+                // Safeguard: Check for active products
+                if ($unit->products()->exists()) {
+                    throw new Exception('Cannot delete unit: It is associated with active products. Please update the products first.', 422);
                 }
+
+                $name = $unit->name;
+                $code = $unit->code;
+                
+                $unit->delete();
+                
+                \App\Models\AdminNotification::record('warning', 'Unit Deleted', "Measurement unit '{$name}' ({$code}) was deleted by " . (auth()->user()->name ?? 'Admin'));
             });
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            DB::rollBack();
-            throw new Exception(QueryExceptionLibrary::message($exception), 422);
+            Log::info("Unit deletion error: " . $exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
         }
     }
 

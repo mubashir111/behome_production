@@ -6,6 +6,7 @@ use App\Enums\Role as EnumsRole;
 use App\Http\Requests\PaginateRequest;
 use App\Http\Requests\RoleRequest;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
@@ -62,38 +63,45 @@ class RoleService
      */
     public function store(RoleRequest $request)
     {
-        try {
-            return Role::create($request->validated() + ['guard_name' => 'sanctum']);
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        return DB::transaction(function() use ($request) {
+            try {
+                $role = Role::create($request->validated() + ['guard_name' => 'sanctum']);
+                \App\Models\AdminNotification::record('info', 'Role Created', "New role '{$role->name}' was created by " . (auth()->user()->name ?? 'Admin'));
+                return $role;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function update(RoleRequest $request, Role $role)
     {
-        try {
-            return tap($role)->update($request->validated());
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        return DB::transaction(function() use ($request, $role) {
+            try {
+                $oldName = $role->name;
+                $role->update($request->validated());
+                \App\Models\AdminNotification::record('info', 'Role Updated', "Role '{$oldName}' was renamed/updated to '{$role->name}' by " . (auth()->user()->name ?? 'Admin'));
+                return $role;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function destroy(Role $role): void
     {
         try {
-            if (!in_array($role->id, $this->roleArray)) {
-                $role->delete();
-            } else {
-                throw new Exception("This role not deletable", 422);
-            }
+            DB::transaction(function() use ($role) {
+                if (!in_array($role->id, $this->roleArray)) {
+                    $name = $role->name;
+                    $role->delete();
+                    \App\Models\AdminNotification::record('warning', 'Role Deleted', "Role '{$name}' was deleted by " . (auth()->user()->name ?? 'Admin'));
+                } else {
+                    throw new Exception("This role not deletable (System Protected Role)", 422);
+                }
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

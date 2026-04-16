@@ -53,7 +53,7 @@ class ReturnAndRefundWebController extends Controller
     public function changeStatus(Request $request, ReturnAndRefund $return)
     {
         $request->validate([
-            'status' => 'required|integer',
+            'status' => 'required|integer|in:' . implode(',', [ReturnOrderStatus::PENDING, ReturnOrderStatus::ACCEPT, ReturnOrderStatus::REJECTED]),
             'reason' => 'nullable|string|max:700',
         ]);
 
@@ -105,7 +105,9 @@ class ReturnAndRefundWebController extends Controller
             return back()->withErrors(['refund' => 'Return must be accepted before processing the refund.']);
         }
 
-        $request->validate(['refund_status' => 'required|integer']);
+        $request->validate([
+            'refund_status' => 'required|integer|in:' . implode(',', [RefundStatus::AWAITING_ITEM, RefundStatus::ITEM_RECEIVED, RefundStatus::REFUND_ISSUED]),
+        ]);
         $newRefundStatus = (int) $request->refund_status;
 
         // Only allow valid forward transitions
@@ -119,14 +121,19 @@ class ReturnAndRefundWebController extends Controller
             return back()->withErrors(['refund' => 'Invalid refund status transition.']);
         }
 
+        // Load relationship once here so both branches can use it safely.
+        $return->load('returnProducts');
+        $refundAmount = (float) $return->returnProducts->sum('return_price');
+
         $return->refund_status = $newRefundStatus;
 
         if ($newRefundStatus === RefundStatus::REFUND_ISSUED) {
-            $return->refund_issued_at = now();
-            $return->loadMissing('returnProducts');
-            $refundAmount = (float) $return->returnProducts->sum('return_price');
+            // ── Stripe API call BEFORE opening the DB transaction ──────────
+            // Doing it inside a transaction risks holding DB locks while waiting
+            // for a remote HTTP response, and a rollback cannot undo a Stripe refund.
+            $stripeRefundId = null;
+            $stripeWarning  = null;
 
-            // Attempt Stripe refund if enabled
             $stripeEnabled = Settings::group('integrations')->get('stripe_refund_enabled');
             $stripeSecret  = Settings::group('integrations')->get('stripe_refund_secret_key');
 
@@ -137,25 +144,48 @@ class ReturnAndRefundWebController extends Controller
                         ->first();
                     if ($transaction && $transaction->transaction_no) {
                         $stripe = new \Stripe\StripeClient($stripeSecret);
-                        $stripeRefund = $stripe->refunds->create([
-                            'charge' => $transaction->transaction_no,
-                            'amount' => (int) ($refundAmount * 100),
-                        ]);
-                        $return->reject_reason = 'STRIPE_REFUND_ID:' . $stripeRefund->id;
+                        $txnNo  = $transaction->transaction_no;
+                        // Use round() to avoid float truncation (e.g. 19.99 * 100 = 1998.999...)
+                        $refundPayload = str_starts_with($txnNo, 'ch_')
+                            ? ['charge' => $txnNo, 'amount' => (int) round($refundAmount * 100)]
+                            : ['payment_intent' => $txnNo, 'amount' => (int) round($refundAmount * 100)];
+
+                        $stripeRefund   = $stripe->refunds->create($refundPayload);
+                        $stripeRefundId = $stripeRefund->id;
                     }
                 } catch (\Exception $stripeEx) {
                     \Illuminate\Support\Facades\Log::error('[STRIPE_REFUND] ' . $stripeEx->getMessage());
-                    session()->flash('warning', 'Refund status updated but Stripe API refund failed: ' . $stripeEx->getMessage());
+                    $stripeWarning = 'Refund status updated but Stripe API refund failed: ' . $stripeEx->getMessage();
                 }
             }
-        }
 
-        $return->save();
+            // ── DB transaction: only local writes, no external calls ────────
+            \Illuminate\Support\Facades\DB::transaction(function () use ($return, $newRefundStatus, $refundAmount, $stripeRefundId) {
+                $return->refund_issued_at = now();
+                if ($stripeRefundId) {
+                    $return->reject_reason = 'REFUND:' . $stripeRefundId;
+                }
+                $return->save();
 
-        // Audit
-        $order = Order::find($return->order_id);
-        if ($order) {
-            AuditLogger::refundStageChanged($order, $newRefundStatus, (float) $return->returnProducts->sum('return_price'));
+                // Audit
+                $order = Order::find($return->order_id);
+                if ($order) {
+                    AuditLogger::refundStageChanged($order, $newRefundStatus, $refundAmount);
+                }
+            });
+
+            if ($stripeWarning) {
+                session()->flash('warning', $stripeWarning);
+            }
+        } else {
+            // Non-REFUND_ISSUED transitions (e.g., AWAITING_ITEM -> ITEM_RECEIVED)
+            $return->save();
+
+            // Audit
+            $order = Order::find($return->order_id);
+            if ($order) {
+                AuditLogger::refundStageChanged($order, $newRefundStatus, $refundAmount);
+            }
         }
 
         $labels = [

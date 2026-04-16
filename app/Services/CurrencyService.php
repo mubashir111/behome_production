@@ -5,6 +5,7 @@ namespace App\Services;
 
 use Exception;
 use App\Models\Currency;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\CurrencyRequest;
 use App\Http\Requests\PaginateRequest;
@@ -59,12 +60,16 @@ class CurrencyService
      */
     public function store(CurrencyRequest $request)
     {
-        try {
-            return Currency::create($request->validated());
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        return DB::transaction(function () use ($request) {
+            try {
+                $currency = Currency::create($request->validated());
+                \App\Models\AdminNotification::record('info', 'Currency Created', "New currency '{$currency->name}' ({$currency->code}) was added by " . (auth()->user()->name ?? 'Admin'));
+                return $currency;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
     /**
@@ -72,12 +77,17 @@ class CurrencyService
      */
     public function update(CurrencyRequest $request, Currency $currency)
     {
-        try {
-            return tap($currency)->update($request->validated());
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        return DB::transaction(function () use ($request, $currency) {
+            try {
+                $oldName = $currency->name;
+                $currency->update($request->validated());
+                \App\Models\AdminNotification::record('info', 'Currency Updated', "Currency '{$oldName}' was updated to '{$currency->name}' by " . (auth()->user()->name ?? 'Admin'));
+                return $currency;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
+            }
+        });
     }
 
     /**
@@ -86,11 +96,16 @@ class CurrencyService
     public function destroy(Currency $currency): void
     {
         try {
-            if (Settings::group('site')->get("site_default_currency") != $currency->id) {
-                $currency->delete();
-            } else {
-                throw new Exception("Default currency not deletable", 422);
-            }
+            DB::transaction(function () use ($currency) {
+                if (Settings::group('site')->get("site_default_currency") != $currency->id) {
+                    $name = $currency->name;
+                    $code = $currency->code;
+                    $currency->delete();
+                    \App\Models\AdminNotification::record('warning', 'Currency Deleted', "Currency '{$name}' ({$code}) was removed by " . (auth()->user()->name ?? 'Admin'));
+                } else {
+                    throw new Exception("Default currency not deletable", 422);
+                }
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
@@ -120,7 +135,7 @@ class CurrencyService
                 'CURRENCY_DECIMAL_POINT' => $decimalPoint,
             ]);
 
-            Artisan::call('optimize:clear');
+            \App\Models\AdminNotification::record('warning', 'Default Currency Changed', "Site default currency was switched to '{$currency->name}' ({$currency->code}) by " . (auth()->user()->name ?? 'Admin'));
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

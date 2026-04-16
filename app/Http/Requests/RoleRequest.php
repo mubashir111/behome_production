@@ -27,7 +27,7 @@ class RoleRequest extends FormRequest
     public function rules() : array
     {
         return [
-            'name' => ['required', 'string', 'max:190', Rule::unique("roles", "name")->ignore($this->route('role.id'))],
+            'name' => ['required', 'string', 'max:190', Rule::unique("roles", "name")->ignore($this->role->id ?? 0)],
         ];
     }
 }

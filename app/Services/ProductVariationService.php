@@ -337,7 +337,7 @@ class ProductVariationService
             return $this->productVariation;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -447,7 +447,7 @@ class ProductVariationService
             return $this->productVariation;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -474,7 +474,7 @@ class ProductVariationService
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }

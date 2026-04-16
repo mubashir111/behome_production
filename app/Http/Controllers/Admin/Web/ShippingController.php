@@ -28,25 +28,21 @@ class ShippingController extends Controller
         }
     }
 
-    public function updateOrderArea(Request $request, \App\Models\OrderArea $orderArea, OrderAreaService $service)
+    public function updateOrderArea(OrderAreaRequest $request, \App\Models\OrderArea $orderArea, OrderAreaService $service)
     {
         try {
             // Status-only toggle (activate/deactivate button)
             if ($request->has('status') && !$request->has('country')) {
                 $orderArea->status = (int) $request->status;
                 $orderArea->save();
+                \App\Models\AdminNotification::record('info', 'Shipping Status Updated', "Delivery status for '{$orderArea->country}' was updated by " . (auth()->user()->name ?? 'Admin'));
                 return back()->with('success', 'Delivery area status updated.');
             }
 
-            // Full update — run proper validation via the form request manually
-            $validated = $request->validate([
-                'country'       => ['required', 'string', 'max:900'],
-                'state'         => ['nullable', 'string', 'max:900'],
-                'city'          => ['nullable', 'string', 'max:900'],
-                'shipping_cost' => ['required', 'numeric'],
-                'status'        => ['required', 'numeric'],
-            ]);
-            $orderArea->update($validated);
+            $orderArea->update($request->validated());
+            
+            \App\Models\AdminNotification::record('warning', 'Shipping Rate Modified', "Shipping rules for '{$orderArea->country}' were updated (New Cost: " . (Settings::group('site')->get('site_default_currency_symbol') ?? '$') . "{$orderArea->shipping_cost}) by " . (auth()->user()->name ?? 'Admin'));
+            
             return back()->with('success', 'Delivery area updated.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());

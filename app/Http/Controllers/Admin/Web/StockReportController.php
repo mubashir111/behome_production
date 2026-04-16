@@ -16,43 +16,54 @@ class StockReportController extends Controller
         $filter  = $request->input('filter', 'all');
         $perPage = 20;
 
-        // Load all products with their current stock qty (SUM in PHP to avoid MySQL ONLY_FULL_GROUP_BY)
-        $allProducts = Product::query()
-            ->with(['category', 'media'])
-            ->withSum(['productStocks as stock_qty' => function ($q) {
-                $q->where('status', Status::ACTIVE);
-            }], 'quantity')
+        // Base query for counting and summary
+        $query = Product::query()
             ->when($search, fn($q) => $q->where(function ($q2) use ($search) {
                 $q2->where('name', 'like', "%{$search}%")
                    ->orWhere('sku', 'like', "%{$search}%");
-            }))
-            ->orderBy('name')
-            ->get();
+            }));
 
-        // Summary counts (always from full unfiltered set when no search)
-        $summaryBase    = $search ? $allProducts : $allProducts;
-        $totalProducts  = $summaryBase->count();
-        $inStock        = $summaryBase->filter(fn($p) => ($p->stock_qty ?? 0) > ($p->low_stock_quantity_warning ?? 5))->count();
-        $lowStock       = $summaryBase->filter(fn($p) => ($p->stock_qty ?? 0) > 0 && ($p->stock_qty ?? 0) <= ($p->low_stock_quantity_warning ?? 5))->count();
-        $outOfStock     = $summaryBase->filter(fn($p) => ($p->stock_qty ?? 0) <= 0)->count();
-        $totalStockValue = $summaryBase->sum(fn($p) => max(0, (int)($p->stock_qty ?? 0)) * (float)($p->buying_price ?? 0));
-
-        // Apply filter in PHP
-        $filtered = match($filter) {
-            'out_of_stock' => $allProducts->filter(fn($p) => ($p->stock_qty ?? 0) <= 0),
-            'low_stock'    => $allProducts->filter(fn($p) => ($p->stock_qty ?? 0) > 0 && ($p->stock_qty ?? 0) <= ($p->low_stock_quantity_warning ?? 5)),
-            'in_stock'     => $allProducts->filter(fn($p) => ($p->stock_qty ?? 0) > ($p->low_stock_quantity_warning ?? 5)),
-            default        => $allProducts,
+        // Summary counts (still need products with their stock sums)
+        $stockSub = function ($q) {
+            $q->where('status', Status::ACTIVE);
         };
 
-        // Sort by stock qty ascending (out-of-stock first)
-        $filtered = $filtered->sortBy(fn($p) => (int)($p->stock_qty ?? 0))->values();
+        // For summary stats (we only need the stock sums, not full models)
+        $allWithStock = (clone $query)
+            ->withSum(['productStocks as stock_qty' => $stockSub], 'quantity')
+            ->get(['id', 'buying_price', 'low_stock_quantity_warning']);
 
-        // Manual pagination
-        $page     = $request->input('page', 1);
+        $totalProducts   = $allWithStock->count();
+        $inStock         = $allWithStock->filter(fn($p) => ($p->stock_qty ?? 0) > ($p->low_stock_quantity_warning ?? 5))->count();
+        $lowStock        = $allWithStock->filter(fn($p) => ($p->stock_qty ?? 0) > 0 && ($p->stock_qty ?? 0) <= ($p->low_stock_quantity_warning ?? 5))->count();
+        $outOfStock      = $allWithStock->filter(fn($p) => ($p->stock_qty ?? 0) <= 0)->count();
+        $totalStockValue = $allWithStock->sum(fn($p) => max(0, (int)($p->stock_qty ?? 0)) * (float)($p->buying_price ?? 0));
+
+        // Filtering
+        $filtered = match($filter) {
+            'out_of_stock' => $allWithStock->filter(fn($p) => ($p->stock_qty ?? 0) <= 0),
+            'low_stock'    => $allWithStock->filter(fn($p) => ($p->stock_qty ?? 0) > 0 && ($p->stock_qty ?? 0) <= ($p->low_stock_quantity_warning ?? 5)),
+            'in_stock'     => $allWithStock->filter(fn($p) => ($p->stock_qty ?? 0) > ($p->low_stock_quantity_warning ?? 5)),
+            default        => $allWithStock,
+        };
+
+        // Sorting
+        $sorted = $filtered->sortBy(fn($p) => (int)($p->stock_qty ?? 0))->values();
+
+        // Paginate only the relevant IDs to avoid loading 1000s of relationships at once
+        $page      = $request->input('page', 1);
+        $pagedIds  = $sorted->forPage($page, $perPage)->pluck('id');
+        
+        $productsList = Product::with(['category', 'media'])
+            ->withSum(['productStocks as stock_qty' => $stockSub], 'quantity')
+            ->whereIn('id', $pagedIds)
+            ->get()
+            ->sortBy(fn($p) => (int)($p->stock_qty ?? 0))
+            ->values();
+
         $products = new \Illuminate\Pagination\LengthAwarePaginator(
-            $filtered->forPage($page, $perPage),
-            $filtered->count(),
+            $productsList,
+            $sorted->count(),
             $perPage,
             $page,
             ['path' => $request->url(), 'query' => $request->query()]

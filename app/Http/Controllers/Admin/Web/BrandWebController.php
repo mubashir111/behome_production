@@ -9,9 +9,17 @@ use Illuminate\Support\Str;
 
 class BrandWebController extends Controller
 {
-    public function index()
+    private \App\Services\ProductBrandService $productBrandService;
+
+    public function __construct(\App\Services\ProductBrandService $productBrandService)
     {
-        $brands = ProductBrand::latest()->paginate(20);
+        $this->productBrandService = $productBrandService;
+    }
+
+    public function index(\App\Http\Requests\PaginateRequest $request)
+    {
+        $request->merge(['paginate' => 1]);
+        $brands = $this->productBrandService->list($request);
         return view('admin.brands.index', compact('brands'));
     }
 
@@ -20,27 +28,14 @@ class BrandWebController extends Controller
         return view('admin.brands.create');
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\ProductBrandRequest $request)
     {
-        $request->validate([
-            'name'        => ['required', 'string', 'max:190'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'status'      => ['required', 'numeric'],
-            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
-
-        $brand = ProductBrand::create([
-            'name'        => $request->name,
-            'slug'        => Str::slug($request->name) . rand(100, 999),
-            'description' => $request->description,
-            'status'      => $request->status,
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $brand->addMedia($request->file('logo'))->toMediaCollection('product-brand');
+        try {
+            $this->productBrandService->store($request);
+            return redirect()->route('admin.brands.index')->with('success', 'Brand created successfully.');
+        } catch (\Exception $exception) {
+            return back()->withInput()->with('error', $exception->getMessage());
         }
-
-        return redirect()->route('admin.brands.index')->with('success', 'Brand created successfully.');
     }
 
     public function edit(ProductBrand $brand)
@@ -48,37 +43,29 @@ class BrandWebController extends Controller
         return view('admin.brands.edit', compact('brand'));
     }
 
-    public function update(Request $request, ProductBrand $brand)
+    public function update(\App\Http\Requests\ProductBrandRequest $request, ProductBrand $brand)
     {
-        $request->validate([
-            'name'        => ['required', 'string', 'max:190'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'status'      => ['required', 'numeric'],
-            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
-
-        $brand->update([
-            'name'        => $request->name,
-            'description' => $request->description,
-            'status'      => $request->status,
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $brand->clearMediaCollection('product-brand');
-            $brand->addMedia($request->file('logo'))->toMediaCollection('product-brand');
+        try {
+            $this->productBrandService->update($request, $brand);
+            return redirect()->route('admin.brands.index')->with('success', 'Brand updated successfully.');
+        } catch (\Exception $exception) {
+            return back()->withInput()->with('error', $exception->getMessage());
         }
-
-        return redirect()->route('admin.brands.index')->with('success', 'Brand updated successfully.');
     }
 
     public function destroy(ProductBrand $brand)
     {
-        $brand->clearMediaCollection('product-brand');
-        $brand->delete();
-
-        if (request()->wantsJson()) {
-            return response()->json(['success' => true]);
+        try {
+            $this->productBrandService->destroy($brand);
+            if (request()->wantsJson()) {
+                return response()->json(['success' => true]);
+            }
+            return redirect()->route('admin.brands.index')->with('success', 'Brand deleted successfully.');
+        } catch (\Exception $exception) {
+            if (request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+            }
+            return back()->with('error', $exception->getMessage());
         }
-        return redirect()->route('admin.brands.index')->with('success', 'Brand deleted successfully.');
     }
 }

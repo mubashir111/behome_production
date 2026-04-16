@@ -25,56 +25,44 @@ class CouponRequest extends FormRequest
      */
     public function rules(): array
     {
+        $couponId = $this->route('coupon') instanceof \App\Models\Coupon ? $this->route('coupon')->id : $this->route('coupon');
+
         return [
             'name'        => [
                 'required',
                 'string',
                 'max:190',
-                Rule::unique("coupons", "name")->ignore($this->route('coupon.id'))
+                Rule::unique("coupons", "name")->ignore($couponId)
             ],
             'description'      => ['nullable', 'string', 'max:900'],
-            'code'             => ['required', 'string', 'max:24', Rule::unique("coupons", "code")->ignore($this->route('coupon.id'))],
+            'code'             => ['required', 'string', 'max:24', Rule::unique("coupons", "code")->ignore($couponId)],
             'discount'         => ['required', 'numeric'],
             'discount_type'    => ['required', 'numeric', 'max:24'],
-            'start_date'       => ['required', 'string',],
-            'end_date'         => ['required', 'string',],
+            'start_date'       => ['required', 'date'],
+            'end_date'         => ['required', 'date', 'after_or_equal:start_date'],
             'minimum_order'    => ['required', 'numeric'],
             'maximum_discount' => ['required', 'numeric'],
             'limit_per_user'   => ['nullable', 'numeric'],
-            'image'            => $this->route('coupon.id') ? ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'] : ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-
+            'image'            => $couponId ? ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'] : ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-
-            if (!$this->isNotNull(request('start_date'))) {
-                $validator->errors()->add('start_date', 'The start date field is required');
-            }
-
-            if (!$this->isNotNull(request('end_date'))) {
-                $validator->errors()->add('end_date', 'The end date field is required');
-            }
-
             if ($this->isPercentage() && request('discount') > 100) {
                 $validator->errors()->add('discount', 'Percentage amount can\'t be greater than 100.');
             }
 
-            if ($this->isNotNull(request('start_date')) && strtotime(request('end_date')) < strtotime(request('start_date'))) {
-                $validator->errors()->add('end_date', 'To date can\'t be older than Start date.');
-            }
-
-            if ($this->isNotNull(request('start_date')) && $this->checkToDate()) {
+            if ($this->checkToDate()) {
                 $validator->errors()->add('end_date', 'To date can\'t be older than now.');
             }
         });
     }
 
-    private function isPercentage()
+    private function isPercentage(): bool
     {
-        return request('discount_type') == DiscountType::PERCENTAGE ? true : false;
+        return (int) request('discount_type') === DiscountType::PERCENTAGE;
     }
 
     public function checkToDate()

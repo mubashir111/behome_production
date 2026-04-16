@@ -38,7 +38,13 @@ class PermissionService
     public function update(PermissionRequest $request, Role $role) : Role
     {
         try {
-            return $role->syncPermissions(Permission::whereIn('id', $request->get('permissions'))->get());
+            return \DB::transaction(function() use ($request, $role) {
+                $role->syncPermissions(\Spatie\Permission\Models\Permission::whereIn('id', $request->get('permissions'))->get());
+                
+                \App\Models\AdminNotification::record('warning', 'Permissions Updated', "Permissions for role '{$role->name}' were modified by " . (auth()->user()->name ?? 'Admin'));
+                
+                return $role;
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

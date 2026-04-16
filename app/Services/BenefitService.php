@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\PaginateRequest;
 use App\Http\Requests\BenefitRequest;
@@ -62,16 +63,19 @@ class BenefitService
      */
     public function store(BenefitRequest $request)
     {
-        try {
-            $benefit = Benefit::create($request->validated());
-            if ($request->image) {
-                $benefit->addMediaFromRequest('image')->toMediaCollection('benefit');
+        return DB::transaction(function () use ($request) {
+            try {
+                $benefit = Benefit::create($request->validated());
+                if ($request->hasFile('image')) {
+                    $benefit->addMediaFromRequest('image')->toMediaCollection('benefit');
+                }
+                \App\Models\AdminNotification::record('info', 'Benefit Created', "Benefit '{$benefit->title}' was created by " . (auth()->user()->name ?? 'Admin'));
+                return $benefit;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $benefit;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        });
     }
 
     /**
@@ -79,17 +83,20 @@ class BenefitService
      */
     public function update(BenefitRequest $request, Benefit $benefit): Benefit
     {
-        try {
-            $benefit->update($request->validated());
-            if ($request->image) {
-                $benefit->clearMediaCollection('benefit');
-                $benefit->addMediaFromRequest('image')->toMediaCollection('benefit');
+        return DB::transaction(function () use ($request, $benefit) {
+            try {
+                $benefit->update($request->validated());
+                if ($request->hasFile('image')) {
+                    $benefit->clearMediaCollection('benefit');
+                    $benefit->addMediaFromRequest('image')->toMediaCollection('benefit');
+                }
+                \App\Models\AdminNotification::record('info', 'Benefit Updated', "Benefit '{$benefit->title}' (ID #{$benefit->id}) was updated by " . (auth()->user()->name ?? 'Admin'));
+                return $benefit;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $benefit;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        });
     }
 
     /**
@@ -98,7 +105,15 @@ class BenefitService
     public function destroy(Benefit $benefit)
     {
         try {
-            $benefit->delete();
+            DB::transaction(function() use ($benefit) {
+                $title = $benefit->title;
+                $id    = $benefit->id;
+                
+                $benefit->clearMediaCollection('benefit');
+                $benefit->delete();
+                
+                \App\Models\AdminNotification::record('warning', 'Benefit Deleted', "Benefit '{$title}' (ID #{$id}) was deleted by " . (auth()->user()->name ?? 'Admin'));
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

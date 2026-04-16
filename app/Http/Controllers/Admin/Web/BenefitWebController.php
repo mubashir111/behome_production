@@ -40,6 +40,8 @@ class BenefitWebController extends Controller
             $benefit->addMedia($request->file('image'))->toMediaCollection('benefit');
         }
 
+        \App\Models\AdminNotification::record('info', 'Benefit Item Created', "A new benefit/ticker item '{$benefit->title}' was added by " . (auth()->user()->name ?? 'Admin'));
+
         return redirect()->route('admin.benefits.index')->with('success', 'Benefit/ticker item created successfully.');
     }
 
@@ -70,13 +72,18 @@ class BenefitWebController extends Controller
             $benefit->addMedia($request->file('image'))->toMediaCollection('benefit');
         }
 
+        \App\Models\AdminNotification::record('info', 'Benefit Item Updated', "Benefit/ticker item '{$benefit->title}' was updated by " . (auth()->user()->name ?? 'Admin'));
+
         return redirect()->route('admin.benefits.index')->with('success', 'Benefit/ticker item updated successfully.');
     }
 
     public function destroy(Benefit $benefit)
     {
+        $title = $benefit->title;
         $benefit->clearMediaCollection('benefit');
         $benefit->delete();
+
+        \App\Models\AdminNotification::record('warning', 'Benefit Item Deleted', "Benefit/ticker item '{$title}' was removed by " . (auth()->user()->name ?? 'Admin'));
 
         if (request()->wantsJson()) {
             return response()->json(['success' => true]);

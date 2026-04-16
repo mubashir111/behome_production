@@ -106,6 +106,7 @@ class PaymentGatewayService
                         }
                     }
                 }
+                \App\Models\AdminNotification::record('warning', 'Payment Gateway Settings Modified', "Settings for the '{$this->gateway->name}' payment gateway were updated by " . (auth()->user()->name ?? 'Admin'));
             }
             return $this->gateway;
         } catch (Exception $exception) {

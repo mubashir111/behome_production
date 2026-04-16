@@ -57,7 +57,7 @@ class ProductAttributeOptionService
             return $this->productAttributeOption;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -76,7 +76,7 @@ class ProductAttributeOptionService
             return $productAttributeOption;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -94,7 +94,7 @@ class ProductAttributeOptionService
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }

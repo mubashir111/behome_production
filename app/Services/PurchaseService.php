@@ -163,7 +163,7 @@ class PurchaseService
             return $this->purchase;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -291,7 +291,7 @@ class PurchaseService
             return $purchase;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -316,7 +316,7 @@ class PurchaseService
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception(QueryExceptionLibrary::message($exception), 422);
         }
     }
@@ -345,22 +345,28 @@ class PurchaseService
                     $purchasePayment->addMediaFromRequest('file')->toMediaCollection('purchase_payment');
                 }
 
-                $checkPurchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->sum('amount');
+                $paidAmount = PurchasePayment::where('purchase_id', $purchase->id)->sum('amount');
 
-                if ($checkPurchasePayment == $purchase->total) {
+                // Use a threshold for float comparison (epsilon = 0.001)
+                $diff = abs($paidAmount - $purchase->total);
+                
+                if ($diff < 0.001) {
                     $purchase->payment_status = PurchasePaymentStatus::FULLY_PAID;
                     $purchase->save();
-                }
-
-                if ($checkPurchasePayment < $purchase->total) {
+                } else if ($paidAmount > 0) {
                     $purchase->payment_status = PurchasePaymentStatus::PARTIAL_PAID;
                     $purchase->save();
+                } else {
+                    $purchase->payment_status = PurchasePaymentStatus::PENDING;
+                    $purchase->save();
                 }
+
+                \App\Models\AdminNotification::record('info', 'Purchase Payment', "Payment of {$request->amount} recorded for purchase #{$purchase->reference_no}");
             });
             return $purchase;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -371,7 +377,6 @@ class PurchaseService
             return PurchasePayment::where('purchase_id', $purchase->id)->get();
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -381,23 +386,29 @@ class PurchaseService
         return $purchasePayment->getMedia('purchase_payment')->first();
     }
 
-    /**
-     * @throws Exception
-     */
     public function paymentDestroy(Purchase $purchase, PurchasePayment $purchasePayment): void
     {
         try {
-            $purchasePayment->delete();
-            $checkPurchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->sum('amount');
-            if ($checkPurchasePayment < $purchase->total && $checkPurchasePayment !== 0) {
-                $purchase->payment_status = PurchasePaymentStatus::PARTIAL_PAID;
-                $purchase->save();
-            }
+            DB::transaction(function() use ($purchase, $purchasePayment) {
+                $amt = $purchasePayment->amount;
+                $purchasePayment->delete();
+                $paidAmount = PurchasePayment::where('purchase_id', $purchase->id)->sum('amount');
+                
+                $diff = abs($paidAmount - $purchase->total);
 
-            if ($checkPurchasePayment == 0) {
-                $purchase->payment_status = PurchasePaymentStatus::PENDING;
-                $purchase->save();
-            }
+                if ($diff < 0.001) {
+                    $purchase->payment_status = PurchasePaymentStatus::FULLY_PAID;
+                    $purchase->save();
+                } else if ($paidAmount > 0) {
+                    $purchase->payment_status = PurchasePaymentStatus::PARTIAL_PAID;
+                    $purchase->save();
+                } else {
+                    $purchase->payment_status = PurchasePaymentStatus::PENDING;
+                    $purchase->save();
+                }
+
+                \App\Models\AdminNotification::record('warning', 'Payment Reverted', "Payment of {$amt} deleted for purchase #{$purchase->reference_no} by " . (auth()->user()->name ?? 'Admin'));
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

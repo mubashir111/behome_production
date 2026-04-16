@@ -82,42 +82,44 @@ class CouponService
      */
     public function store(CouponRequest $request)
     {
-        try {
-            $this->coupon = Coupon::create([
-                'name'             => $request->name,
-                'description'      => $request->description,
-                'code'             => $request->code,
-                'discount'         => $request->discount,
-                'discount_type'    => $request->discount_type,
-                'start_date'       => !blank($request->start_date) ? date(
-                    'Y-m-d H:i:s',
-                    strtotime($request->start_date)
-                ) : "",
-                'end_date'         => !blank($request->end_date) ? date(
-                    'Y-m-d H:i:s',
-                    strtotime($request->end_date)
-                ) : "",
-                'minimum_order'    => $request->minimum_order,
-                'maximum_discount' => $request->maximum_discount,
-                'limit_per_user'   => $request->limit_per_user,
-            ]);
-            if ($request->image) {
-                $this->coupon->addMedia($request->image)->toMediaCollection('coupon');
+        return DB::transaction(function () use ($request) {
+            try {
+                $this->coupon = Coupon::create([
+                    'name'             => $request->name,
+                    'description'      => $request->description,
+                    'code'             => $request->code,
+                    'discount'         => $request->discount,
+                    'discount_type'    => $request->discount_type,
+                    'start_date'       => !blank($request->start_date) ? date(
+                        'Y-m-d H:i:s',
+                        strtotime($request->start_date)
+                    ) : "",
+                    'end_date'         => !blank($request->end_date) ? date(
+                        'Y-m-d H:i:s',
+                        strtotime($request->end_date)
+                    ) : "",
+                    'minimum_order'    => $request->minimum_order,
+                    'maximum_discount' => $request->maximum_discount,
+                    'limit_per_user'   => $request->limit_per_user,
+                ]);
+                if ($request->image) {
+                    $this->coupon->addMedia($request->image)->toMediaCollection('coupon');
+                }
+
+                \App\Models\AdminNotification::record('info', 'Coupon Created', "Coupon '{$this->coupon->code}' was created by " . (auth()->user()->name ?? 'Admin'));
+                
+                return $this->coupon;
+            } catch (Exception $exception) {
+                Log::info($exception->getMessage());
+                throw new Exception($exception->getMessage(), 422);
             }
-            return $this->coupon;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
+        });
     }
 
-    /**
-     * @throws Exception
-     */
     public function update(CouponRequest $request, Coupon $coupon)
     {
         try {
-            DB::transaction(function () use ($request, $coupon) {
+            return DB::transaction(function () use ($request, $coupon) {
                 $this->coupon             = $coupon;
                 $coupon->name             = $request->name;
                 $coupon->description      = $request->description;
@@ -137,53 +139,28 @@ class CouponService
                 $coupon->limit_per_user   = $request->limit_per_user;
                 $coupon->save();
                 if ($request->image) {
-                    $coupon->media()->delete();
+                    $coupon->clearMediaCollection('coupon');
                     $coupon->addMedia($request->image)->toMediaCollection('coupon');
                 }
+
+                \App\Models\AdminNotification::record('info', 'Coupon Updated', "Coupon '{$coupon->code}' (ID #{$coupon->id}) was updated by " . (auth()->user()->name ?? 'Admin'));
+
+                return $this->coupon;
             });
-            return $this->coupon;
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function destroy(Coupon $coupon): void
     {
         try {
-            $coupon->delete();
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function show(Coupon $coupon): Coupon
-    {
-        try {
-            return $coupon;
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function couponDateWise(): \Illuminate\Database\Eloquent\Collection
-    {
-        try {
-            return Coupon::all()->filter(function ($item) {
-                if (Carbon::now()->between($item->start_date, $item->end_date)) {
-                    return $item;
-                }
+            $code = $coupon->code;
+            $id   = $coupon->id;
+            DB::transaction(function () use ($coupon, $code, $id) {
+                $coupon->delete();
+                \App\Models\AdminNotification::record('warning', 'Coupon Deleted', "Coupon '{$code}' (ID #{$id}) was deleted by " . (auth()->user()->name ?? 'Admin'));
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
@@ -191,23 +168,54 @@ class CouponService
         }
     }
 
-    /**
-     * @throws Exception
-     */
+    public function couponDateWise(): \Illuminate\Database\Eloquent\Collection
+    {
+        try {
+            $now = Carbon::now();
+            return Coupon::where('start_date', '<=', $now)
+                ->where('end_date', '>=', $now)
+                ->get();
+        } catch (Exception $exception) {
+            Log::info($exception->getMessage());
+            throw new Exception($exception->getMessage(), 422);
+        }
+    }
+
     public function couponChecking(CouponCheckRequest $request)
     {
         try {
             $coupon = Coupon::where(['code' => $request->code])->first();
             if ($coupon) {
+                $now = Carbon::now();
+                
+                // Check if coupon period has started
+                if (strtotime($coupon->start_date) > strtotime($now)) {
+                    throw new Exception(trans('all.message.coupon_not_started_yet') ?? 'This coupon is not active yet.', 422);
+                }
+
+                // Check if coupon period has ended
+                if (strtotime($coupon->end_date) < strtotime($now)) {
+                    throw new Exception(trans('all.message.coupon_date_expired'), 422);
+                }
+
                 if ($coupon->minimum_order > $request->total) {
                     throw new Exception(trans('all.message.minimum_order_amount') . AppLibrary::convertAmountFormat($coupon->minimum_order), 422);
-                } else {
-                    if (strtotime($coupon->end_date) >= strtotime(Carbon::now())) {
-                        return $coupon;
-                    } else {
-                        throw new Exception(trans('all.message.coupon_date_expired'), 422);
+                }
+                
+                // Check if user has exceeded their usage limit for this coupon
+                if (Auth::check() && $coupon->limit_per_user > 0) {
+                    $usageCount = \App\Models\OrderCoupon::where('coupon_id', $coupon->id)
+                        ->where('user_id', Auth::id())
+                        ->whereHas('order', function($q) {
+                            $q->where('status', '!=', \App\Enums\OrderStatus::CANCELED);
+                        })->count();
+                    
+                    if ($usageCount >= $coupon->limit_per_user) {
+                        throw new Exception(trans('all.message.coupon_limit_exceeded') ?? 'You have already used this coupon maximum number of times.', 422);
                     }
                 }
+                
+                return $coupon;
             } else {
                 throw new Exception(trans('all.message.coupon_not_exist'), 422);
             }

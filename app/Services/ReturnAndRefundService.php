@@ -137,7 +137,7 @@ class ReturnAndRefundService
                 return $this->returnAndRefund;
             }
         } catch (Exception $exception) {
-            DB::rollBack();
+
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -170,30 +170,41 @@ class ReturnAndRefundService
     public function changeStatus(ReturnAndRefund $returnAndRefund, OrderStatusRequest $request): ReturnAndRefund
     {
         try {
+            return DB::transaction(function () use ($returnAndRefund, $request) {
+                $oldStatus = $returnAndRefund->status;
 
-            if ($request->status == ReturnOrderStatus::REJECTED) {
-                $request->validate([
-                    'reason' => 'required|max:700',
-                ]);
+                if ($request->status == ReturnOrderStatus::REJECTED) {
+                    $request->validate([
+                        'reason' => 'required|max:700',
+                    ]);
 
-                if ($request->reason) {
-                    $returnAndRefund->reject_reason = $request->reason;
+                    if ($request->reason) {
+                        $returnAndRefund->reject_reason = $request->reason;
+                    }
                 }
-            }
 
-            // Credit balance only when accepting (and not already accepted)
-            if ($request->status == ReturnOrderStatus::ACCEPT && $returnAndRefund->status !== ReturnOrderStatus::ACCEPT) {
-                $order = Order::findOrFail($returnAndRefund->order_id);
-                if ($order->payment_method !== 1 && Settings::group('site')->get('site_is_return_product_price_add_to_credit') === Ask::YES) {
-                    $user          = User::findOrFail($returnAndRefund->user_id);
-                    $user->balance += $returnAndRefund?->returnProducts->sum('return_price');
-                    $user->save();
+                // Credit balance only when accepting (and not already accepted)
+                if ($request->status == ReturnOrderStatus::ACCEPT && $returnAndRefund->status !== ReturnOrderStatus::ACCEPT) {
+                    $order = Order::findOrFail($returnAndRefund->order_id);
+                    // Check if site settings allow auto-credit to wallet
+                    if ($order->payment_method !== 1 && Settings::group('site')->get('site_is_return_product_price_add_to_credit') === Ask::YES) {
+                        $user          = User::findOrFail($returnAndRefund->user_id);
+                        $user->balance += $returnAndRefund?->returnProducts->sum('return_price');
+                        $user->save();
+                    }
                 }
-            }
 
-            $returnAndRefund->status = $request->status;
-            $returnAndRefund->save();
-            return $returnAndRefund;
+                $returnAndRefund->status = $request->status;
+                $returnAndRefund->save();
+
+                // Log the status change in the Order Audit Trail
+                $order = Order::find($returnAndRefund->order_id);
+                if ($order) {
+                    AuditLogger::returnStatusChanged($order, $oldStatus, (int) $request->status, $request->reason ?? null);
+                }
+
+                return $returnAndRefund;
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

@@ -81,23 +81,52 @@ class BlogPostController extends Controller
         $data             = $request->only(['title', 'excerpt', 'content', 'category', 'author', 'meta_title', 'meta_description', 'published_at']);
         $data['is_published'] = $request->boolean('is_published');
 
+        // Sync Slug if title changed
+        if ($blog->title !== $request->title) {
+            $slug = Str::slug($request->title);
+            $base = $slug;
+            $i    = 1;
+            while (BlogPost::where('slug', $slug)->where('id', '!=', $blog->id)->exists()) {
+                $slug = "{$base}-{$i}";
+                $i++;
+            }
+            $data['slug'] = $slug;
+        }
+
         if (!$data['published_at'] && $data['is_published'] && !$blog->published_at) {
             $data['published_at'] = now();
         }
 
         if ($request->hasFile('cover_image')) {
+            // Delete old image from storage before replacing
+            if ($blog->cover_image) {
+                $oldPath = ltrim(str_replace('/storage/', '', $blog->cover_image), '/');
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
             $path = $request->file('cover_image')->store('blog', 'public');
             $data['cover_image'] = '/storage/' . $path;
         }
 
         $blog->update($data);
 
+        \App\Models\AdminNotification::record('info', 'Blog Updated', "Blog post '{$blog->title}' was updated by " . (auth()->user()->name ?? 'Admin'));
+
         return redirect()->route('admin.blog.index')->with('success', 'Blog post updated successfully.');
     }
 
     public function destroy(BlogPost $blog)
     {
+        $title = $blog->title;
+        
+        // Cleanup image from storage
+        if ($blog->cover_image) {
+            $oldPath = ltrim(str_replace('/storage/', '', $blog->cover_image), '/');
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+        }
+
         $blog->delete();
+
+        \App\Models\AdminNotification::record('warning', 'Blog Deleted', "Blog post '{$title}' was deleted by " . (auth()->user()->name ?? 'Admin'));
 
         if (request()->wantsJson()) {
             return response()->json(['success' => true]);

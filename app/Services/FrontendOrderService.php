@@ -247,7 +247,41 @@ class FrontendOrderService
 
                 $this->order->tax = $finalTotalTax;
                 $this->order->subtotal = $finalSubtotal;
-                $this->order->total = $finalTotalAmount + $this->order->shipping_charge - $this->order->discount;
+                
+                // --- Server-side Coupon & Discount Validation ---
+                $calculatedDiscount = 0;
+                if ($request->coupon_id > 0) {
+                    $coupon = \App\Models\Coupon::find($request->coupon_id);
+                    if ($coupon) {
+                        $now = now();
+                        // Re-verify validity dates
+                        if ($coupon->start_date <= $now && $coupon->end_date >= $now) {
+                            // Re-verify minimum order
+                            if ($finalSubtotal >= $coupon->minimum_order) {
+                                // Re-verify usage limit
+                                $usageCount = \App\Models\OrderCoupon::where('coupon_id', $coupon->id)
+                                    ->where('user_id', Auth::id())
+                                    ->whereHas('order', fn($q) => $q->where('status', '!=', \App\Enums\OrderStatus::CANCELED))
+                                    ->count();
+                                
+                                if ($usageCount < $coupon->limit_per_user || $coupon->limit_per_user == 0) {
+                                    if ($coupon->discount_type == \App\Enums\DiscountType::FIXED) {
+                                        $calculatedDiscount = (float) $coupon->discount;
+                                    } else {
+                                        $calculatedDiscount = ($finalSubtotal * (float) $coupon->discount) / 100;
+                                        if ($coupon->maximum_discount > 0 && $calculatedDiscount > $coupon->maximum_discount) {
+                                            $calculatedDiscount = (float) $coupon->maximum_discount;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Force use of server-calculated discount, ignoring any request-injected value
+                $this->order->discount = $calculatedDiscount;
+                $this->order->total = max(0, $finalTotalAmount + $this->order->shipping_charge - $this->order->discount);
                 
                 $this->order->save();
 
@@ -312,12 +346,12 @@ class FrontendOrderService
                     }
                 }
 
-                if ($request->coupon_id > 0) {
+                if ($request->coupon_id > 0 && $this->order->discount > 0) {
                     OrderCoupon::create([
                         'order_id'  => $this->order->id,
                         'coupon_id' => $request->coupon_id,
                         'user_id'   => Auth::user()->id,
-                        'discount'  => $request->discount
+                        'discount'  => $this->order->discount
                     ]);
                 }
 
@@ -355,7 +389,7 @@ class FrontendOrderService
 
             return $this->order;
         } catch (Exception $exception) {
-            DB::rollBack();
+
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);
         }
@@ -364,17 +398,12 @@ class FrontendOrderService
     /**
      * @throws Exception
      */
-    public function show(Order $order): Order|array
+    public function show(Order $order): Order
     {
-        try {
-            if ($order->user_id == Auth::user()->id) {
-                return $order;
-            }
-            return [];
-        } catch (Exception $exception) {
-            Log::info($exception->getMessage());
-            throw new Exception($exception->getMessage(), 422);
+        if ((int) $order->user_id !== (int) Auth::user()->id) {
+            throw new Exception(trans('all.message.permission_denied'), 403);
         }
+        return $order;
     }
 
     /**
@@ -383,46 +412,45 @@ class FrontendOrderService
     public function changeStatus(Order $order, OrderStatusRequest $request): Order
     {
         try {
-            if ($order->user_id == Auth::user()->id) {
+            return DB::transaction(function () use ($order, $request) {
+                if ((int) $order->user_id !== (int) Auth::user()->id) {
+                    throw new Exception(trans('all.message.permission_denied'), 403);
+                }
                 if ($request->status == OrderStatus::CANCELED) {
-                    if ($order->status >= OrderStatus::CONFIRMED) {
-                        throw new Exception(trans('all.message.order_confirmed'), 422);
-                    } else {
-                        if ($order->transaction) {
-                            app(PaymentService::class)->cashBack(
-                                $order,
-                                'credit',
-                                rand(111111111111111, 99999999999999)
-                            );
-                        }
-                        SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status]);
-                        SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
-                        SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                        if ($order->status >= OrderStatus::CONFIRMED) {
+                            throw new Exception(trans('all.message.order_confirmed'), 422);
+                        } else {
+                            if ($order->transaction) {
+                                app(PaymentService::class)->cashBack($order, 'credit');
+                            }
+                            SendOrderMail::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                            SendOrderSms::dispatch(['order_id' => $order->id, 'status' => $request->status]);
+                            SendOrderPush::dispatch(['order_id' => $order->id, 'status' => $request->status]);
 
-                        $stocks = Stock::where(['model_type' => Order::class, 'model_id' => $order->id])->get();
-                        foreach ($stocks as $stock) {
-                            $stock->status = Status::INACTIVE;
-                            $stock->save();
-                        };
+                            $stocks = Stock::where(['model_type' => Order::class, 'model_id' => $order->id])->get();
+                            foreach ($stocks as $stock) {
+                                $stock->status = Status::INACTIVE;
+                                $stock->save();
+                            };
 
-                        $oldStatus = $order->status;
-                        $order->status = $request->status;
-                        if ($request->reason) {
-                            $order->setAdminStatusReason($request->reason);
-                        }
-                        $order->save();
-                        AuditLogger::orderStatusChanged($order, $oldStatus, $request->status);
+                            $oldStatus = $order->status;
+                            $order->status = $request->status;
+                            if ($request->reason) {
+                                $order->setAdminStatusReason($request->reason);
+                            }
+                            $order->save();
+                            AuditLogger::orderStatusChanged($order, $oldStatus, $request->status);
 
-                        try {
-                            $orderMailNotificationBuilderService = new OrderMailNotificationBuilder($order->id);
-                            $orderMailNotificationBuilderService->adminOrderCancellationNotification();
-                        } catch (Exception $e) {
-                            Log::info($e->getMessage());
+                            try {
+                                $orderMailNotificationBuilderService = new OrderMailNotificationBuilder($order->id);
+                                $orderMailNotificationBuilderService->adminOrderCancellationNotification();
+                            } catch (Exception $e) {
+                                Log::info($e->getMessage());
+                            }
                         }
                     }
-                }
-            }
-            return $order;
+                return $order;
+            });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception($exception->getMessage(), 422);

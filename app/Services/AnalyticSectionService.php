@@ -84,7 +84,7 @@ class AnalyticSectionService
 
             if (!$this->envService->getValue('DEMO')) {
             DB::transaction(function () use ($request, $analytic, $analyticsSection) {
-                if ($analytic->id == $analyticsSection->analytic_id) {
+                if ($analytic->id === $analyticsSection->analytic_id) {
                     $analyticsSection->update($request->validated());
                 }
             });
@@ -94,7 +94,7 @@ class AnalyticSectionService
             }
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -106,13 +106,13 @@ class AnalyticSectionService
     {
         try {
             DB::transaction(function () use ($analytic, $analyticsSection) {
-                if ($analytic->id == $analyticsSection->analytic_id) {
+                if ($analytic->id === $analyticsSection->analytic_id) {
                     $analyticsSection->delete();
                 }
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -123,7 +123,7 @@ class AnalyticSectionService
     public function show(Analytic $analytic, AnalyticSection $analyticsSection)
     {
         try {
-            if ($analytic->id == $analyticsSection->analytic_id) {
+            if ($analytic->id === $analyticsSection->analytic_id) {
                 return $analyticsSection;
             }
         } catch (Exception $exception) {

@@ -60,7 +60,19 @@ class AddressController extends Controller
         }
 
         try {
-            $address->update($request->all());
+            $validated = $request->validate([
+                'full_name'    => 'nullable|string|max:191',
+                'email'        => 'nullable|email|max:191',
+                'phone'        => 'nullable|string|max:191',
+                'country'      => 'nullable|string|max:191',
+                'address'      => 'nullable|string',
+                'city'         => 'nullable|string|max:191',
+                'state'        => 'nullable|string|max:191',
+                'zip_code'     => 'nullable|string|max:191',
+                'country_code' => 'nullable|string|max:10',
+            ]);
+
+            $address->update($validated);
             return $this->successResponse($address, 'Address updated successfully');
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);

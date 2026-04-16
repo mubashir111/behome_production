@@ -107,12 +107,12 @@ class User extends Authenticatable implements HasMedia
         return $this->roles->pluck('id', 'id')->first();
     }
 
-    public function getrole(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function getrole(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->hasOne(Role::class, 'id', 'myrole');
+        return $this->belongsTo(Role::class, 'myrole', 'id');
     }
     public function returnOrders()
     {
-        $this->hasMany(ReturnOrder::class, 'user_id', 'id');
+        return $this->hasMany(ReturnOrder::class, 'user_id', 'id');
     }
 }

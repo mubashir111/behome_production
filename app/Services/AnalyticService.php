@@ -105,7 +105,7 @@ class AnalyticService
             });
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception(QueryExceptionLibrary::message($exception), $exception->getCode());
         }
     }

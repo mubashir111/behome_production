@@ -88,7 +88,7 @@ class EmployeeService
             }
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -101,7 +101,7 @@ class EmployeeService
         try {
             if (
                 !in_array($request->role_id, $this->blockRoles) && !in_array(
-                    optional($employee->roles[0])->id,
+                    optional($employee->roles->first())->id,
                     $this->blockRoles
                 )
             ) {
@@ -124,7 +124,7 @@ class EmployeeService
             }
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception($exception->getMessage(), 422);
         }
     }
@@ -135,7 +135,7 @@ class EmployeeService
     public function show(User $employee): User
     {
         try {
-            if (!in_array(optional($employee->roles[0])->id, $this->blockRoles)) {
+            if (!in_array(optional($employee->roles->first())->id, $this->blockRoles)) {
                 return $employee;
             } else {
                 throw new Exception(trans('all.message.permission_denied'), 422);
@@ -153,8 +153,8 @@ class EmployeeService
     public function destroy(User $employee)
     {
         try {
-            if (!in_array(optional($employee->roles[0])->id, $this->blockRoles)) {
-                if ($employee->hasRole(optional($employee->roles[0])->id)) {
+            if (!in_array(optional($employee->roles->first())->id, $this->blockRoles)) {
+                if ($employee->hasRole(optional($employee->roles->first())->id)) {
                     DB::transaction(function () use ($employee) {
                         $employee->addresses()->delete();
                         $employee->delete();
@@ -167,7 +167,7 @@ class EmployeeService
             }
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
-            DB::rollBack();
+
             throw new Exception(QueryExceptionLibrary::message($exception), 422);
         }
     }
@@ -184,7 +184,7 @@ class EmployeeService
     public function changePassword(UserChangePasswordRequest $request, User $employee): User
     {
         try {
-            if (!in_array(optional($employee->roles[0])->id, $this->blockRoles)) {
+            if (!in_array(optional($employee->roles->first())->id, $this->blockRoles)) {
                 $employee->password = Hash::make($request->password);
                 $employee->save();
                 return $employee;
@@ -203,7 +203,7 @@ class EmployeeService
     public function changeImage(ChangeImageRequest $request, User $employee): User
     {
         try {
-            if (!in_array(optional($employee->roles[0])->id, $this->blockRoles)) {
+            if (!in_array(optional($employee->roles->first())->id, $this->blockRoles)) {
                 if ($request->image) {
                     $employee->clearMediaCollection('profile');
                     $employee->addMediaFromRequest('image')->toMediaCollection('profile');

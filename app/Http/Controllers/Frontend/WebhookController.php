@@ -56,17 +56,15 @@ class WebhookController extends Controller
             }
 
             try {
-                DB::transaction(function () use ($orderId, $paymentIntent) {
                     $order = Order::find($orderId);
 
                     if (!$order || $order->payment_status === PaymentStatus::PAID) {
-                        return;
+                        return response()->json(['received' => true]);
                     }
 
-                    // Mark as PAID
+                    // PaymentService::payment() already wraps in DB::transaction() internally
                     (new PaymentService())->payment($order, 'stripe', $paymentIntent->id);
                     Log::info("Stripe webhook: order #{$order->id} marked PAID via PaymentIntent {$paymentIntent->id}");
-                });
             } catch (Exception $e) {
                 Log::error('Stripe webhook error: ' . $e->getMessage());
                 return response()->json(['error' => 'Processing failed'], 500);

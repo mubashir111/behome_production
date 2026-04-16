@@ -246,15 +246,23 @@ class AppLibrary
         $cdn = public_path("firebase-cdn.txt");
         $textContent = public_path("firebase-content.txt");
         $file = public_path("firebase-messaging-sw.js");
-        $content = 'let config = {
-        apiKey: "' . $request->notification_fcm_api_key . '",
-        authDomain: "' . $request->notification_fcm_auth_domain . '",
-        projectId: "' . $request->notification_fcm_project_id . '",
-        storageBucket: "' . $request->notification_fcm_storage_bucket . '",
-        messagingSenderId: "' . $request->notification_fcm_messaging_sender_id . '",
-        appId: "' . $request->notification_fcm_app_id . '",
-        measurementId: "' . $request->notification_fcm_measurement_id . '",' . "\n" . ' };' . "\n";
-        File::put($file, File::get($cdn) . $content . File::get($textContent));
+        
+        // Strict sanitization: Ensure values are safely escaped for JS
+        $config = [
+            'apiKey'            => (string) $request->notification_fcm_api_key,
+            'authDomain'        => (string) $request->notification_fcm_auth_domain,
+            'projectId'         => (string) $request->notification_fcm_project_id,
+            'storageBucket'     => (string) $request->notification_fcm_storage_bucket,
+            'messagingSenderId' => (string) $request->notification_fcm_messaging_sender_id,
+            'appId'             => (string) $request->notification_fcm_app_id,
+            'measurementId'     => (string) $request->notification_fcm_measurement_id,
+        ];
+
+        $content = "let config = " . json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . ";\n";
+        
+        if (File::exists($cdn) && File::exists($textContent)) {
+            File::put($file, File::get($cdn) . $content . File::get($textContent));
+        }
     }
 
     public static function defaultPermission($permissions)
