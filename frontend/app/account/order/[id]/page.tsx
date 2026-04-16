@@ -278,6 +278,8 @@ export default function OrderDetail() {
         const win = window.open('', '_blank');
         if (!win) return;
 
+        const esc = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
         // Address: API returns order_address as array
         const addr = (order.order_address ?? [])[0] ?? null;
         const addrLines = addr ? [
@@ -286,16 +288,16 @@ export default function OrderDetail() {
             addr.address,
             [addr.city, addr.state, addr.zip_code].filter(Boolean).join(', '),
             addr.country,
-        ].filter(Boolean) : [];
+        ].filter(Boolean).map(esc) : [];
 
         // Products: use pre-formatted currency_price fields from API
         const products: any[] = order.order_products ?? [];
         const rows = products.map((item: any) => {
-            const name    = item.product_name || 'Product';
+            const name    = esc(item.product_name || 'Product');
             const qty     = item.quantity || 1;
-            const price   = item.currency_price || item.price || '';
-            const total   = item.total_currency_price || item.subtotal_currency_price || '';
-            const variant = item.variation_names ? `<br/><small style="color:#666">${item.variation_names}</small>` : '';
+            const price   = esc(item.currency_price || item.price || '');
+            const total   = esc(item.total_currency_price || item.subtotal_currency_price || '');
+            const variant = item.variation_names ? `<br/><small style="color:#666">${esc(item.variation_names)}</small>` : '';
             return `<tr>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee">${name}${variant}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:center">${qty}</td>
@@ -311,15 +313,15 @@ export default function OrderDetail() {
             order.shipping_charge > 0 && { label: 'Shipping', value: order.shipping_charge_currency_price },
             order.discount > 0 && { label: 'Discount', value: order.discount_currency_price, negative: true },
         ].filter(Boolean).map((row: any) =>
-            `<tr><td style="padding:6px 12px;text-align:right;color:#555">${row.label}</td>
-             <td style="padding:6px 12px;text-align:right">${row.negative ? '-' : ''}${row.value}</td></tr>`
+            `<tr><td style="padding:6px 12px;text-align:right;color:#555">${esc(row.label)}</td>
+             <td style="padding:6px 12px;text-align:right">${row.negative ? '-' : ''}${esc(row.value)}</td></tr>`
         ).join('');
 
-        const date = order.order_datetime || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        const date = esc(order.order_datetime || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }));
         const isPaid = order.payment_status_name || (order.payment_status === 5 ? 'Paid' : 'Unpaid');
         const paidColor = isPaid === 'Paid' ? '#16a34a' : '#dc2626';
 
-        win.document.write(`<!DOCTYPE html><html><head><title>Invoice #${order.order_serial_no}</title>
+        win.document.write(`<!DOCTYPE html><html><head><title>Invoice #${esc(order.order_serial_no)}</title>
         <style>
             *{box-sizing:border-box;margin:0;padding:0}
             body{font-family:Arial,sans-serif;font-size:14px;color:#222;padding:40px;max-width:780px;margin:0 auto}
@@ -345,10 +347,10 @@ export default function OrderDetail() {
             <div><div class="brand">Behome</div><div style="font-size:12px;color:#777;margin-top:4px">Premium Architectural Decor &amp; Furniture</div></div>
             <div class="invoice-meta">
                 <strong>INVOICE</strong>
-                Order #${order.order_serial_no}<br/>
+                Order #${esc(order.order_serial_no)}<br/>
                 Date: ${date}<br/>
-                ${order.payment_method_name ? 'Payment: ' + order.payment_method_name + '<br/>' : ''}
-                <span class="paid-badge" style="background:${paidColor}22;color:${paidColor};border:1px solid ${paidColor}44">${isPaid}</span>
+                ${order.payment_method_name ? 'Payment: ' + esc(order.payment_method_name) + '<br/>' : ''}
+                <span class="paid-badge" style="background:${paidColor}22;color:${paidColor};border:1px solid ${paidColor}44">${esc(isPaid)}</span>
             </div>
         </div>
         ${addrLines.length ? `<div class="addresses"><div class="address-block"><h4>Deliver to</h4><p>${addrLines.join('<br/>')}</p></div></div>` : ''}
@@ -361,7 +363,7 @@ export default function OrderDetail() {
                 ${totalsRows}
                 <tr class="grand-total">
                     <td style="padding:10px 12px;text-align:right">Total</td>
-                    <td style="padding:10px 12px;text-align:right">${order.total_currency_price}</td>
+                    <td style="padding:10px 12px;text-align:right">${esc(order.total_currency_price)}</td>
                 </tr>
             </tbody>
         </table>

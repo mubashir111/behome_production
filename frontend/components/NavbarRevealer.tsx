@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useToast } from '@/components/ToastProvider';
 
 /**
  * NavbarRevealer
@@ -14,6 +15,19 @@ import { useEffect } from 'react';
  * Hard cap at 800 ms so it never stays hidden on slow connections.
  */
 export default function NavbarRevealer() {
+  const { showToast } = useToast();
+
+  // Show toast when session expires (redirected with ?session=expired)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('session=expired')) {
+      showToast('Your session has expired. Please log in again.', 'error');
+      // Clean the param from URL without reloading
+      const url = new URL(window.location.href);
+      url.searchParams.delete('session');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [showToast]);
+
   useEffect(() => {
     const reveal = () => {
       document.querySelectorAll('.navbar').forEach(el => {

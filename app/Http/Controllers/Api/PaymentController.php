@@ -32,7 +32,11 @@ class PaymentController extends Controller
         ]);
 
         try {
-            $order = Order::findOrFail($request->order_id);
+            // Verify the order belongs to the authenticated user
+            $order = Order::where('id', $request->order_id)
+                ->where('user_id', auth()->id())
+                ->firstOrFail();
+
             $gateway = $request->payment_gateway;
             
             if ($this->paymentManagerService->gateway($gateway)->status()) {

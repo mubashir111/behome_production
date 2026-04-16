@@ -61,7 +61,7 @@ export default function Cart() {
         } catch (couponError: any) {
             clearCouponState(couponError.message || 'Saved coupon is no longer valid');
         }
-    }, [clearCouponState, currencySymbol]);
+    }, [clearCouponState, currencySymbol, formatAmount]);
 
     const calculateTotal = useCallback((items: any[]) => {
         // Subtotal = sum of pre-tax line totals (price × quantity)

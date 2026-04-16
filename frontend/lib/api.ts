@@ -38,8 +38,24 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     });
 
     if (!response.ok) {
+        // 401 = token expired or invalid — clear session and redirect to login
+        if (response.status === 401 && typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.dispatchEvent(new Event('auth:logout'));
+            // Redirect to home (auth modal will open) unless already there
+            if (!['/', '/account'].includes(window.location.pathname)) {
+                window.location.href = '/?session=expired';
+            }
+        }
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `API request failed with status ${response.status}`);
+        // Surface field-level validation errors (e.g. from Laravel FormRequest)
+        let errorMessage = errorData.message || `API request failed with status ${response.status}`;
+        if (errorData.errors && typeof errorData.errors === 'object') {
+            const fieldMessages = (Object.values(errorData.errors) as string[][]).flat();
+            if (fieldMessages.length > 0) errorMessage = fieldMessages.join(' ');
+        }
+        throw new Error(errorMessage);
     }
 
     // Handle empty bodies (204 No Content = genuine success with no payload)

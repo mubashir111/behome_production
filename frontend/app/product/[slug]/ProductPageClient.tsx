@@ -38,6 +38,7 @@ interface Review {
     star: number;
     review: string;
     created_at: string;
+    user_id?: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -224,7 +225,13 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
     useEffect(() => {
         setActiveImageIndex(0);
-    }, [product?.id]);
+        setQuantity(1);
+        setNotifyEmail('');
+        setNotifyDone(false);
+        setNotifyError('');
+        setReviewForm({ star: 5, review: '' });
+        setReviewMessage('');
+    }, [slug]);
 
     // ── Sync active variation when selection changes ─────────────────────────
     useEffect(() => {
@@ -453,6 +460,15 @@ export default function ProductPageClient({ params }: { params: { slug: string }
         const token = localStorage.getItem('token');
         if (!token) { openAuthModal(() => submitReview(e)); return; }
         if (!reviewForm.review.trim()) { setReviewMessage('Please write a review'); return; }
+
+        // Prevent duplicate: check if current user already has a review in the list
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const alreadyReviewed = currentUser?.id && reviews.some(r => r.user_id === currentUser.id);
+        if (alreadyReviewed) {
+            setReviewMessage('You have already reviewed this product.');
+            return;
+        }
+
         setSubmittingReview(true);
         setReviewMessage('');
         try {
@@ -462,10 +478,10 @@ export default function ProductPageClient({ params }: { params: { slug: string }
             });
             const reviewData = res.data || res;
             if (reviewData?.id) {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
                 setReviews(prev => [{
                     id: reviewData.id,
-                    name: user.name || 'You',
+                    name: currentUser.name || 'You',
+                    user_id: currentUser.id,
                     star: reviewForm.star,
                     review: reviewForm.review,
                     created_at: 'Just now',
@@ -516,6 +532,9 @@ export default function ProductPageClient({ params }: { params: { slug: string }
     }
 
     const attrNames = Object.keys(attrOptions);
+    // True only when every attribute has been chosen (or product has no variations)
+    const allAttrsSelected = attrNames.length === 0 || attrNames.every(a => !!selected[a]);
+    const missingAttr = attrNames.find(a => !selected[a]);
 
     return (
         <main className="no-layout-pad page-top-100">
@@ -809,11 +828,12 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                     <div className="mb-24px">
                                         {attrNames.map(attrName => (
                                             <div key={attrName} className="mb-15px">
-                                                <span className="d-block text-white fw-600 fs-14 mb-10px">
+                                                <span className="d-block fw-600 fs-14 mb-10px" style={{ color: !selected[attrName] && missingAttr === attrName ? 'var(--base-color)' : '#fff' }}>
                                                     Select {attrName}
-                                                    {selected[attrName] && (
-                                                        <span className="ms-8px fw-400 product-brand-label">{selected[attrName]}</span>
-                                                    )}
+                                                    {selected[attrName]
+                                                        ? <span className="ms-8px fw-400 product-brand-label">{selected[attrName]}</span>
+                                                        : <span className="ms-8px fw-400 fs-12" style={{ color: 'rgba(197,160,89,0.7)' }}>— required</span>
+                                                    }
                                                 </span>
                                                 <div className="d-flex flex-wrap gap-2">
                                                     {attrOptions[attrName].map(opt => {
@@ -884,7 +904,13 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                             {/* Add to Cart */}
                                             <button
                                                 className="flex-grow-1 d-flex align-items-center justify-content-center gap-2 border-radius-6px fw-600 fs-15 transition-all product-atc-btn"
-                                                onClick={() => addToCart()}
+                                                onClick={() => {
+                                                    if (!allAttrsSelected) {
+                                                        notify(`Please select a ${missingAttr}`, 'error');
+                                                        return;
+                                                    }
+                                                    addToCart();
+                                                }}
                                                 disabled={!stockOk || addingToCart}
                                                 style={{ opacity: stockOk && !addingToCart ? 1 : 0.6 }}
                                             >
@@ -909,7 +935,13 @@ export default function ProductPageClient({ params }: { params: { slug: string }
                                         {/* Row 2: Buy Now (Full Width) */}
                                         <button
                                             className="btn btn-extra-large btn-switch-text btn-box-shadow btn-none-transform border-radius-6px w-100 fw-600 transition-all product-buy-now-btn"
-                                            onClick={buyNow}
+                                            onClick={() => {
+                                                if (!allAttrsSelected) {
+                                                    notify(`Please select a ${missingAttr}`, 'error');
+                                                    return;
+                                                }
+                                                buyNow();
+                                            }}
                                             disabled={!stockOk}
                                             style={{ opacity: stockOk ? 1 : 0.5 }}
                                         >

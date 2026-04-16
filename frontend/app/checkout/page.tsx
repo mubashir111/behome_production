@@ -165,7 +165,7 @@ export default function Checkout() {
             setCouponMessage(couponError.message || 'Saved coupon is no longer valid');
             storeCoupon(null);
         }
-    }, [currencySymbol]);
+    }, [currencySymbol, formatAmount]);
 
     const fetchCheckoutData = useCallback(async () => {
         try {
@@ -187,10 +187,16 @@ export default function Checkout() {
             ]);
 
             if (cartResponse.status) {
-                setCartItems(cartResponse.data);
-                const total = cartResponse.data.reduce((acc: number, item: any) => acc + parseFloat(item.subtotal), 0);
+                const items = cartResponse.data ?? [];
+                // Redirect to cart if empty — nothing to checkout
+                if (items.length === 0) {
+                    window.location.href = '/cart';
+                    return;
+                }
+                setCartItems(items);
+                const total = items.reduce((acc: number, item: any) => acc + parseFloat(item.subtotal), 0);
                 setSubtotal(total);
-                const totalTax = cartResponse.data.reduce((acc: number, item: any) => acc + parseFloat(item.tax || 0), 0);
+                const totalTax = items.reduce((acc: number, item: any) => acc + parseFloat(item.tax || 0), 0);
                 setTax(totalTax);
                 await syncCoupon(total);
             } else {
@@ -205,6 +211,9 @@ export default function Checkout() {
             setPaymentGateways(gateways);
             if (gateways.length > 0) {
                 setFormData(prev => ({ ...prev, payment_method: String(gateways[0].id) }));
+            } else {
+                // Clear stale default so a disabled gateway is never submitted
+                setFormData(prev => ({ ...prev, payment_method: '' }));
             }
 
 
@@ -293,12 +302,31 @@ export default function Checkout() {
 
     const placeOrder = async (e: React.FormEvent) => {
         e.preventDefault();
-        setPlacingOrder(true);
         setOrderError(null);
+
+        // Client-side address validation before hitting the API
+        if (!selectedAddressId) {
+            const f = formData;
+            if (!f.first_name.trim()) { setOrderError({ message: 'Please enter your first name.', action: 'address' }); return; }
+            if (!f.last_name.trim())  { setOrderError({ message: 'Please enter your last name.', action: 'address' }); return; }
+            if (!f.email.trim())      { setOrderError({ message: 'Please enter your email address.', action: 'address' }); return; }
+            if (!f.phone.trim())      { setOrderError({ message: 'Please enter your phone number.', action: 'address' }); return; }
+            if (!f.address.trim())    { setOrderError({ message: 'Please enter your street address.', action: 'address' }); return; }
+            if (!f.city.trim())       { setOrderError({ message: 'Please enter your city.', action: 'address' }); return; }
+            if (!f.country.trim())    { setOrderError({ message: 'Please select your country.', action: 'address' }); return; }
+        }
+
+        setPlacingOrder(true);
 
         try {
             let addressId = selectedAddressId;
+            // Re-verify selected address still exists in local state (could have been deleted in another tab)
             const selectedAddress = addresses.find((address: any) => address.id === selectedAddressId) || null;
+            if (addressId && !selectedAddress) {
+                // Address was deleted — clear the stale selection and proceed to create a fresh one
+                addressId = null;
+                setSelectedAddressId(null);
+            }
             const addressPayload = buildAddressPayload();
 
             // 1. Create a shipping address if the user has no saved one
@@ -681,8 +709,14 @@ export default function Checkout() {
                                             onChange={handleInputChange}
                                             className="border-radius-4px input-small"
                                             rows={4}
+                                            maxLength={700}
                                             placeholder="Add delivery notes or order instructions"
                                         />
+                                        {formData.order_note.length > 600 && (
+                                            <p className="fs-11 mt-5px" style={{ color: formData.order_note.length >= 700 ? '#ef4444' : 'rgba(255,255,255,0.4)' }}>
+                                                {formData.order_note.length}/700
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -880,7 +914,7 @@ export default function Checkout() {
                                         </span>
                                     </label>
 
-                                    <button type="submit" disabled={placingOrder || !agreedToTerms} className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-10px" style={{ opacity: agreedToTerms ? 1 : 0.5 }}>
+                                    <button type="submit" disabled={placingOrder || !agreedToTerms || paymentGateways.length === 0} className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-10px" style={{ opacity: (agreedToTerms && paymentGateways.length > 0) ? 1 : 0.5 }}>
                                         <span>
                                             <span className="btn-double-text" data-text={placingOrder ? "Placing order..." : "Place order"}>{placingOrder ? "Placing order..." : "Place order"}</span>
                                         </span>

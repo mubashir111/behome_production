@@ -31,22 +31,18 @@ class WebhookController extends Controller
 
         // ── 1. Verify signature ──────────────────────────────────────────────
         if (!$secret) {
-            Log::warning('Stripe webhook: STRIPE_WEBHOOK_SECRET not set — skipping signature check');
-            // Still process in dev; block in production by checking APP_ENV
-            if (app()->environment('production')) {
-                return response()->json(['error' => 'Webhook secret not configured'], 500);
-            }
-            $event = json_decode($payload);
-        } else {
-            try {
-                $event = \Stripe\Webhook::constructEvent($payload, $signature, $secret);
-            } catch (\Stripe\Exception\SignatureVerificationException $e) {
-                Log::warning('Stripe webhook: invalid signature — ' . $e->getMessage());
-                return response()->json(['error' => 'Invalid signature'], 400);
-            } catch (Exception $e) {
-                Log::warning('Stripe webhook: parse error — ' . $e->getMessage());
-                return response()->json(['error' => 'Invalid payload'], 400);
-            }
+            Log::error('Stripe webhook: STRIPE_WEBHOOK_SECRET not set — rejecting request. Set STRIPE_WEBHOOK_SECRET in .env.');
+            return response()->json(['error' => 'Webhook secret not configured'], 500);
+        }
+
+        try {
+            $event = \Stripe\Webhook::constructEvent($payload, $signature, $secret);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            Log::warning('Stripe webhook: invalid signature — ' . $e->getMessage());
+            return response()->json(['error' => 'Invalid signature'], 400);
+        } catch (Exception $e) {
+            Log::warning('Stripe webhook: parse error — ' . $e->getMessage());
+            return response()->json(['error' => 'Invalid payload'], 400);
         }
 
         // ── 2. Handle events ───────────────────────────────────────────────

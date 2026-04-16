@@ -35,8 +35,14 @@ function AccountContent() {
     const [fpPassword, setFpPassword] = useState('');
     const [fpPasswordConfirm, setFpPasswordConfirm] = useState('');
 
+    // Tab-level loading (does not blank the full page — used inside tab content)
+    const [tabLoading, setTabLoading] = useState(false);
+
     // Dashboard Data
     const [orders, setOrders] = useState<any[]>([]);
+    const [ordersPage, setOrdersPage] = useState(1);
+    const [ordersMeta, setOrdersMeta] = useState<{ last_page: number; total: number } | null>(null);
+    const [ordersLoadingMore, setOrdersLoadingMore] = useState(false);
     const [addresses, setAddresses] = useState<any[]>([]);
     const [wishlistItems, setWishlistItems] = useState<any[]>([]);
 
@@ -57,10 +63,12 @@ function AccountContent() {
     const [addressSaving, setAddressSaving] = useState(false);
 
     const fetchTabData = useCallback(async () => {
-        setLoading(true);
+        setTabLoading(true);
+        setOrdersPage(1);
+        setOrdersMeta(null);
         try {
             if (activeTab === 'orders') {
-                const response = await apiFetch('/orders');
+                const response = await apiFetch('/orders?page=1&per_page=10');
                 if (response.status) {
                     const orderItems = Array.isArray(response?.data)
                         ? response.data
@@ -68,6 +76,9 @@ function AccountContent() {
                             ? response.data.data
                             : [];
                     setOrders(orderItems);
+                    if (response?.data?.last_page !== undefined) {
+                        setOrdersMeta({ last_page: response.data.last_page, total: response.data.total ?? orderItems.length });
+                    }
                 }
             } else if (activeTab === 'wishlist') {
                 const response = await apiFetch('/frontend/wishlist');
@@ -87,9 +98,33 @@ function AccountContent() {
         } catch (err) {
             console.error('Failed to fetch dashboard data:', err);
         } finally {
-            setLoading(false);
+            setTabLoading(false);
         }
     }, [activeTab]);
+
+    const loadMoreOrders = async () => {
+        const nextPage = ordersPage + 1;
+        setOrdersLoadingMore(true);
+        try {
+            const response = await apiFetch(`/orders?page=${nextPage}&per_page=10`);
+            if (response.status) {
+                const newItems = Array.isArray(response?.data)
+                    ? response.data
+                    : Array.isArray(response?.data?.data)
+                        ? response.data.data
+                        : [];
+                setOrders(prev => [...prev, ...newItems]);
+                setOrdersPage(nextPage);
+                if (response?.data?.last_page !== undefined) {
+                    setOrdersMeta({ last_page: response.data.last_page, total: response.data.total ?? orders.length + newItems.length });
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load more orders:', err);
+        } finally {
+            setOrdersLoadingMore(false);
+        }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -99,6 +134,7 @@ function AccountContent() {
             setIsLoggedIn(true);
             setUser(u);
             setProfileData({ name: u.name || '', email: u.email || '', phone: u.phone || '', country_code: u.country_code || '' });
+            setLoading(false); // auth check done — reveal the page shell immediately
             fetchTabData();
         } else {
             setLoading(false);
@@ -155,6 +191,16 @@ function AccountContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoggedIn, siteSettings]);
 
+    // After any successful auth, honour the ?redirect= param (e.g. from checkout guest gate)
+    const resolveRedirect = () => {
+        const redirectTo = searchParams.get('redirect');
+        if (redirectTo && redirectTo.startsWith('/')) {
+            window.location.href = redirectTo;
+        } else {
+            window.location.reload();
+        }
+    };
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -167,7 +213,7 @@ function AccountContent() {
             if (response.status) {
                 localStorage.setItem('token', response.data.access_token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
-                window.location.reload();
+                resolveRedirect();
             } else {
                 setError(response.message || 'Login failed');
             }
@@ -189,7 +235,7 @@ function AccountContent() {
             if (response.status) {
                 localStorage.setItem('token', response.data.access_token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
-                window.location.reload();
+                resolveRedirect();
             } else {
                 setError(response.message || 'Google login failed');
             }
@@ -202,6 +248,10 @@ function AccountContent() {
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (registerData.password.length < 6) {
+            showToast('Password must be at least 6 characters', 'error');
+            return;
+        }
         if (registerData.password !== registerData.password_confirmation) {
             showToast('Passwords do not match', 'error');
             return;
@@ -222,7 +272,7 @@ function AccountContent() {
                     localStorage.setItem('token', response.token);
                     localStorage.setItem('user', JSON.stringify(response.user?.data ?? response.user));
                     showToast('Registration successful! Logging you in...', 'success');
-                    window.location.reload();
+                    resolveRedirect();
                 } else {
                     // OTP sent — move to OTP step
                     setOtpEmail(registerData.email);
@@ -254,7 +304,7 @@ function AccountContent() {
             if (response.status) {
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('user', JSON.stringify(response.user?.data ?? response.user));
-                window.location.reload();
+                resolveRedirect();
             } else {
                 showToast(response.message || 'Invalid OTP code', 'error');
             }
@@ -301,6 +351,7 @@ function AccountContent() {
 
     const handleForgotReset = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (fpPassword.length < 6) { setError('Password must be at least 6 characters'); return; }
         if (fpPassword !== fpPasswordConfirm) { setError('Passwords do not match'); return; }
         setLoading(true); setError('');
         try {
@@ -312,7 +363,7 @@ function AccountContent() {
                 localStorage.setItem('token', res.token);
                 localStorage.setItem('user', JSON.stringify(res.user?.data ?? res.user));
                 showToast('Password reset successfully!', 'success');
-                window.location.reload();
+                resolveRedirect();
             } else { setError(res.message || 'Reset failed.'); }
         } catch (err: any) { setError(err.message || 'Reset failed.'); }
         finally { setLoading(false); }
@@ -355,12 +406,19 @@ function AccountContent() {
 
     const handlePasswordChange = async (e: React.FormEvent) => {
         e.preventDefault();
-        setPasswordSaving(true);
-        if (passwordData.new_password !== passwordData.confirm_password) {
-            showToast('New passwords do not match', 'error');
-            setPasswordSaving(false);
+        if (!passwordData.old_password.trim()) {
+            showToast('Please enter your current password', 'error');
             return;
         }
+        if (!passwordData.new_password.trim() || passwordData.new_password.length < 8) {
+            showToast('New password must be at least 8 characters', 'error');
+            return;
+        }
+        if (passwordData.new_password !== passwordData.confirm_password) {
+            showToast('New passwords do not match', 'error');
+            return;
+        }
+        setPasswordSaving(true);
         try {
             await apiFetch('/profile/change-password', {
                 method: 'PUT',
@@ -525,8 +583,15 @@ function AccountContent() {
                             {/* Content */}
                             <div className="col-lg-9 col-md-8 col-12 ui-content-offset">
 
+                                {/* Tab loading indicator — only covers the content area, not the whole page */}
+                                {tabLoading && (
+                                    <div className="text-center py-60px">
+                                        <div className="spinner-border" role="status" style={{ color: 'var(--base-color)', width: 32, height: 32 }}></div>
+                                    </div>
+                                )}
+
                                 {/* Profile Tab */}
-                                {activeTab === 'profile' && (
+                                {!tabLoading && activeTab === 'profile' && (
                                     <div className="ui-stack-md">
                                         <h4 className="ui-section-title">Edit Profile</h4>
                                         <div className="bg-dark-gray border-radius-6px box-shadow-extra-large border border-color-extra-medium-gray ui-panel ui-panel-lg">
@@ -583,11 +648,13 @@ function AccountContent() {
                                 )}
 
                                 {/* Orders Tab */}
-                                {activeTab === 'orders' && (
+                                {!tabLoading && activeTab === 'orders' && (
                                     <div className="ui-stack-md">
                                         <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-0">
                                             <h4 className="ui-section-title mb-0">Your Orders</h4>
-                                            <span className="text-white opacity-5 fs-13">{orders.length} order{orders.length !== 1 ? 's' : ''}</span>
+                                            <span className="text-white opacity-5 fs-13">
+                                                {ordersMeta ? `${orders.length} of ${ordersMeta.total}` : orders.length} order{(ordersMeta?.total ?? orders.length) !== 1 ? 's' : ''}
+                                            </span>
                                         </div>
                                         {orders.length === 0 ? (
                                             <div className="text-center border-radius-6px border border-dashed border-color-extra-medium-gray ui-panel">
@@ -659,11 +726,23 @@ function AccountContent() {
                                                 </div>
                                             </div>
                                         )}
+                                        {orders.length > 0 && ordersMeta && ordersPage < ordersMeta.last_page && (
+                                            <div className="text-center mt-20px">
+                                                <button
+                                                    onClick={loadMoreOrders}
+                                                    disabled={ordersLoadingMore}
+                                                    className="btn btn-small btn-round-edge"
+                                                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.12)' }}
+                                                >
+                                                    {ordersLoadingMore ? 'Loading...' : 'Load More Orders'}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
                                 {/* Addresses Tab */}
-                                {activeTab === 'addresses' && (
+                                {!tabLoading && activeTab === 'addresses' && (
                                     <div className="ui-stack-md">
                                         <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
                                             <h4 className="ui-section-title mb-0">My Addresses</h4>
@@ -776,7 +855,7 @@ function AccountContent() {
                                 )}
 
                                 {/* Security Tab */}
-                                {activeTab === 'security' && (
+                                {!tabLoading && activeTab === 'security' && (
                                     <div className="ui-stack-md">
                                         <h4 className="ui-section-title">Change Password</h4>
                                         <div className="bg-dark-gray border-radius-6px box-shadow-extra-large border border-color-extra-medium-gray ui-panel ui-panel-lg security-form-wrap" style={{ maxWidth: 500 }}>
@@ -822,7 +901,7 @@ function AccountContent() {
                                 )}
 
                                 {/* Wishlist Tab */}
-                                {activeTab === 'wishlist' && (
+                                {!tabLoading && activeTab === 'wishlist' && (
                                     <div className="ui-stack-md">
                                         <h4 className="ui-section-title">My Wishlist</h4>
                                         {wishlistItems.length === 0 ? (
