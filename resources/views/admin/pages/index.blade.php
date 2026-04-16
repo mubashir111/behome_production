@@ -58,8 +58,9 @@
                     </div>
                 @else
                     <button type="button"
-                        onclick="confirmSubmit('del-page-{{ $page->id }}', { title: 'Delete Page', message: 'Delete &ldquo;{{ $page->title }}&rdquo;? This cannot be undone.', confirmText: 'Delete', type: 'danger' })"
-                        class="p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors">
+                        class="page-delete-btn p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors"
+                        data-form="del-page-{{ $page->id }}"
+                        data-title="{{ $page->title }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
@@ -76,3 +77,18 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.querySelectorAll('.page-delete-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        confirmSubmit(this.dataset.form, {
+            title: 'Delete Page',
+            message: 'Delete "' + this.dataset.title + '"? This cannot be undone.',
+            confirmText: 'Delete',
+            type: 'danger'
+        });
+    });
+});
+</script>
+@endpush

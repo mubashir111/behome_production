@@ -291,7 +291,11 @@
                 <form id="refund-form" method="POST" action="{{ route('admin.returns.process-refund', $return) }}">
                     @csrf
                     <input type="hidden" name="refund_status" value="{{ \App\Enums\RefundStatus::REFUND_ISSUED }}">
-                    <button type="button" onclick="confirmSubmit('refund-form', { title: 'Issue Refund', message: 'Issue refund of {{ number_format($totalRefund, 2) }} to {{ $return->user->name ?? 'customer' }}?', confirmText: 'Yes, Issue Refund', type: 'success' })" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all">
+                    <button type="button"
+                        id="refund-confirm-btn"
+                        data-amount="{{ number_format($totalRefund, 2) }}"
+                        data-customer="{{ $return->user->name ?? 'customer' }}"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Issue Refund ({{ number_format($totalRefund, 2) }})
                     </button>
@@ -379,6 +383,18 @@ function submitReject() {
         return;
     }
     document.getElementById('reject-form').submit();
+}
+
+var refundBtn = document.getElementById('refund-confirm-btn');
+if (refundBtn) {
+    refundBtn.addEventListener('click', function() {
+        confirmSubmit('refund-form', {
+            title: 'Issue Refund',
+            message: 'Issue refund of ' + this.dataset.amount + ' to ' + this.dataset.customer + '?',
+            confirmText: 'Yes, Issue Refund',
+            type: 'success'
+        });
+    });
 }
 </script>
 @endsection

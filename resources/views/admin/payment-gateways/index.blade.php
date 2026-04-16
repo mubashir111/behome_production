@@ -48,12 +48,10 @@
                         <input type="hidden" name="payment_type" value="{{ $gateway->slug }}">
                         <input type="hidden" name="gateway_status" value="{{ $isActive ? \App\Enums\Activity::DISABLE : \App\Enums\Activity::ENABLE }}">
                         <button type="button"
-                            onclick="confirmSubmit('gw-form-{{ $gateway->id }}', {
-                                title: '{{ $isActive ? 'Deactivate Gateway' : 'Activate Gateway' }}',
-                                message: '{{ $isActive ? 'Deactivating' : 'Activating' }} {{ addslashes($gateway->name) }} will {{ $isActive ? 'hide it from the checkout. Customers will not be able to use this payment method.' : 'make it available to customers at checkout.' }}',
-                                confirmText: '{{ $isActive ? 'Yes, Deactivate' : 'Yes, Activate' }}',
-                                type: '{{ $isActive ? 'danger' : 'success' }}'
-                            })"
+                            class="gw-toggle-btn"
+                            data-form="gw-form-{{ $gateway->id }}"
+                            data-name="{{ $gateway->name }}"
+                            data-active="{{ $isActive ? '1' : '0' }}"
                             title="{{ $isActive ? 'Click to deactivate' : 'Click to activate' }}"
                             style="position:relative;width:44px;height:24px;border-radius:999px;border:none;cursor:pointer;transition:background 0.25s;padding:0;
                                 background:{{ $isActive ? '#10b981' : '#cbd5e1' }};">
@@ -76,3 +74,23 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.querySelectorAll('.gw-toggle-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var isActive = this.dataset.active === '1';
+        var name = this.dataset.name;
+        confirmSubmit(this.dataset.form, {
+            title: isActive ? 'Deactivate Gateway' : 'Activate Gateway',
+            message: (isActive ? 'Deactivating ' : 'Activating ') + name + ' will ' +
+                (isActive
+                    ? 'hide it from checkout. Customers will not be able to use this payment method.'
+                    : 'make it available to customers at checkout.'),
+            confirmText: isActive ? 'Yes, Deactivate' : 'Yes, Activate',
+            type: isActive ? 'danger' : 'success'
+        });
+    });
+});
+</script>
+@endpush

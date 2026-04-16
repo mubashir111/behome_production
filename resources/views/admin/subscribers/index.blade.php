@@ -32,8 +32,9 @@
                         <td class="admin-table-cell text-sm text-slate-500">{{ $subscriber->created_at->format('d M Y, H:i') }}</td>
                         <td class="admin-table-actions">
                             <button type="button"
-                                onclick="confirmSubmit('del-sub-{{ $subscriber->id }}', { title: 'Remove Subscriber', message: 'Remove {{ $subscriber->email }} from the list?', confirmText: 'Yes, Remove', type: 'danger' })"
-                                class="admin-btn-secondary py-2 px-3 text-xs text-rose-600 hover:bg-rose-50">
+                                class="sub-delete-btn admin-btn-secondary py-2 px-3 text-xs text-rose-600 hover:bg-rose-50"
+                                data-form="del-sub-{{ $subscriber->id }}"
+                                data-email="{{ $subscriber->email }}">
                                 Remove
                             </button>
                             <form id="del-sub-{{ $subscriber->id }}" action="{{ route('admin.subscribers.destroy', $subscriber) }}" method="POST" style="display:none;">
@@ -54,3 +55,18 @@
     <div class="mt-4">{{ $subscribers->links() }}</div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.querySelectorAll('.sub-delete-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        confirmSubmit(this.dataset.form, {
+            title: 'Remove Subscriber',
+            message: 'Remove ' + this.dataset.email + ' from the list?',
+            confirmText: 'Yes, Remove',
+            type: 'danger'
+        });
+    });
+});
+</script>
+@endpush
