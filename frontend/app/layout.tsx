@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { Marcellus, Outfit } from 'next/font/google';
 import NavbarRevealer from '@/components/NavbarRevealer';
@@ -18,6 +18,12 @@ import AuthModal from '@/components/AuthModal';
 import { constructMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = constructMetadata();
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+};
 
 export default function RootLayout({
   children,
