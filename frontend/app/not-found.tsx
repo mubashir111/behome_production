@@ -51,9 +51,7 @@ export default function NotFound() {
                             { href: '/account',     label: 'My Account'  },
                             { href: '/wishlist',    label: 'Wishlist'    },
                         ].map(({ href, label }) => (
-                            <Link key={href} href={href} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
-                                onMouseOver={e => (e.currentTarget.style.color = 'var(--base-color)')}
-                                onMouseOut={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                            <Link key={href} href={href} className="notfound-quick-link">
                                 {label}
                             </Link>
                         ))}

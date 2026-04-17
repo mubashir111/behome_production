@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Enums\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AdminAuthController extends Controller
 {
@@ -25,6 +27,14 @@ class AdminAuthController extends Controller
             'password' => ['required', 'string', 'min:6'],
         ]);
 
+        $throttleKey = Str::lower($request->input('email')) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()->withInput($request->only('email', 'remember'))
+                ->withErrors(['email' => "Too many login attempts. Please try again in {$seconds} seconds."]);
+        }
+
         $credentials = [
             'email' => $request->email,
             'password' => $request->password,
@@ -32,9 +42,12 @@ class AdminAuthController extends Controller
         ];
 
         if (!Auth::guard('web')->attempt($credentials, $request->filled('remember'))) {
+            RateLimiter::hit($throttleKey, 300); // 5 minute lock
             return back()->withInput($request->only('email', 'remember'))
                 ->withErrors(['email' => 'These credentials do not match our records or account is inactive.']);
         }
+
+        RateLimiter::clear($throttleKey);
 
         $user = Auth::guard('web')->user();
         if ($user->is_guest == \App\Enums\Ask::YES) {

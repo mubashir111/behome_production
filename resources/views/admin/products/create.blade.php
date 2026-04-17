@@ -141,27 +141,25 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label for="buying_price" class="block text-sm font-bold text-slate-700 ml-1">Buying Price</label>
-                        <div class="price-input-wrapper">
-                            <input type="number" step="0.01" name="buying_price" id="buying_price" value="{{ old('buying_price') }}" required
-                                   placeholder=" "
-                                   class="price-input w-full peer pr-10 py-4 rounded-2xl border border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all duration-300 bg-white text-slate-900">
-                            <span class="price-input-icon">
-                                {{ config('app.currency_symbol') }}
-                            </span>
-                        </div>
+                        <x-admin-price-input 
+                            name="buying_price" 
+                            id="buying_price" 
+                            :value="old('buying_price')" 
+                            required 
+                            class="py-4 rounded-2xl border border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
+                        />
                         @error('buying_price') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="space-y-2">
                         <label for="selling_price" class="block text-sm font-bold text-slate-700 ml-1">Selling Price</label>
-                        <div class="price-input-wrapper">
-                            <input type="number" step="0.01" name="selling_price" id="selling_price" value="{{ old('selling_price') }}" required
-                                   placeholder=" "
-                                   class="price-input w-full peer pr-10 py-4 rounded-2xl border border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all duration-300 bg-white text-slate-900">
-                            <span class="price-input-icon">
-                                {{ config('app.currency_symbol') }}
-                            </span>
-                        </div>
+                        <x-admin-price-input 
+                            name="selling_price" 
+                            id="selling_price" 
+                            :value="old('selling_price')" 
+                            required 
+                            class="py-4 rounded-2xl border border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 font-bold"
+                        />
                         @error('selling_price') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>

@@ -66,31 +66,34 @@
                     </select>
                 </div>
 
-                <div class="price-input-wrapper">
-                    <input type="number" step="0.01" name="discount" value="{{ old('discount', $coupon->discount) }}" required
-                           placeholder=" "
-                           class="price-input w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600 outline-none transition-all bg-white text-slate-900">
-                    <span class="price-input-icon">
-                        {{ config('app.currency_symbol') }}
-                    </span>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Discount Amount</label>
+                    <x-admin-price-input 
+                        name="discount" 
+                        :value="old('discount', $coupon->discount)" 
+                        required 
+                        class="px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600"
+                    />
                 </div>
 
-                <div class="price-input-wrapper">
-                    <input type="number" step="0.01" name="minimum_order" value="{{ old('minimum_order', $coupon->minimum_order) }}" required
-                           placeholder=" "
-                           class="price-input w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600 outline-none transition-all bg-white text-slate-900">
-                    <span class="price-input-icon">
-                        {{ config('app.currency_symbol') }}
-                    </span>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Minimum Order Amount</label>
+                    <x-admin-price-input 
+                        name="minimum_order" 
+                        :value="old('minimum_order', $coupon->minimum_order)" 
+                        required 
+                        class="px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600"
+                    />
                 </div>
 
-                <div class="price-input-wrapper">
-                    <input type="number" step="0.01" name="maximum_discount" value="{{ old('maximum_discount', $coupon->maximum_discount) }}" required
-                           placeholder=" "
-                           class="price-input w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600 outline-none transition-all bg-white text-slate-900">
-                    <span class="price-input-icon">
-                        {{ config('app.currency_symbol') }}
-                    </span>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Maximum Discount Amount</label>
+                    <x-admin-price-input 
+                        name="maximum_discount" 
+                        :value="old('maximum_discount', $coupon->maximum_discount)" 
+                        required 
+                        class="px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600"
+                    />
                 </div>
 
                 <div>

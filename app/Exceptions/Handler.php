@@ -31,6 +31,14 @@ class Handler extends ExceptionHandler
     {
         if ($request->expectsJson() || $request->is('api/*')) {
 
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return new JsonResponse([
+                    'status'  => false,
+                    'message' => 'The given data was invalid.',
+                    'errors'  => $e->errors(),
+                ], 422);
+            }
+
             if ($e instanceof \Illuminate\Auth\AuthenticationException) {
                 return new JsonResponse([
                     'status'  => false,

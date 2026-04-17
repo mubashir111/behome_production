@@ -562,25 +562,23 @@
                     <div class="p-6 space-y-5">
                         <div class="space-y-1.5">
                             <label for="selling_price" class="text-sm font-medium text-slate-700">Selling Price</label>
-                            <div class="price-input-wrapper">
-                                <input type="number" step="0.01" name="selling_price" id="selling_price" value="{{ number_format($p_selling_price, 2, '.', '') }}" required
-                                       placeholder=" "
-                                       class="price-input w-full peer pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm font-bold">
-                                <span class="price-input-icon">
-                                    {{ config('app.currency_symbol') }}
-                                </span>
-                            </div>
+                            <x-admin-price-input 
+                                name="selling_price" 
+                                id="selling_price" 
+                                :value="number_format($p_selling_price, 2, '.', '')" 
+                                required 
+                                class="pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-sm font-bold"
+                            />
                         </div>
                         <div class="space-y-1.5">
                             <label for="buying_price" class="text-sm font-medium text-slate-700">Cost per Item</label>
-                            <div class="price-input-wrapper">
-                                <input type="number" step="0.01" name="buying_price" id="buying_price" value="{{ number_format($p_buying_price, 2, '.', '') }}" required
-                                       placeholder=" "
-                                       class="price-input w-full peer pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-sm">
-                                <span class="price-input-icon">
-                                    {{ config('app.currency_symbol') }}
-                                </span>
-                            </div>
+                            <x-admin-price-input 
+                                name="buying_price" 
+                                id="buying_price" 
+                                :value="number_format($p_buying_price, 2, '.', '')" 
+                                required 
+                                class="pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-sm"
+                            />
                             <p class="text-[10px] text-slate-400">Not visible to customers.</p>
                         </div>
                     </div>
