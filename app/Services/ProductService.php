@@ -60,7 +60,7 @@ class ProductService
             $orderColumn = $request->get('order_column') ?? 'id';
             $orderType   = $request->get('order_type') ?? 'desc';
 
-            return Product::with('media', 'category', 'brand', 'taxes', 'tags', 'reviews')->with(['wishlist' => fn ($query) => $query->where('user_id', Auth::check() ? Auth::user()->id : 0)])->withReviewRating()->where(function ($query) use ($requests) {
+            return Product::with('media', 'category', 'brand', 'taxes', 'tags', 'reviews')->with(['wishlist' => fn ($query) => $query->where('user_id', Auth::check() ? Auth::user()->id : 0)])->withReviewRating()->withSum('stockItems', 'quantity')->where(function ($query) use ($requests) {
                 foreach ($requests as $key => $request) {
                     if (in_array($key, $this->productFilter)) {
                         if ($key == "except") {
@@ -445,10 +445,11 @@ class ProductService
             $orderType   = $request->get('order_type') ?? 'desc';
             $rand        = $request->get('rand', 0) > 0 ? $request->get('rand') : 0;
 
-            return Product::select('products.id', 'products.name', 'products.sku', 'products.slug', 'products.selling_price', 'products.variation_price', 'products.add_to_flash_sale', 'products.offer_start_date', 'products.offer_end_date', 'products.discount', 'products.status')
+            return Product::select('products.id', 'products.name', 'products.sku', 'products.slug', 'products.selling_price', 'products.variation_price', 'products.add_to_flash_sale', 'products.offer_start_date', 'products.offer_end_date', 'products.discount', 'products.status', 'products.show_stock_out', 'products.can_purchasable')
                 ->with(['wishlist' => fn ($query) => $query->where('user_id', Auth::check() ? Auth::user()->id : 0)])
                 ->withReviewRating()
                 ->withCount('orderCountable')
+                ->withSum('stockItems', 'quantity')
                 ->where(['status' => Status::ACTIVE])
                 ->orderBy('order_countable_count', 'desc')
                 ->randAndLimitOrOrderBy($rand, $orderColumn, $orderType)
@@ -751,10 +752,11 @@ class ProductService
             $orderType   = $request->get('order_type') ?? 'desc';
             $rand        = $request->get('rand', 0) > 0 ? $request->get('rand') : 0;
 
-            return Product::select('products.id', 'products.name', 'products.sku', 'products.slug', 'products.selling_price', 'products.variation_price', 'products.add_to_flash_sale', 'products.offer_start_date', 'products.offer_end_date', 'products.discount', 'products.status')
+            return Product::select('products.id', 'products.name', 'products.sku', 'products.slug', 'products.selling_price', 'products.variation_price', 'products.add_to_flash_sale', 'products.offer_start_date', 'products.offer_end_date', 'products.discount', 'products.status', 'products.show_stock_out', 'products.can_purchasable')
                 ->withReviewRating()
                 ->with(['wishlist' => fn ($query) => $query->where('user_id', Auth::check() ? Auth::user()->id : 0)])
                 ->with('media', 'variations', 'reviews')
+                ->withSum('stockItems', 'quantity')
                 ->active('products.status')
                 ->where('products.add_to_flash_sale', Ask::YES)
                 ->where('products.offer_start_date', '<=', $now)
@@ -780,10 +782,11 @@ class ProductService
             $orderType   = $request->get('order_type') ?? 'desc';
             $rand        = $request->get('rand', 0) > 0 ? $request->get('rand') : 0;
 
-            return Product::select('products.id', 'products.name', 'products.sku', 'products.slug', 'products.selling_price', 'products.variation_price', 'products.add_to_flash_sale', 'products.offer_start_date', 'products.offer_end_date', 'products.discount', 'products.status')
+            return Product::select('products.id', 'products.name', 'products.sku', 'products.slug', 'products.selling_price', 'products.variation_price', 'products.add_to_flash_sale', 'products.offer_start_date', 'products.offer_end_date', 'products.discount', 'products.status', 'products.show_stock_out', 'products.can_purchasable')
                 ->withReviewRating()
                 ->with(['wishlist' => fn ($query) => $query->where('user_id', Auth::check() ? Auth::user()->id : 0)])
                 ->with('media', 'variations', 'reviews')
+                ->withSum('stockItems', 'quantity')
                 ->active('products.status')
                 ->where('products.offer_start_date', '<=', $now)
                 ->where('products.offer_end_date', '>=', $now)

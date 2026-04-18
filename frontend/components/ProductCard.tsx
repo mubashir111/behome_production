@@ -88,7 +88,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                 {product.stock != null && product.stock <= 0 && (
                     <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.45)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', textTransform: 'uppercase', zIndex: 2, pointerEvents: 'none' }}>Out of Stock</span>
                 )}
-                {product.stock != null && product.stock > 0 && product.stock <= 5 && (
+                {product.stock != null && product.stock > 0 && product.stock <= 15 && (
                     <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--base-color)', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, letterSpacing: '0.05em', zIndex: 2, pointerEvents: 'none' }}>Only {product.stock} left</span>
                 )}
                 <div className="shop-hover d-flex justify-content-center">
@@ -135,7 +135,7 @@ export default function ProductCard({ product, showCategory = false, onAddToCart
                         <span>{product.currency_price}</span>
                     )}
                 </div>
-                {product.stock != null && product.stock > 0 && product.stock <= 5 && (
+                {product.stock != null && product.stock > 0 && product.stock <= 15 && (
                     <p style={{ margin: '6px 0 0', fontSize: 11, fontWeight: 700, color: 'var(--base-color)' }}>
                         <i className="feather icon-feather-alert-circle" style={{ fontSize: 10, marginRight: 3 }}></i>
                         Only {product.stock} left

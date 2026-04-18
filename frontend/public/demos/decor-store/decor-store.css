@@ -4405,3 +4405,106 @@ header .header-top-bar+.navbar.disable-fixed {
         top: 0 !important;
     }
 }
+
+/* ── Featured Categories — home page ─────────────────────────────────────── */
+.home-cat-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+}
+.home-cat-scroll::-webkit-scrollbar { display: none; }
+
+.home-cat-item {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    scroll-snap-align: start;
+    width: 80px;
+}
+
+.home-cat-img-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    flex-shrink: 0;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.home-cat-item:hover .home-cat-img-wrap {
+    border-color: rgba(201,169,110,0.5);
+    box-shadow: 0 8px 28px rgba(201,169,110,0.20);
+}
+
+.home-cat-label {
+    font-size: 11px;
+    line-height: 1.3;
+    text-align: center;
+    word-break: break-word;
+    color: rgba(255,255,255,0.85);
+    transition: color 0.3s ease;
+}
+.home-cat-item:hover .home-cat-label { color: var(--base-color, #c9a96e); }
+
+/* Desktop: switch to grid, bigger circles */
+@media (min-width: 768px) {
+    .home-cat-scroll {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        overflow: visible;
+        gap: 16px;
+        scroll-snap-type: none;
+    }
+    .home-cat-item {
+        width: auto;
+        gap: 14px;
+    }
+    .home-cat-img-wrap {
+        width: 110px;
+        height: 110px;
+    }
+    .home-cat-label { font-size: 14px; }
+}
+
+@media (min-width: 1200px) {
+    .home-cat-img-wrap {
+        width: 130px;
+        height: 130px;
+    }
+}
+
+/* Category count badge */
+.home-cat-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--base-color, #c9a96e);
+    color: #0d0d0d;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0b0b0f;
+    line-height: 1;
+}
+
+@media (min-width: 768px) {
+    .home-cat-badge {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+        bottom: 4px;
+        right: 4px;
+    }
+}

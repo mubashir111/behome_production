@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import HeroSlider from '@/components/HeroSliderAlt';
 import { apiFetch } from '@/lib/api';
-import WishlistButton from '@/components/WishlistButton';
 import HomeProductTabs from '@/components/HomeProductTabs';
 import HomeInit from '@/components/HomeInit';
 import { constructMetadata } from '@/lib/metadata';
@@ -92,8 +91,6 @@ export default async function Home() {
     const smallPromotions = promotions.filter((p: any) => p.type === 5).slice(0, 2);
 
     const settings = settingsData?.data || settingsData || {};
-    const symbol = settings?.site_default_currency_symbol || '£';
-
     const formatAmount = (amount: number) => {
         const sym = settings?.site_default_currency_symbol || '£';
         const pos = settings?.site_currency_position == 10 ? 'right' : 'left';
@@ -143,26 +140,29 @@ export default async function Home() {
                             <h6 className="mb-0 fw-700 alt-font text-white">Featured categories</h6>
                         </div>
                         <div className="col-xl-10 col-lg-9">
-                            <div className="row row-cols-2 row-cols-md-6 row-cols-sm-3 align-items-center">
+                            {/* Mobile: horizontal scroll | Desktop: grid */}
+                            <div className="home-cat-scroll">
                                 {categories.map((cat: any) => (
-                                    <div key={cat.id} className="col categories-style-01 sm-mb-30px">
-                                        <div className="categories-box">
-                                            <div className="icon-box position-relative mb-20px">
-                                                <a href={`/shop?category=${cat.slug}`} className="d-block">
-                                                    <Image
-                                                        alt={cat.name}
-                                                        src={cat.thumb || '/images/demo-decor-store-icon-01.png'}
-                                                        width={130}
-                                                        height={130}
-                                                        unoptimized
-                                                        style={{ borderRadius: '50%', width: 130, height: 130, objectFit: 'cover', boxShadow: '0 10px 30px rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)' }}
-                                                    />
-                                                </a>
+                                    <a key={cat.id} href={`/shop?category=${cat.slug}`} className="home-cat-item text-decoration-none text-center">
+                                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                                            <div className="home-cat-img-wrap">
+                                                <Image
+                                                    alt={cat.name}
+                                                    src={cat.thumb || '/images/demo-decor-store-icon-01.png'}
+                                                    width={90}
+                                                    height={90}
+                                                    sizes="90px"
+                                                    style={{ borderRadius: '50%', width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
                                             </div>
-                                            <a className="fw-600 fs-17 text-white text-white-hover"
-                                                href={`/shop?category=${cat.slug}`}>{cat.name}</a>
+                                            {(cat.products_count > 0) && (
+                                                <div className="home-cat-badge">
+                                                    {cat.products_count}
+                                                </div>
+                                            )}
                                         </div>
-                                    </div>
+                                        <span className="home-cat-label fw-600 text-white">{cat.name}</span>
+                                    </a>
                                 ))}
                             </div>
                         </div>

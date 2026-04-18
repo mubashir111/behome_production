@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 
+use App\Enums\Activity;
 use App\Enums\Ask;
 use App\Libraries\AppLibrary;
 use Carbon\Carbon;
@@ -31,6 +32,9 @@ class SimpleProductResource extends JsonResource
             'rating_star'       => $this->rating_star,
             'rating_star_count' => (int) $this->rating_star_count,
             'wishlist'          => (bool)$this->wishlist,
+            'stock'             => $this->show_stock_out == Activity::DISABLE
+                ? ($this->can_purchasable == Ask::NO ? (int)env('NON_PURCHASE_QUANTITY') : (int)($this->stock_items_sum_quantity ?? 0))
+                : null,
         ];
     }
 }

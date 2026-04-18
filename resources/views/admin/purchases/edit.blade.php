@@ -182,19 +182,19 @@
     @if(isset($purchase->stocks) && count($purchase->stocks))
         @foreach($purchase->stocks as $stock)
             poItems.push({
-                uid: 'item_' + Date.now() + Math.floor(Math.random() * 1000) + {!! $loop->index !!},
+                uid: 'item_' + Date.now() + Math.floor(Math.random() * 1000) + {{ $loop->index }},
                 product_id: parseInt({{ $stock->product_id }}),
                 item_id: parseInt({{ $stock->item_id }}),
                 is_variation: {{ $stock->item_type === \App\Models\ProductVariation::class ? 'true' : 'false' }},
-                variation_names: "{!! $stock->variation_names !!}",
-                name: "{!! addslashes($stock->product->name ?? 'Unknown') !!}" + ("{!! $stock->variation_names !!}" ? " ({!! $stock->variation_names !!})" : ""),
+                variation_names: {!! json_encode($stock->variation_names) !!},
+                name: {!! json_encode(($stock->product->name ?? 'Unknown') . ($stock->variation_names ? " ({$stock->variation_names})" : "")) !!},
                 price: parseFloat({{ $stock->price }}),
                 quantity: parseInt({{ $stock->quantity }}),
                 total_discount: parseFloat({{ $stock->discount }}),
                 total_tax: parseFloat({{ $stock->tax }}),
                 subtotal: parseFloat({{ $stock->subtotal }}),
                 total: parseFloat({{ $stock->total }}),
-                sku: "{!! $stock->sku !!}",
+                sku: {!! json_encode($stock->sku) !!},
                 tax_id: [] 
             });
         @endforeach

@@ -5,6 +5,11 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 
+const FALLBACK_IMAGES = [
+    '/images/demo-decor-store-main-banner-01.jpg',
+    '/images/demo-decor-store-main-banner-02.jpg',
+    '/images/demo-decor-store-main-banner-03.jpg',
+];
 
 export default function Collections() {
     const router = useRouter();
@@ -28,7 +33,6 @@ export default function Collections() {
                 const response = await apiFetch(`/frontend/product-category?paginate=1&per_page=12&page=${currentPage}`);
                 const list = Array.isArray(response?.data) ? response.data : [];
                 const meta = response?.meta || {};
-
                 setCategories(list);
                 setCurrentPage(meta.current_page || currentPage);
                 setLastPage(meta.last_page || 1);
@@ -46,14 +50,12 @@ export default function Collections() {
     const changePage = (page: number) => {
         const nextPage = Math.max(1, Math.min(page, lastPage || 1));
         setCurrentPage(nextPage);
-
         const nextParams = new URLSearchParams(searchParams.toString());
         if (nextPage <= 1) {
             nextParams.delete('page');
         } else {
             nextParams.set('page', String(nextPage));
         }
-
         const nextUrl = nextParams.toString() ? `${pathname}?${nextParams.toString()}` : pathname;
         router.replace(nextUrl, { scroll: false });
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -64,27 +66,27 @@ export default function Collections() {
         const start = Math.max(1, currentPage - 2);
         const end = Math.min(lastPage, currentPage + 2);
         const pages: number[] = [];
-        for (let page = start; page <= end; page += 1) {
-            pages.push(page);
-        }
+        for (let p = start; p <= end; p++) pages.push(p);
         return pages;
     })();
-
-    if (loading) {
-        return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>;
-    }
 
     return (
         <main className="no-layout-pad" style={{ paddingTop: '50px' }}>
 
-            {/*  start page title  */}
-            <section className="page-title-center-alignment cover-background bg-dark-gray" style={{ backgroundImage: 'linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.7)), url(\'images/new/bg/bg1.webp\')', paddingBottom: '70px' }}>
+            {/* Hero */}
+            <section className="page-title-center-alignment cover-background bg-dark-gray" style={{
+                backgroundImage: "linear-gradient(rgba(10,10,10,0.72),rgba(10,10,10,0.72)),url('/images/new/bg/bg1.webp')",
+                paddingBottom: '70px',
+            }}>
                 <div className="container">
                     <div className="row">
                         <div className="col-12 text-center position-relative page-title-extra-large">
                             <h1 className="alt-font d-inline-block fw-700 ls-minus-05px text-white mb-10px">Collections</h1>
+                            <p className="text-white opacity-6 mb-0" style={{ fontSize: 15, letterSpacing: '0.3px' }}>
+                                Discover our curated range of premium categories
+                            </p>
                         </div>
-                        <div className="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
+                        <div className="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center mt-2">
                             <ul>
                                 <li><a className="text-white" href="/">Home</a></li>
                                 <li className="text-white opacity-7">Collections</li>
@@ -93,94 +95,182 @@ export default function Collections() {
                     </div>
                 </div>
             </section>
-            {/*  end page title  */}
-            {/*  start section  */}
-            <section className="position-relative">
-                <div className="container">
-                    <div className="row row-cols-1 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 justify-content-center align-items-center">
-                        {categories.map((category) => (
-                            <div key={category.id} className="col categories-style-01 text-center mb-50px xs-mb-35px">
-                                <div className="categories-box">
-                                    <div className="icon-box position-relative mb-10px">
-                                        <a href={`/shop?category=${category.slug}`}>
-                                            <Image
-                                                className="category-thumb"
-                                                alt={category.name}
-                                                src={category.thumb || category.cover || '/images/demo-decor-store-icon-01.png'}
-                                                width={130}
-                                                height={130}
-                                                unoptimized
-                                                style={{ objectFit: 'cover', borderRadius: '50%' }}
-                                            />
-                                        </a>
-                                        <div className="count-circle d-flex align-items-center justify-content-center w-35px h-35px bg-base-color text-white rounded-circle fw-600 fs-12">
-                                            {category.products_count || '00'}
-                                        </div>
-                                    </div>
-                                    <a className="fw-600 fs-17 text-white text-white-hover" href={`/shop?category=${category.slug}`}>
-                                        {category.name}
-                                    </a>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
 
+            {/* Grid */}
+            <section className="py-5" style={{ background: '#0b0b0f' }}>
+                <div className="container">
+
+                    {loading ? (
+                        <div className="row g-4">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-cust5">
+                                    <div className="shop-shimmer" style={{ height: 340, borderRadius: 12 }} />
+                                </div>
+                            ))}
+                        </div>
+                    ) : categories.length === 0 ? (
+                        <div className="text-center py-5">
+                            <div style={{
+                                width: 72, height: 72, borderRadius: '50%',
+                                background: 'rgba(201,169,110,0.10)', border: '1px solid rgba(201,169,110,0.2)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
+                            }}>
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--base-color,#c9a96e)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="2" y="3" width="7" height="7" rx="1" />
+                                    <rect x="15" y="3" width="7" height="7" rx="1" />
+                                    <rect x="2" y="14" width="7" height="7" rx="1" />
+                                    <rect x="15" y="14" width="7" height="7" rx="1" />
+                                </svg>
+                            </div>
+                            <p className="text-white opacity-5 mb-0">No collections found</p>
+                        </div>
+                    ) : (
+                        <div className="row g-4">
+                            {categories.map((cat, idx) => {
+                                const img = cat.cover || cat.thumb || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
+                                const count = cat.products_count ?? 0;
+                                return (
+                                    <div key={cat.id} className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-cust5">
+                                        <a href={`/shop?category=${cat.slug}`} className="collection-card d-block text-decoration-none" style={{
+                                            position: 'relative', display: 'block',
+                                            borderRadius: 12, overflow: 'hidden',
+                                            height: 340,
+                                            background: '#111',
+                                        }}>
+                                            {/* Image */}
+                                            <Image
+                                                src={img}
+                                                alt={cat.name}
+                                                fill
+                                                sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, (max-width: 992px) 33vw, (max-width: 1200px) 25vw, 20vw"
+                                                style={{ objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.6s ease' }}
+                                                className="collection-card-img"
+                                            />
+
+                                            {/* Overlay */}
+                                            <div style={{
+                                                position: 'absolute', inset: 0,
+                                                background: 'linear-gradient(to top, rgba(5,5,8,0.88) 0%, rgba(5,5,8,0.30) 50%, rgba(5,5,8,0.10) 100%)',
+                                                transition: 'background 0.4s ease',
+                                            }} className="collection-card-overlay" />
+
+                                            {/* Count badge */}
+                                            {count > 0 && (
+                                                <div style={{
+                                                    position: 'absolute', top: 16, right: 16,
+                                                    background: 'rgba(8,8,12,0.72)',
+                                                    backdropFilter: 'blur(10px)',
+                                                    WebkitBackdropFilter: 'blur(10px)',
+                                                    border: '1px solid rgba(201,169,110,0.28)',
+                                                    borderRadius: 20,
+                                                    padding: '4px 12px',
+                                                    fontSize: 11,
+                                                    fontWeight: 700,
+                                                    color: 'var(--base-color,#c9a96e)',
+                                                    letterSpacing: '0.5px',
+                                                    zIndex: 2,
+                                                }}>
+                                                    {count} {count === 1 ? 'item' : 'items'}
+                                                </div>
+                                            )}
+
+                                            {/* Bottom text */}
+                                            <div style={{
+                                                position: 'absolute', bottom: 0, left: 0, right: 0,
+                                                padding: '28px 24px 24px',
+                                                zIndex: 2,
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
+                                                    <div>
+                                                        <div style={{
+                                                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                                                            marginBottom: 6,
+                                                        }}>
+                                                            <span style={{ display: 'block', width: 18, height: 1, background: 'var(--base-color,#c9a96e)' }} />
+                                                            <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: 9, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase' }}>
+                                                                Collection
+                                                            </span>
+                                                        </div>
+                                                        <div style={{
+                                                            fontFamily: 'var(--primary-font,serif)',
+                                                            color: '#fff',
+                                                            fontSize: 'clamp(18px,2vw,24px)',
+                                                            fontWeight: 700,
+                                                            letterSpacing: '-0.3px',
+                                                            lineHeight: 1.2,
+                                                        }}>
+                                                            {cat.name}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Arrow CTA */}
+                                                    <div className="collection-card-arrow" style={{
+                                                        width: 42, height: 42, borderRadius: '50%',
+                                                        background: 'var(--base-color,#c9a96e)',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        flexShrink: 0,
+                                                        opacity: 0,
+                                                        transform: 'translateY(8px)',
+                                                        transition: 'opacity 0.3s ease, transform 0.3s ease',
+                                                    }}>
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d0d0d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M5 12h14M12 5l7 7-7 7" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* Pagination */}
                     {lastPage > 1 && (
-                        <nav aria-label="Collections pagination" className="d-flex justify-content-center mt-4 mb-5">
+                        <nav aria-label="Collections pagination" className="d-flex justify-content-center mt-5">
                             <ul className="pagination pagination-style-01 m-0">
                                 <li className={`page-item ${currentPage <= 1 ? 'disabled' : ''}`}>
-                                    <button className="page-link bg-transparent border-0" onClick={() => changePage(currentPage - 1)} disabled={currentPage <= 1}>
+                                    <button className="page-link bg-transparent border-0 text-white" onClick={() => changePage(currentPage - 1)} disabled={currentPage <= 1}>
                                         Prev
                                     </button>
                                 </li>
                                 {visiblePages.map((page) => (
                                     <li key={page} className={`page-item ${page === currentPage ? 'active' : ''}`}>
-                                        <button className="page-link bg-transparent border-0" onClick={() => changePage(page)}>
+                                        <button className="page-link bg-transparent border-0 text-white" onClick={() => changePage(page)}>
                                             {page}
                                         </button>
                                     </li>
                                 ))}
                                 <li className={`page-item ${currentPage >= lastPage ? 'disabled' : ''}`}>
-                                    <button className="page-link bg-transparent border-0" onClick={() => changePage(currentPage + 1)} disabled={currentPage >= lastPage}>
+                                    <button className="page-link bg-transparent border-0 text-white" onClick={() => changePage(currentPage + 1)} disabled={currentPage >= lastPage}>
                                         Next
                                     </button>
                                 </li>
                             </ul>
                         </nav>
                     )}
-
                 </div>
             </section>
-            {/*  end section  */}
-            {/*  start cookie message  */}
-            <div className="cookie-message bg-dark-gray border-radius-8px" id="cookies-model">
-                <div className="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing
-                    experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you
-                    consent to our use of cookies. </div>
-                <div className="cookie-btn">
-                    <a aria-label="btn" className="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" href="/collections#">
-                        <span>
-                            <span className="btn-double-text" data-text="Cookie policy">Cookie policy</span>
-                        </span>
-                    </a>
-                    <a aria-label="text" className="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn="" href="/collections#">
-                        <span>
-                            <span className="btn-double-text" data-text="Allow cookies">Allow cookies</span>
-                        </span>
-                    </a>
-                </div>
-            </div>
-            {/*  end cookie message  */}
-            {/*  start scroll progress  */}
-            <div className="scroll-progress d-none d-xxl-block">
-                <a aria-label="scroll" className="scroll-top" href="/collections#">
-                    <span className="scroll-text">Scroll</span><span className="scroll-line"><span className="scroll-point"></span></span>
-                </a>
-            </div>
-            {/*  end scroll progress  */}
-            {/*  javascript libraries  */}
-            {/*  Mega Menu Alignment Fix  */}
-            {/*  Behome Premium Animation System  */}
+
+            <style>{`
+                @media (min-width: 1200px) {
+                    .col-xl-cust5 {
+                        flex: 0 0 auto;
+                        width: 20%;
+                    }
+                }
+                .collection-card:hover .collection-card-img {
+                    transform: scale(1.06);
+                }
+                .collection-card:hover .collection-card-overlay {
+                    background: linear-gradient(to top, rgba(5,5,8,0.94) 0%, rgba(5,5,8,0.45) 55%, rgba(5,5,8,0.15) 100%);
+                }
+                .collection-card:hover .collection-card-arrow {
+                    opacity: 1 !important;
+                    transform: translateY(0) !important;
+                }
+            `}</style>
 
         </main>
     );
