@@ -139,31 +139,40 @@ export default async function Home() {
                             </div>
                             <h6 className="mb-0 fw-700 alt-font text-white">Featured categories</h6>
                         </div>
-                        <div className="col-xl-10 col-lg-9">
-                            {/* Mobile: horizontal scroll | Desktop: grid */}
-                            <div className="home-cat-scroll">
-                                {categories.map((cat: any) => (
-                                    <a key={cat.id} href={`/shop?category=${cat.slug}`} className="home-cat-item text-decoration-none text-center">
-                                        <div style={{ position: 'relative', display: 'inline-block' }}>
-                                            <div className="home-cat-img-wrap">
-                                                <Image
-                                                    alt={cat.name}
-                                                    src={cat.thumb || '/images/demo-decor-store-icon-01.png'}
-                                                    width={90}
-                                                    height={90}
-                                                    sizes="90px"
-                                                    style={{ borderRadius: '50%', width: '100%', height: '100%', objectFit: 'cover' }}
-                                                />
-                                            </div>
-                                            {(cat.products_count > 0) && (
-                                                <div className="home-cat-badge">
-                                                    {cat.products_count}
+                        {/* min-width:0 is the iOS Safari flex-overflow fix — without it the column
+                            expands to fit content and overflow-x:auto on the child never triggers */}
+                        <div className="col-xl-10 col-lg-9" style={{ minWidth: 0 }}>
+                            {/* overflow:hidden constrains the scroll container width on iOS Safari */}
+                            <div style={{ overflow: 'hidden', width: '100%' }}>
+                                <div className="home-cat-scroll">
+                                    {categories.map((cat: any) => (
+                                        <a
+                                            key={cat.id}
+                                            href={`/shop?category=${cat.slug}`}
+                                            className="home-cat-item text-decoration-none text-center"
+                                            style={{ flex: '0 0 80px', minWidth: '80px' }}
+                                        >
+                                            <div style={{ position: 'relative', display: 'inline-block', lineHeight: 0 }}>
+                                                <div className="home-cat-img-wrap">
+                                                    <Image
+                                                        alt={cat.name}
+                                                        src={cat.thumb || '/images/demo-decor-store-icon-01.png'}
+                                                        width={90}
+                                                        height={90}
+                                                        sizes="90px"
+                                                        style={{ borderRadius: '50%', width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
                                                 </div>
-                                            )}
-                                        </div>
-                                        <span className="home-cat-label fw-600 text-white">{cat.name}</span>
-                                    </a>
-                                ))}
+                                                {(cat.products_count > 0) && (
+                                                    <div className="home-cat-badge">
+                                                        {cat.products_count}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span className="home-cat-label fw-600 text-white">{cat.name}</span>
+                                        </a>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
