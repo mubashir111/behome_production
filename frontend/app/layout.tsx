@@ -41,7 +41,7 @@ export default function RootLayout({
         {/* Single purged bundle — all CSS including revolution (1 request) */}
         <link rel="stylesheet" href="/css/all.min.css?v=4" />
         {/* Decor-store theme overrides + FA Brands font-face */}
-        <link rel="stylesheet" href="/demos/decor-store/decor-store.css" />
+        <link rel="stylesheet" href="/demos/decor-store/decor-store.css?v=2" />
       </head>
       <body className={`bg-dark-gray ${marcellus.variable} ${outfit.variable}`} data-mobile-nav-style="classic">
         <SettingsProvider>

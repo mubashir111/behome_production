@@ -4451,14 +4451,16 @@ header.header-with-topbar.scrolled .header-top-bar {
 /* Desktop: switch to grid, bigger circles */
 @media (min-width: 768px) {
     .home-cat-scroll {
-        display: grid;
+        display: grid !important;
         grid-template-columns: repeat(6, 1fr);
-        overflow: visible;
+        overflow: visible !important;
         gap: 16px;
         scroll-snap-type: none;
     }
     .home-cat-item {
-        width: auto;
+        flex: none !important;
+        width: auto !important;
+        min-width: 0 !important;
         gap: 14px;
     }
     .home-cat-img-wrap {
