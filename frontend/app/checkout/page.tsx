@@ -50,6 +50,12 @@ export default function Checkout() {
     const [paymentCancelled, setPaymentCancelled] = useState(false);
     const [orderError, setOrderError] = useState<{ message: string; action?: string; orderId?: number } | null>(null);
     const [guestGate, setGuestGate] = useState(false);
+    const [guestFormOpen, setGuestFormOpen] = useState(false);
+    const [guestName, setGuestName] = useState('');
+    const [guestEmail, setGuestEmail] = useState('');
+    const [guestPhone, setGuestPhone] = useState('');
+    const [guestLoading, setGuestLoading] = useState(false);
+    const [guestError, setGuestError] = useState<string | null>(null);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const paymentSectionRef = useRef<HTMLDivElement>(null);
 
@@ -459,6 +465,34 @@ export default function Checkout() {
         }
     };
 
+    const handleGuestCheckout = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setGuestError(null);
+        if (!guestName.trim()) { setGuestError('Please enter your name.'); return; }
+        if (!guestEmail.trim()) { setGuestError('Please enter your email address.'); return; }
+        setGuestLoading(true);
+        try {
+            const password = Math.random().toString(36).slice(-8) + Math.random().toString(36).toUpperCase().slice(-4) + '!2';
+            const res = await apiFetch('/v1/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ name: guestName.trim(), email: guestEmail.trim(), phone: guestPhone.trim() || undefined, password }),
+            });
+            if (res?.status && res?.data?.access_token) {
+                localStorage.setItem('token', res.data.access_token);
+                localStorage.setItem('user', JSON.stringify(res.data.user ?? {}));
+                window.dispatchEvent(new CustomEvent('auth:login', {}));
+                setGuestGate(false);
+                fetchCheckoutData();
+            } else {
+                setGuestError(res?.message || 'Could not create guest account. Please try signing in.');
+            }
+        } catch (err: any) {
+            setGuestError(err.message || 'Something went wrong. Please try signing in.');
+        } finally {
+            setGuestLoading(false);
+        }
+    };
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -518,8 +552,8 @@ export default function Checkout() {
                                     <div style={{ padding: '40px 40px 36px' }}>
                                         <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}>Checkout</p>
                                         <h2 style={{ margin: '0 0 10px', color: '#fff', fontSize: 'clamp(20px,4vw,26px)', fontWeight: 700 }}>Continue to checkout</h2>
-                                        <p style={{ margin: '0 0 32px', color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 1.6 }}>
-                                            Sign in for faster checkout with saved addresses, order history, and order tracking. Or create a free account in under a minute.
+                                        <p style={{ margin: '0 0 28px', color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 1.6 }}>
+                                            Sign in for faster checkout with saved addresses and order tracking.
                                         </p>
 
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -530,7 +564,7 @@ export default function Checkout() {
                                             }}>
                                                 <i className="feather icon-feather-log-in" style={{ fontSize: 20, color: '#000' }}></i>
                                                 <span style={{ color: '#000', fontWeight: 700, fontSize: 14 }}>Sign In</span>
-                                                <span style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12 }}>Use saved address &amp; orders</span>
+                                                <span style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12 }}>Saved address &amp; orders</span>
                                             </a>
                                             <a href="/account?tab=register&redirect=/checkout" style={{
                                                 display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6,
@@ -539,24 +573,79 @@ export default function Checkout() {
                                             }}>
                                                 <i className="feather icon-feather-user-plus" style={{ fontSize: 20, color: '#fff' }}></i>
                                                 <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>Create Account</span>
-                                                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Free &amp; takes 30 seconds</span>
+                                                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Free &amp; 30 seconds</span>
                                             </a>
                                         </div>
 
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0 20px' }}>
                                             <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
                                             <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>or</span>
                                             <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
                                         </div>
 
-                                        <a href="/cart" style={{
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                            padding: '13px 20px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10,
-                                            textDecoration: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 600,
-                                        }}>
-                                            <i className="feather icon-feather-arrow-left" style={{ fontSize: 14 }}></i>
-                                            Back to Cart
-                                        </a>
+                                        {/* Guest checkout form */}
+                                        {!guestFormOpen ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => setGuestFormOpen(true)}
+                                                style={{
+                                                    width: '100%', padding: '14px 20px', background: 'rgba(255,255,255,0.04)',
+                                                    border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, cursor: 'pointer',
+                                                    color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: 600,
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                                }}>
+                                                <i className="feather icon-feather-shopping-bag" style={{ fontSize: 16 }}></i>
+                                                Continue as Guest
+                                            </button>
+                                        ) : (
+                                            <form onSubmit={handleGuestCheckout} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                                <p style={{ margin: '0 0 4px', fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+                                                    Enter your details to checkout. We'll create a guest account so you can track your order.
+                                                </p>
+                                                <input
+                                                    type="text" placeholder="Full name *" required
+                                                    value={guestName} onChange={e => setGuestName(e.target.value)}
+                                                    style={{ padding: '11px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 14, outline: 'none', width: '100%' }}
+                                                />
+                                                <input
+                                                    type="email" placeholder="Email address *" required
+                                                    value={guestEmail} onChange={e => setGuestEmail(e.target.value)}
+                                                    style={{ padding: '11px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 14, outline: 'none', width: '100%' }}
+                                                />
+                                                <input
+                                                    type="tel" placeholder="Phone (optional)"
+                                                    value={guestPhone} onChange={e => setGuestPhone(e.target.value)}
+                                                    style={{ padding: '11px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 14, outline: 'none', width: '100%' }}
+                                                />
+                                                {guestError && (
+                                                    <p style={{ margin: 0, fontSize: 13, color: 'var(--base-color)' }}>{guestError}</p>
+                                                )}
+                                                <button
+                                                    type="submit" disabled={guestLoading}
+                                                    style={{
+                                                        padding: '13px 20px', background: guestLoading ? 'rgba(197,160,89,0.5)' : 'var(--base-color)',
+                                                        border: 'none', borderRadius: 10, cursor: guestLoading ? 'not-allowed' : 'pointer',
+                                                        color: '#000', fontSize: 14, fontWeight: 700,
+                                                    }}>
+                                                    {guestLoading ? 'Please wait...' : 'Continue to Checkout →'}
+                                                </button>
+                                                <button type="button" onClick={() => { setGuestFormOpen(false); setGuestError(null); }}
+                                                    style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 12, cursor: 'pointer', padding: 0 }}>
+                                                    ← Back
+                                                </button>
+                                            </form>
+                                        )}
+
+                                        <div style={{ marginTop: 20 }}>
+                                            <a href="/cart" style={{
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                                padding: '10px 20px', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10,
+                                                textDecoration: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 12, fontWeight: 600,
+                                            }}>
+                                                <i className="feather icon-feather-arrow-left" style={{ fontSize: 13 }}></i>
+                                                Back to Cart
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -75,13 +75,110 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
     const showPromoCard = !!activePromo;
 
     if (activeSlides.length === 0) {
+        const quickLinks = [
+            { label: 'Sofas', href: '/shop?category=sofa' },
+            { label: 'Beds', href: '/shop?category=bed' },
+            { label: 'Dining', href: '/shop?category=dining' },
+            { label: 'Lighting', href: '/shop?category=lighting' },
+        ];
         return (
-            <section className="p-0" style={{ minHeight: '100vh', background: '#0d0d0d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="text-center text-white">
-                    <h1 className="alt-font fw-700 fs-80 mb-15px">Elevate your living</h1>
-                    <p className="mb-30px opacity-7">Premium modern homes & furniture</p>
-                    <Link href="/shop" className="btn btn-glass btn-large btn-round-edge">SHOP NOW</Link>
+            <section className="p-0 overflow-hidden hero-slider-section" style={{
+                position: 'relative', width: '100%',
+                height: '100svh', minHeight: 'clamp(520px, 80vh, 960px)',
+                background: '#08080c',
+            }}>
+                <Image src="/images/demo-decor-store-main-banner-01.jpg" alt="" fill
+                    sizes="100vw" priority style={{ objectFit: 'cover', objectPosition: 'center', opacity: 0.45 }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(105deg, rgba(8,8,12,0.88) 0%, rgba(8,8,12,0.55) 60%, rgba(8,8,12,0.30) 100%)' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, transparent 40%)' }} />
+
+                {/* Main content */}
+                <div style={{
+                    position: 'absolute', inset: 0, zIndex: 2,
+                    display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                    padding: 'clamp(80px,8vw,120px) clamp(22px,6vw,80px) 120px',
+                }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
+                        <span style={{ display: 'block', width: 36, height: 1, background: 'var(--base-color,#c9a96e)' }} />
+                        <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: 10, fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase' }}>Premium Collection</span>
+                    </div>
+                    <h1 style={{
+                        fontFamily: 'var(--primary-font,serif)', color: '#fff', fontWeight: 700,
+                        fontSize: 'clamp(36px,6vw,96px)', lineHeight: 1.04,
+                        letterSpacing: 'clamp(-1px,-0.025em,-2.5px)', marginBottom: 18, maxWidth: 600,
+                    }}>
+                        Elevate<br />Your Living
+                    </h1>
+                    <p style={{
+                        color: 'rgba(255,255,255,0.58)', fontSize: 'clamp(13px,1.4vw,17px)',
+                        lineHeight: 1.7, marginBottom: 36, maxWidth: 400,
+                    }}>
+                        Premium architectural decor &amp; luxury furniture for discerning homes.
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+                        <Link href="/shop" style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 10,
+                            background: 'var(--base-color,#c9a96e)', color: '#0d0d0d',
+                            padding: '14px 32px', borderRadius: 3, fontWeight: 700,
+                            fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase',
+                            textDecoration: 'none', boxShadow: '0 4px 24px rgba(201,169,110,0.35)',
+                        }}>
+                            Shop Collection
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </Link>
+                        <Link href="/collections" style={{
+                            color: 'rgba(255,255,255,0.65)', fontSize: 11, fontWeight: 600,
+                            letterSpacing: '1.5px', textTransform: 'uppercase', textDecoration: 'none',
+                            borderBottom: '1px solid rgba(255,255,255,0.28)', paddingBottom: 2,
+                        }}>
+                            View All
+                        </Link>
+                    </div>
                 </div>
+
+                {/* Bottom category strip — drives product discovery */}
+                <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 3,
+                    background: 'rgba(6,6,9,0.82)', backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    padding: '14px 20px 18px',
+                }}>
+                    <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: 10 }}>Shop by category</p>
+                    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
+                        {quickLinks.map(ql => (
+                            <Link key={ql.label} href={ql.href} style={{
+                                flexShrink: 0, padding: '7px 16px',
+                                borderRadius: 20, border: '1px solid rgba(201,169,110,0.28)',
+                                background: 'rgba(201,169,110,0.07)',
+                                color: 'rgba(255,255,255,0.82)', fontSize: 12, fontWeight: 600,
+                                textDecoration: 'none', whiteSpace: 'nowrap',
+                                transition: 'all 0.25s ease',
+                            }}>
+                                {ql.label}
+                            </Link>
+                        ))}
+                        <Link href="/collections" style={{
+                            flexShrink: 0, padding: '7px 16px', borderRadius: 20,
+                            border: '1px solid rgba(255,255,255,0.12)',
+                            background: 'transparent',
+                            color: 'rgba(255,255,255,0.42)', fontSize: 12, fontWeight: 600,
+                            textDecoration: 'none', whiteSpace: 'nowrap',
+                        }}>
+                            All →
+                        </Link>
+                    </div>
+                </div>
+
+                <style>{`
+                    @keyframes heroScrollBounce {
+                        0%, 100% { transform: translateY(0); opacity: 1; }
+                        60% { transform: translateY(8px); opacity: 0.3; }
+                    }
+                    @media (max-width: 767px) {
+                        .hero-slider-section { height: 78vh !important; min-height: 520px !important; }
+                    }
+                `}</style>
             </section>
         );
     }
@@ -610,9 +707,10 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                     60% { transform: translateY(8px); opacity: 0.3; }
                 }
                 @media (max-width: 767px) {
+                    .hero-slider-section { height: 78vh !important; min-height: 520px !important; }
                     .hero-slider-grid {
                         grid-template-columns: 1fr !important;
-                        padding: 100px 22px 100px !important;
+                        padding: 90px 22px 90px !important;
                         align-items: flex-end !important;
                     }
                     .hero-slider-right-panel { display: none !important; }

@@ -313,41 +313,45 @@
   }
 }
 
-/* custom layout and header fixes */
-.layout-content {
-  padding-top: 110px;
-}
-
+/* ── Header is position:fixed — layout-content needs top clearance ───────────
+   Inner pages get padding-top ≈ header height so content starts below navbar.
+   Hero pages (no-layout-pad) get 0 so the hero fills behind the fixed header. */
+.layout-content,
 .header-with-topbar+.layout-content {
-  padding-top: 110px;
+  padding-top: 80px; /* navbar height */
 }
 
 @media (max-width: 991px) {
-
   .layout-content,
   .header-with-topbar+.layout-content {
-    padding-top: 85px;
+    padding-top: 64px;
   }
 }
 
-/* Pages that manage their own top spacing (home, shop, collections) */
+/* Hero / full-bleed pages manage their own spacing */
 .layout-content:has(> main.no-layout-pad),
 .header-with-topbar+.layout-content:has(> main.no-layout-pad) {
   padding-top: 0;
 }
 
-/* Ensure page-shell inside no-layout-pad doesn't have redundant padding */
+/* Ensure page-shell inside no-layout-pad doesn't add redundant padding */
 main.no-layout-pad .page-shell {
   padding-top: 0;
 }
 
-/* ── Prevent double top-spacing on regular pages ──────────────────────────────
-   .layout-content already clears the fixed header with padding-top.
-   page-shell and the template's top-space-padding class must NOT add a second
-   header-height offset on top of it — that was causing ~266px of blank space.    ── */
+/* ── Prevent double top-spacing on inner pages ────────────────────────────────
+   layout-content already clears the fixed header via padding-top above.
+   page-shell / top-space-padding must NOT add another full-header offset. */
 .layout-content .page-shell,
 .layout-content .top-space-padding {
   padding-top: 50px;
+}
+
+@media (max-width: 767px) {
+  .layout-content .page-shell,
+  .layout-content .top-space-padding {
+    padding-top: 0 !important;
+  }
 }
 
 
@@ -922,10 +926,6 @@ main.no-layout-pad .page-shell {
     border-radius: 10px;
   }
 
-  .layout-content,
-  .header-with-topbar+.layout-content {
-    padding-top: 95px;
-  }
 }
 
 /* Mobile: template spacing classes (.page-shell, .top-space-padding) stack on top

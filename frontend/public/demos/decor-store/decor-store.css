@@ -203,18 +203,8 @@ textarea:-ms-input-placeholder {
 /* --- Mobile Menu Restoration --- */
 @media (max-width: 991px) {
 
-    /* Fix the header to the top on mobile */
-    header.header-with-topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 998;
-        background: rgba(8, 8, 10, 0.92);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    }
+    /* Mobile inherits the global transparent + glass-on-scroll from the rule above.
+       No overrides needed here — global rule handles both desktop and mobile. */
 
     .header-navbar-main {
         height: 64px !important;
@@ -2781,13 +2771,6 @@ select,
         flex: 0 0 100% !important;
     }
 
-    /* Header is now position:fixed on mobile (topbar ~40px + navbar 80px = ~120px).
-       top-space-padding pushes page content below the fixed header. */
-    .header-with-topbar+.top-space-padding,
-    .top-space-padding {
-        padding-top: 64px !important;
-    }
-
     /* Also reduce the general section top/bottom padding on mobile */
     section {
         padding-top: 60px !important;
@@ -2893,6 +2876,28 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
 
 .top-bar-close-btn:hover {
     color: #fff;
+}
+
+/* ── TopBar: always visible with its own dark background ─────────────────────
+   The header is transparent by default, so the topbar needs its own background.
+   On scroll (.sticky added by main.js) the topbar collapses to 0 height. ------ */
+.header-top-bar {
+    background: rgba(8, 8, 10, 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.32s ease, opacity 0.28s ease, padding 0.32s ease !important;
+}
+
+/* Collapse topbar on scroll (.scrolled added by NavbarRevealer) */
+header.header-with-topbar.scrolled .header-top-bar {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+    pointer-events: none;
 }
 
 /* Logo — make the circular frame subtler */
@@ -4389,22 +4394,7 @@ input.bg-dark-gray-light:-webkit-autofill:focus,
     font-weight: 600;
 }
 
-/* ── Navbar initial-load jump fix ─────────────────────────────────────────────
-   style.min.css sets `.header-top-bar + .navbar.disable-fixed { top: 0 }`.
-   main.js immediately overrides this to `top: 40px` (topbar height) via inline
-   style on the first scroll-position check, and transition:.3s animates the gap
-   → visible "stuck then jumps" on load.
-   Setting the initial CSS to 40px means CSS start == main.js end value,
-   so the transition has nothing to animate. ---------------------------------- */
-header .header-top-bar+.navbar.disable-fixed {
-    top: 40px !important;
-}
-
-@media (max-width: 991px) {
-    header .header-top-bar+.navbar.disable-fixed {
-        top: 0 !important;
-    }
-}
+/* old top:40px hack removed — superseded by the always-at-top fix below */
 
 /* ── Featured Categories — home page ─────────────────────────────────────── */
 .home-cat-scroll {
@@ -4507,4 +4497,53 @@ header .header-top-bar+.navbar.disable-fixed {
         bottom: 4px;
         right: 4px;
     }
+}
+
+/* ── Navbar: fixed, transparent by default, glass on scroll ──────────────────
+   position:fixed lets the hero render behind the transparent header.
+   The .sticky class (added by main.js after scroll) triggers the glass effect.
+   top: 0 !important neutralises the JS-injected top:40px the template sets
+   when the topbar is present — that was causing "navbar not at top" on some
+   devices. ----------------------------------------------------------------- */
+header.header-with-topbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 998 !important;
+    background: transparent !important;
+    transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
+    border-bottom: 1px solid transparent;
+}
+
+/* Glass effect once user scrolls past threshold (.scrolled added by NavbarRevealer) */
+header.header-with-topbar.scrolled {
+    background: rgba(8, 8, 10, 0.85) !important;
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Navbar inside the fixed header stays in normal block flow.
+   Override all.min.css lines 25732-25758 which push the navbar down by 40px
+   and set position:absolute when a topbar is present. */
+header .navbar.disable-fixed,
+header .header-top-bar + .navbar,
+header .header-top-bar + .navbar.disable-fixed,
+header .disable-fixed {
+    position: relative !important;
+    top: 0 !important;
+}
+
+@media (max-width: 991px) {
+    header .header-top-bar + .navbar.disable-fixed {
+        top: 0 !important;
+    }
+}
+
+/* Navbar strip always transparent — header wrapper handles the background */
+header .navbar,
+header .navbar.header-light {
+    background: transparent !important;
+    background-color: transparent !important;
 }

@@ -9,20 +9,17 @@ export default function TopBar() {
     const [closing, setClosing] = useState(false);
 
     useEffect(() => {
-        if (sessionStorage.getItem('topbar-closed') === '1') return;
+        const dismissed = localStorage.getItem('topbar-dismissed-at');
+        if (dismissed) {
+            const hoursSince = (Date.now() - Number(dismissed)) / 3_600_000;
+            if (hoursSince < 24) return; // stay hidden for 24 h after dismissal
+        }
         setVisible(true);
     }, []);
 
     const handleClose = () => {
-        sessionStorage.setItem('topbar-closed', '1');
+        localStorage.setItem('topbar-dismissed-at', String(Date.now()));
         setClosing(true);
-        // Move navbar up in sync — the template CSS keeps it at top:40px
-        // while the top-bar element exists in the DOM, so we override it directly.
-        const nav = document.querySelector('header .navbar') as HTMLElement | null;
-        if (nav) {
-            nav.style.transition = 'top 0.32s ease';
-            nav.style.top = '0px';
-        }
         setTimeout(() => setVisible(false), 320);
     };
 

@@ -261,129 +261,91 @@ export default function Cart() {
                             <div className="row align-items-start">
                                 <div className="col-lg-8 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
 
-                                    {/* ── Desktop table (md and up) ── */}
-                                    <div className="d-none d-md-block">
-                                        <table className="table cart-products border-color-transparent-white-light !border-0">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th className="alt-font fw-600 text-white" scope="col">Product</th>
-                                                    <th scope="col"></th>
-                                                    <th className="alt-font fw-600 text-white" scope="col">Price</th>
-                                                    <th className="alt-font fw-600 text-white" scope="col">Quantity</th>
-                                                    <th className="alt-font fw-600 text-white" scope="col">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {cartItems.map((item) => (
-                                                    <tr key={item.id}>
-                                                        <td className="product-remove">
-                                                            <a className="fs-20 fw-500 cursor-pointer" onClick={() => removeItem(item.id)}>×</a>
-                                                        </td>
-                                                        <td className="product-thumbnail">
-                                                            <a href={`/product/${item.product?.slug}`}>
-                                                                <Image alt={item.product?.name} className="cart-product-image" src={item.product?.cover || "/images/demo-decor-store-product-01.jpg"} width={140} height={140} unoptimized />
-                                                            </a>
-                                                        </td>
-                                                        <td className="product-name">
-                                                            <a className="text-white fw-500 d-block lh-initial" href={`/product/${item.product?.slug}`}>{item.product?.name}</a>
-                                                            {item.variation_names && <span className="fs-14 d-block">{item.variation_names}</span>}
-                                                        </td>
-                                                        <td className="product-price" data-title="Price">
-                                                            {item.old_price > item.price && (
-                                                                <>
-                                                                    <del className="fs-13 text-white/40 me-2 lh-initial">{formatAmount(parseFloat(item.old_price))}</del>
-                                                                    <br />
-                                                                </>
-                                                            )}
-                                                            {formatAmount(parseFloat(item.price))}
-                                                        </td>
-                                                        <td className="product-quantity" data-title="Quantity">
-                                                            <div className="quantity" style={{ opacity: updatingItems.has(item.id) ? 0.4 : 1, transition: 'opacity 0.2s ease' }}>
-                                                                <button className="qty-minus" onClick={() => updateQuantity(item.id, item.quantity - 1)} type="button" disabled={updatingItems.has(item.id)}>-</button>
-                                                                <input aria-label="qty-text" className="qty-text bg-transparent text-white" readOnly type="text" value={item.quantity} />
-                                                                <button className="qty-plus" onClick={() => updateQuantity(item.id, item.quantity + 1)} type="button" disabled={updatingItems.has(item.id) || (item.product?.stock != null && item.quantity >= item.product.stock)}>+</button>
-                                                            </div>
-                                                        </td>
-                                                        <td className="product-subtotal" data-title="Total">{formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    {/* ── Mobile card list (xs and sm only) ── */}
-                                    <div className="d-md-none" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingBottom: 120 }}>
+                                    {/* ── Cart items — card layout for all sizes ── */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 8 }}>
                                         {cartItems.map((item) => (
                                             <div key={item.id} style={{
                                                 display: 'flex',
-                                                gap: '14px',
-                                                padding: '16px 0',
-                                                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                                gap: 16,
+                                                padding: '16px 20px',
+                                                background: 'rgba(15,15,25,0.6)',
+                                                border: '1px solid rgba(255,255,255,0.07)',
+                                                borderRadius: 12,
+                                                alignItems: 'center',
                                                 opacity: updatingItems.has(item.id) ? 0.5 : 1,
                                                 transition: 'opacity 0.2s ease',
                                             }}>
-                                                {/* Product image */}
+                                                {/* Image */}
                                                 <a href={`/product/${item.product?.slug}`} style={{ flexShrink: 0 }}>
                                                     <Image
-                                                        alt={item.product?.name}
+                                                        alt={item.product?.name || ''}
                                                         src={item.product?.cover || '/images/demo-decor-store-product-01.jpg'}
-                                                        width={80} height={80} unoptimized
-                                                        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, display: 'block' }}
+                                                        width={88} height={88} unoptimized
+                                                        style={{ width: 88, height: 88, objectFit: 'cover', borderRadius: 8, display: 'block' }}
                                                     />
                                                 </a>
 
-                                                {/* Details */}
-                                                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                                    {/* Name + remove */}
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                                                        <a href={`/product/${item.product?.slug}`} style={{ color: '#fff', fontWeight: 600, fontSize: 14, lineHeight: 1.3, textDecoration: 'none' }}>
-                                                            {item.product?.name}
-                                                        </a>
-                                                        <button onClick={() => removeItem(item.id)} disabled={updatingItems.has(item.id)}
-                                                            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 22, lineHeight: 1, cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}>
-                                                            ×
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Variant */}
+                                                {/* Name + variant (grows) */}
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <a href={`/product/${item.product?.slug}`}
+                                                        style={{ color: '#fff', fontWeight: 600, fontSize: 15, lineHeight: 1.3, textDecoration: 'none', display: 'block', marginBottom: 4 }}>
+                                                        {item.product?.name}
+                                                    </a>
                                                     {item.variation_names && (
-                                                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{item.variation_names}</span>
+                                                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>{item.variation_names}</span>
                                                     )}
-
-                                                    {/* Unit price */}
-                                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+                                                    {/* Unit price — shown on mobile below name */}
+                                                    <div className="d-md-none" style={{ marginTop: 6, fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
                                                         {item.old_price > item.price && (
-                                                            <del style={{ marginRight: 8, opacity: 0.6 }}>{formatAmount(parseFloat(item.old_price))}</del>
+                                                            <del style={{ marginRight: 6, opacity: 0.6 }}>{formatAmount(parseFloat(item.old_price))}</del>
                                                         )}
                                                         {formatAmount(parseFloat(item.price))} each
-                                                    </span>
-
-                                                    {/* Qty controls + line total */}
-                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
-                                                        {/* Custom qty stepper — avoids .quantity's position:absolute buttons */}
-                                                        <div style={{ display: 'flex', alignItems: 'center', height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                                                            <button
-                                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                                disabled={updatingItems.has(item.id)}
-                                                                type="button"
-                                                                style={{ width: 36, height: 36, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-                                                            >−</button>
-                                                            <span style={{ minWidth: 32, textAlign: 'center', color: '#fff', fontWeight: 600, fontSize: 14, lineHeight: 1 }}>
-                                                                {item.quantity}
-                                                            </span>
-                                                            <button
-                                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                disabled={updatingItems.has(item.id) || (item.product?.stock != null && item.quantity >= item.product.stock)}
-                                                                type="button"
-                                                                style={{ width: 36, height: 36, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-                                                            >+</button>
-                                                        </div>
-                                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>
-                                                            {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
-                                                        </span>
                                                     </div>
                                                 </div>
+
+                                                {/* Unit price — desktop only */}
+                                                <div className="d-none d-md-block" style={{ minWidth: 80, textAlign: 'right' }}>
+                                                    {item.old_price > item.price && (
+                                                        <del style={{ display: 'block', fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>
+                                                            {formatAmount(parseFloat(item.old_price))}
+                                                        </del>
+                                                    )}
+                                                    <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
+                                                        {formatAmount(parseFloat(item.price))}
+                                                    </span>
+                                                </div>
+
+                                                {/* Qty stepper */}
+                                                <div style={{ display: 'flex', alignItems: 'center', height: 38, borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)', overflow: 'hidden', flexShrink: 0 }}>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        disabled={updatingItems.has(item.id)}
+                                                        type="button"
+                                                        style={{ width: 38, height: 38, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                                                    >−</button>
+                                                    <span style={{ minWidth: 34, textAlign: 'center', color: '#fff', fontWeight: 600, fontSize: 14, lineHeight: 1 }}>
+                                                        {item.quantity}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        disabled={updatingItems.has(item.id) || (item.product?.stock != null && item.quantity >= item.product.stock)}
+                                                        type="button"
+                                                        style={{ width: 38, height: 38, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                                                    >+</button>
+                                                </div>
+
+                                                {/* Line total */}
+                                                <div style={{ minWidth: 72, textAlign: 'right', fontWeight: 700, fontSize: 15, color: 'var(--base-color)', flexShrink: 0 }}>
+                                                    {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
+                                                </div>
+
+                                                {/* Remove */}
+                                                <button onClick={() => removeItem(item.id)} disabled={updatingItems.has(item.id)}
+                                                    style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: 20, lineHeight: 1, cursor: 'pointer', padding: '4px 0 4px 8px', flexShrink: 0, transition: 'color 0.2s' }}
+                                                    onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
+                                                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}>
+                                                    <i className="feather icon-feather-trash-2" style={{ fontSize: 16 }}></i>
+                                                </button>
                                             </div>
                                         ))}
                                     </div>

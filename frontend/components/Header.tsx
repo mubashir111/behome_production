@@ -6,8 +6,6 @@ import NotificationBell from './NotificationBell';
 import HeaderSearch from './HeaderSearch';
 import MobileSearchBar from './MobileSearchBar';
 import LanguageSwitcher from './LanguageSwitcher';
-import TopBar from './TopBar';
-
 export default async function Header() {
     let categories = [];
     let settings: any = null;
@@ -26,16 +24,13 @@ export default async function Header() {
     // Group categories if needed, or just list them. 
     // For now, let's just list them in the first column or spread them.
     return (
-        <header className="header-with-topbar">
-            {/*  start header top bar  */}
-            <TopBar />
-            {/*  end header top bar  */}
+        <header className="header-with-topbar no-sticky">
             {/*  start navigation  */}
             <nav className="navbar navbar-expand-lg header-light bg-transparent disable-fixed px-lg-0 py-0 py-lg-0">
                 <div className="container-fluid px-0 px-md-4 d-flex align-items-center header-navbar-main">
                     <div className="row w-100 align-items-center m-0">
                         <div className="col-6 col-xl-3 col-lg-2 order-1 d-flex align-items-center gap-3">
-                            <a className="glass-logo-wrapper" href="https://www.blkrockarchitect.ae/en" target="" rel="noopener noreferrer">
+                            <a className="glass-logo-wrapper d-none d-lg-flex" href="https://www.blkrockarchitect.ae/en" target="" rel="noopener noreferrer">
                                 <div className="glass-logo-box2">
                                     <Image alt="Blackrock Logo" src="/images/new/logo/blackrock.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
                                 </div>
@@ -158,96 +153,24 @@ export default async function Header() {
                                                 <div className="d-lg-flex mega-menu m-auto flex-column">
                                                     <div
                                                         className="row row-cols-2 row-cols-lg-6 row-cols-sm-3 md-pt-15px align-items-center justify-content-center mb-60px md-mb-30px sm-mb-0">
-                                                        <div className="col md-mb-30px">
-                                                            <a className="text-center" href="/collections">
-                                                                <Image alt=""
-                                                                    src="/images/demo-decor-store-menu-category-01.jpg" width={240} height={240} />
-                                                            </a>
-                                                            <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
-                                                                href="/collections">
-                                                                <span>
-                                                                    <span className="btn-text text-dark-gray fs-16">Designer
-                                                                        stool</span>
-                                                                    <span className="btn-icon"><i
-                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
-                                                                </span>
-                                                            </a>
-                                                        </div>
-                                                        <div className="col md-mb-30px">
-                                                            <a className="text-center" href="/collections">
-                                                                <Image alt=""
-                                                                    src="/images/demo-decor-store-menu-category-02.jpg" width={240} height={240} />
-                                                            </a>
-                                                            <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
-                                                                href="/collections">
-                                                                <span>
-                                                                    <span className="btn-text text-dark-gray fs-16">Modern
-                                                                        chair</span>
-                                                                    <span className="btn-icon"><i
-                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
-                                                                </span>
-                                                            </a>
-                                                        </div>
-                                                        <div className="col md-mb-30px">
-                                                            <a className="text-center" href="/collections">
-                                                                <Image alt=""
-                                                                    src="/images/demo-decor-store-menu-category-03.jpg" width={240} height={240} />
-                                                            </a>
-                                                            <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
-                                                                href="/collections">
-                                                                <span>
-                                                                    <span className="btn-text text-dark-gray fs-16">Table
-                                                                        lamp</span>
-                                                                    <span className="btn-icon"><i
-                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
-                                                                </span>
-                                                            </a>
-                                                        </div>
-                                                        <div className="col md-mb-30px">
-                                                            <a className="text-center" href="/collections">
-                                                                <Image alt=""
-                                                                    src="/images/demo-decor-store-menu-category-04.jpg" width={240} height={240} />
-                                                            </a>
-                                                            <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
-                                                                href="/collections">
-                                                                <span>
-                                                                    <span className="btn-text text-dark-gray fs-16">Home
-                                                                        decor</span>
-                                                                    <span className="btn-icon"><i
-                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
-                                                                </span>
-                                                            </a>
-                                                        </div>
-                                                        <div className="col md-mb-30px">
-                                                            <a className="text-center" href="/collections">
-                                                                <Image alt=""
-                                                                    src="/images/demo-decor-store-menu-category-05.jpg" width={240} height={240} />
-                                                            </a>
-                                                            <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
-                                                                href="/collections">
-                                                                <span>
-                                                                    <span className="btn-text text-dark-gray fs-16">Ceramic
-                                                                        pots</span>
-                                                                    <span className="btn-icon"><i
-                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
-                                                                </span>
-                                                            </a>
-                                                        </div>
-                                                        <div className="col md-mb-30px">
-                                                            <a className="text-center" href="/collections">
-                                                                <Image alt=""
-                                                                    src="/images/demo-decor-store-menu-category-06.jpg" width={240} height={240} />
-                                                            </a>
-                                                            <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
-                                                                href="/collections">
-                                                                <span>
-                                                                    <span className="btn-text text-dark-gray fs-16">Wooden
-                                                                        table</span>
-                                                                    <span className="btn-icon"><i
-                                                                        className="fa-solid fa-arrow-right m-0"></i></span>
-                                                                </span>
-                                                            </a>
-                                                        </div>
+                                                        {(categories.length > 0 ? categories : []).slice(0, 6).map((cat: any, idx: number) => {
+                                                            const imgSrc = cat.cover || cat.thumb || `/images/demo-decor-store-menu-category-0${(idx % 6) + 1}.jpg`;
+                                                            return (
+                                                                <div className="col md-mb-30px" key={cat.id}>
+                                                                    <a className="text-center" href={`/shop?category=${cat.slug}`}>
+                                                                        <Image alt={cat.name}
+                                                                            src={imgSrc} width={240} height={240} />
+                                                                    </a>
+                                                                    <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
+                                                                        href={`/shop?category=${cat.slug}`}>
+                                                                        <span>
+                                                                            <span className="btn-text text-dark-gray fs-16">{cat.name}</span>
+                                                                            <span className="btn-icon"><i className="fa-solid fa-arrow-right m-0"></i></span>
+                                                                        </span>
+                                                                    </a>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                     <div className="row row-cols-1 row-cols-md-2">
                                                         <div className="col">
