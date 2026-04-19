@@ -130,7 +130,7 @@ export default function UserAccount() {
                 .user-dropdown-menu {
                     position: absolute;
                     top: 100%;
-                    right: 0;
+                    inset-inline-end: 0;
                     width: 250px;
                     background: #1a1a1a !important;
                     border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -151,7 +151,7 @@ export default function UserAccount() {
                 .dropdown-pointer {
                     position: absolute;
                     top: -6px;
-                    right: 24px;
+                    inset-inline-end: 24px;
                     width: 12px;
                     height: 12px;
                     background: #1a1a1a;
@@ -161,9 +161,10 @@ export default function UserAccount() {
                     z-index: -1;
                 }
                 .dropdown-header-custom {
-                    padding: 22px 45px !important;
+                    padding: 22px 35px !important;
                     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
                     background: rgba(255, 255, 255, 0.01) !important;
+                    text-align: start !important;
                 }
 
                 /* AGGRESSIVE GLOBAL OVERRIDES */
@@ -175,12 +176,13 @@ export default function UserAccount() {
                 :global(.dropdown-item-custom) {
                     display: flex !important;
                     align-items: center !important;
-                    padding: 12px 45px !important;
+                    padding: 12px 35px !important;
                     text-decoration: none !important;
                     transition: all 0.2s ease !important;
                     gap: 14px !important;
                     color: #ffffff !important;
                     background: transparent !important;
+                    text-align: start !important;
                 }
                 :global(.dropdown-item-custom span) {
                     color: #ffffff !important;
@@ -195,7 +197,7 @@ export default function UserAccount() {
                 }
                 :global(.dropdown-item-custom:hover) {
                     background: rgba(255, 255, 255, 0.08) !important;
-                    padding-left: 52px !important;
+                    padding-inline-start: 42px !important;
                 }
                 :global(.dropdown-divider-custom) {
                     height: 1px !important;
@@ -210,12 +212,13 @@ export default function UserAccount() {
                     display: flex !important;
                     align-items: center !important;
                     width: 100% !important;
-                    padding: 14px 45px !important;
+                    padding: 14px 35px !important;
                     background: transparent !important;
                     border: none !important;
                     gap: 14px !important;
                     cursor: pointer !important;
                     color: #ffffff !important;
+                    text-align: start !important;
                 }
                 :global(.logout-btn-custom span) {
                     color: #ffffff !important;

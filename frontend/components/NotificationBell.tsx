@@ -142,7 +142,7 @@ export default function NotificationBell() {
         </svg>
         {unread > 0 && (
           <span style={{
-            position: 'absolute', top: '-4px', right: '-4px',
+            position: 'absolute', top: '-4px', insetInlineEnd: '-4px',
             minWidth: '18px', height: '18px', borderRadius: '9px',
             background: '#ef4444', color: '#fff',
             fontSize: '9px', fontWeight: 800,
@@ -158,21 +158,23 @@ export default function NotificationBell() {
       {/* Dropdown */}
       {open && (
         <div style={{
-          position: 'absolute', top: 'calc(100% + 12px)', right: 0,
+          position: 'absolute', top: 'calc(100% + 12px)', insetInlineEnd: 0,
           width: '340px', background: '#1a1a2e',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
           zIndex: 9999, overflow: 'hidden',
+          textAlign: 'start',
         }}>
           {/* Header */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+            textAlign: 'start',
           }}>
             <span style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>
               Notifications
               {unread > 0 && (
-                <span style={{ marginLeft: '8px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 800, borderRadius: '10px', padding: '1px 7px' }}>
+                <span style={{ marginInlineStart: '8px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 800, borderRadius: '10px', padding: '1px 7px' }}>
                   {unread} new
                 </span>
               )}
@@ -239,7 +241,7 @@ export default function NotificationBell() {
           </div>
 
           {/* Footer */}
-          <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+          <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'start' }}>
             <a href="/notifications" onClick={() => setOpen(false)} style={{ fontSize: '12px', color: '#818cf8', textDecoration: 'none', fontWeight: 600 }}>
               View all notifications
             </a>
