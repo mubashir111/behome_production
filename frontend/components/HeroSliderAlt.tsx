@@ -794,7 +794,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                     .hero-slider-section { height: 78vh !important; min-height: 520px !important; }
                     .hero-slider-grid {
                         grid-template-columns: 1fr !important;
-                        padding: 90px 22px 90px !important;
+                        padding: 90px 22px 180px !important;
                         align-items: flex-end !important;
                     }
                     .hero-slider-right-panel { display: none !important; }
