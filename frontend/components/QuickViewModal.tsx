@@ -63,14 +63,16 @@ export default function QuickViewModal({ slug, onClose }: QuickViewModalProps) {
 
     useEffect(() => {
         if (!slug) return;
+        const controller = new AbortController();
         setLoading(true);
         setProduct(null);
         setQty(1);
         setSelectedOptions({});
-        apiFetch(`/products/${slug}`)
+        apiFetch(`/products/${slug}`, { signal: controller.signal })
             .then(res => setProduct(res?.data ?? null))
-            .catch(() => setProduct(null))
-            .finally(() => setLoading(false));
+            .catch((err) => { if (err?.name !== 'AbortError') setProduct(null); })
+            .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+        return () => controller.abort();
     }, [slug]);
 
     useEffect(() => {

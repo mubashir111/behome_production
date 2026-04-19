@@ -669,7 +669,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:sanctum'])->group(func
     });
 });
 
-Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey', 'throttle:120,1', 'localization'])->group(function () {
+Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey', 'throttle:1000,1', 'localization'])->group(function () {
     Route::prefix('setting')->name('setting.')->group(function () {
         Route::get('/', [FrontendSettingController::class, 'index']);
     });
@@ -745,7 +745,9 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
         Route::post('/{slug}/comments', [\App\Http\Controllers\Frontend\BlogController::class, 'storeComment']);
     });
 
-    Route::post('/contact', [\App\Http\Controllers\Frontend\ContactController::class, 'store'])->name('contact.store');
+    Route::post('/contact', [\App\Http\Controllers\Frontend\ContactController::class, 'store'])
+        ->middleware('throttle:contact')
+        ->name('contact.store');
 
     Route::prefix('product-section')->name('productSection.')->group(function () {
         Route::get('/', [FrontendProductSectionController::class, 'index']);
@@ -932,14 +934,14 @@ Route::prefix('v1')->middleware(['installed', 'apiKey'])->group(function () {
         Route::post('/auth/login', [ApiAuthController::class, 'login']);
     });
 
-    Route::middleware('throttle:120,1')->group(function () {
+    Route::middleware('throttle:600,1')->group(function () {
         Route::get('/products', [ApiProductController::class, 'index']);
         Route::get('/products/{slug}', [ApiProductController::class, 'show']);
         Route::get('/categories', [ApiCategoryController::class, 'index']);
         Route::get('/categories/{slug}', [ApiCategoryController::class, 'show']);
     });
 
-    Route::middleware(['auth:sanctum', 'throttle:300,1'])->group(function () {
+    Route::middleware(['auth:sanctum', 'throttle:1000,1'])->group(function () {
         Route::post('/auth/logout', [ApiAuthController::class, 'logout']);
         Route::get('/auth/me', [ApiAuthController::class, 'me']);
 

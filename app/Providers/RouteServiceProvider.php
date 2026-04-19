@@ -26,11 +26,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // General API: 200 req/min for authenticated users, 60 for guests
+        // General API: 1000 req/min for authenticated users, 300 for guests
         RateLimiter::for('api', function (Request $request) {
             return $request->user()
-                ? Limit::perMinute(200)->by($request->user()->id)
-                : Limit::perMinute(60)->by($request->ip());
+                ? Limit::perMinute(1000)->by($request->user()->id)
+                : Limit::perMinute(300)->by($request->ip());
         });
 
         // Auth endpoints (login, register, password reset): 10 req/min per IP

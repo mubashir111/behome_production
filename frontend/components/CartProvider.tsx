@@ -53,12 +53,30 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     };
 
     useEffect(() => {
-        fetchCart();
+        // AbortController cancels the initial fetch if StrictMode unmounts before it completes
+        const controller = new AbortController();
 
-        // Listen for legacy events or manual triggers
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setCount(0);
+            setLoading(false);
+        } else {
+            apiFetch('/cart', { signal: controller.signal })
+                .then(res => {
+                    if (res?.status && Array.isArray(res.data)) {
+                        setCount(res.data.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0));
+                    }
+                })
+                .catch((err) => { if (err?.name !== 'AbortError') console.error('[CART_FETCH_ERROR]', err); })
+                .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+        }
+
         const handleUpdate = () => fetchCart();
         window.addEventListener('cart:updated', handleUpdate);
-        return () => window.removeEventListener('cart:updated', handleUpdate);
+        return () => {
+            controller.abort();
+            window.removeEventListener('cart:updated', handleUpdate);
+        };
     }, []);
 
     return (

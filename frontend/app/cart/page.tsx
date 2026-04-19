@@ -240,307 +240,393 @@ export default function Cart() {
         );
     }
 
-    return (
-        <main className="no-layout-pad page-top-100">
-            <section className="pt-20px pb-20px ps-45px pe-45px lg-ps-35px lg-pe-35px md-ps-15px md-pe-15px">
-                <div className="container-fluid">
-                    <div className="col-12 breadcrumb breadcrumb-style-01 fs-14">
-                        <ul>
-                            <li><a href="/" className="breadcrumb-link">Home</a></li>
-                            <li><a href="/shop" className="breadcrumb-link">Shop</a></li>
-                            <li>Cart</li>
-                        </ul>
+    const totalTax = cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0);
+    const grandTotal = Math.max(subtotal + totalTax - couponDiscount, 0);
+
+    /* ── Shared suggestion card ── */
+    const SuggestionCard = ({ product }: { product: any }) => {
+        const img = (product.cover || product.image || '').trim() || '/images/demo-decor-store-product-01.jpg';
+        const price = product.discounted_price || product.currency_price || '';
+        return (
+            <a href={`/product/${product.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                <div
+                    style={{ background: 'rgba(18,16,12,0.9)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.3s ease, transform 0.3s ease', cursor: 'pointer' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201,169,110,0.35)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; }}
+                >
+                    <div style={{ aspectRatio: '4/3', overflow: 'hidden', background: 'rgba(255,255,255,0.03)' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img} alt={product.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.06)'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)'; }}
+                            onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/demo-decor-store-product-01.jpg'; }} />
+                    </div>
+                    <div style={{ padding: '14px 16px 16px' }}>
+                        <p style={{ margin: '0 0 6px', color: '#fff', fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
+                        {price && <p style={{ margin: 0, color: 'var(--base-color,#c9a96e)', fontWeight: 700, fontSize: 13 }}>{price}</p>}
                     </div>
                 </div>
-            </section>
-            <section className="page-shell page-shell-tight min-h-600px d-flex align-items-center">
-                <div className="container-fluid">
-                    <div className="content-layout-wrapper">
-                        {cartItems.length > 0 ? (
-                            <>
-                            <div className="row align-items-start">
-                                <div className="col-lg-8 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
+            </a>
+        );
+    };
 
-                                    {/* ── Cart items — card layout for all sizes ── */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 8 }}>
-                                        {cartItems.map((item) => (
-                                            <div key={item.id} style={{
-                                                display: 'flex',
-                                                gap: 16,
-                                                padding: '16px 20px',
-                                                background: 'rgba(15,15,25,0.6)',
-                                                border: '1px solid rgba(255,255,255,0.07)',
-                                                borderRadius: 12,
-                                                alignItems: 'center',
-                                                opacity: updatingItems.has(item.id) ? 0.5 : 1,
-                                                transition: 'opacity 0.2s ease',
-                                            }}>
-                                                {/* Image */}
-                                                <a href={`/product/${item.product?.slug}`} style={{ flexShrink: 0 }}>
-                                                    <Image
-                                                        alt={item.product?.name || ''}
-                                                        src={item.product?.cover || '/images/demo-decor-store-product-01.jpg'}
-                                                        width={88} height={88} unoptimized
-                                                        style={{ width: 88, height: 88, objectFit: 'cover', borderRadius: 8, display: 'block' }}
-                                                    />
+    return (
+        <main className="no-layout-pad" style={{ background: '#0a0906', minHeight: '100vh' }}>
+
+            {/* ── Page Header ── */}
+            <div style={{
+                paddingTop: 110,
+                paddingBottom: 32,
+                paddingLeft: 'clamp(20px,5vw,60px)',
+                paddingRight: 'clamp(20px,5vw,60px)',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+            }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                            <span style={{ display: 'block', width: 28, height: 1, background: 'var(--base-color,#c9a96e)' }} />
+                            <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: 10, fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Your Selection</span>
+                        </div>
+                        <h1 style={{ fontFamily: 'var(--primary-font,serif)', color: '#fff', fontWeight: 700, fontSize: 'clamp(26px,3.5vw,42px)', margin: 0, letterSpacing: '-0.5px' }}>
+                            Shopping Cart
+                            {cartItems.length > 0 && (
+                                <span style={{ marginLeft: 14, fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--secondary-font,sans-serif)', letterSpacing: 0 }}>
+                                    {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
+                                </span>
+                            )}
+                        </h1>
+                    </div>
+                    <nav style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <a href="/" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>Home</a>
+                        <span>/</span>
+                        <a href="/shop" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>Shop</a>
+                        <span>/</span>
+                        <span style={{ color: 'var(--base-color,#c9a96e)' }}>Cart</span>
+                    </nav>
+                </div>
+            </div>
+
+            <div style={{ padding: 'clamp(28px,4vw,52px) clamp(20px,5vw,60px)', maxWidth: 1400, margin: '0 auto' }}>
+                {cartItems.length > 0 ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 32, alignItems: 'start' }} className="cart-layout">
+
+                        {/* ── LEFT: Items + Coupon ── */}
+                        <div>
+                            {/* Column headers — desktop only */}
+                            <div className="d-none d-md-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 80px 120px 80px 36px', gap: 16, padding: '0 20px 12px', marginBottom: 4 }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)' }}>Product</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', textAlign: 'center' }}>Price</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', textAlign: 'center' }}>Qty</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', textAlign: 'right' }}>Total</span>
+                                <span />
+                            </div>
+
+                            {/* Item cards */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                {cartItems.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'auto 1fr',
+                                            gap: 16,
+                                            padding: '18px 20px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            border: '1px solid rgba(255,255,255,0.07)',
+                                            borderRadius: 14,
+                                            opacity: updatingItems.has(item.id) ? 0.45 : 1,
+                                            transition: 'opacity 0.25s ease, border-color 0.25s ease',
+                                        }}
+                                        onMouseEnter={e => { if (!updatingItems.has(item.id)) (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201,169,110,0.2)'; }}
+                                        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.07)'; }}
+                                    >
+                                        {/* Thumbnail */}
+                                        <a href={`/product/${item.product?.slug}`} style={{ flexShrink: 0, display: 'block' }}>
+                                            <div style={{ position: 'relative', width: 100, height: 100, borderRadius: 10, overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
+                                                <Image
+                                                    alt={item.product?.name || ''}
+                                                    src={item.product?.cover || '/images/demo-decor-store-product-01.jpg'}
+                                                    fill unoptimized
+                                                    style={{ objectFit: 'cover' }}
+                                                />
+                                            </div>
+                                        </a>
+
+                                        {/* Right side */}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flexWrap: 'wrap' }}>
+                                            {/* Name + variant */}
+                                            <div style={{ flex: '1 1 160px', minWidth: 0 }}>
+                                                <a href={`/product/${item.product?.slug}`}
+                                                    style={{ color: '#fff', fontWeight: 600, fontSize: 15, lineHeight: 1.35, textDecoration: 'none', display: 'block', marginBottom: 5 }}>
+                                                    {item.product?.name}
                                                 </a>
-
-                                                {/* Name + variant (grows) */}
-                                                <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <a href={`/product/${item.product?.slug}`}
-                                                        style={{ color: '#fff', fontWeight: 600, fontSize: 15, lineHeight: 1.3, textDecoration: 'none', display: 'block', marginBottom: 4 }}>
-                                                        {item.product?.name}
-                                                    </a>
-                                                    {item.variation_names && (
-                                                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>{item.variation_names}</span>
-                                                    )}
-                                                    {/* Unit price — shown on mobile below name */}
-                                                    <div className="d-md-none" style={{ marginTop: 6, fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
-                                                        {item.old_price > item.price && (
-                                                            <del style={{ marginRight: 6, opacity: 0.6 }}>{formatAmount(parseFloat(item.old_price))}</del>
-                                                        )}
-                                                        {formatAmount(parseFloat(item.price))} each
-                                                    </div>
-                                                </div>
-
-                                                {/* Unit price — desktop only */}
-                                                <div className="d-none d-md-block" style={{ minWidth: 80, textAlign: 'right' }}>
+                                                {item.variation_names && (
+                                                    <span style={{ display: 'inline-block', fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.06)', borderRadius: 4, padding: '2px 8px', marginBottom: 6 }}>
+                                                        {item.variation_names}
+                                                    </span>
+                                                )}
+                                                {/* Unit price on mobile */}
+                                                <div className="d-md-none" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
                                                     {item.old_price > item.price && (
-                                                        <del style={{ display: 'block', fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>
-                                                            {formatAmount(parseFloat(item.old_price))}
-                                                        </del>
+                                                        <del style={{ marginRight: 6 }}>{formatAmount(parseFloat(item.old_price))}</del>
                                                     )}
-                                                    <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
-                                                        {formatAmount(parseFloat(item.price))}
-                                                    </span>
+                                                    {formatAmount(parseFloat(item.price))} each
                                                 </div>
+                                            </div>
 
-                                                {/* Qty stepper */}
-                                                <div style={{ display: 'flex', alignItems: 'center', height: 38, borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)', overflow: 'hidden', flexShrink: 0 }}>
-                                                    <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                        disabled={updatingItems.has(item.id)}
-                                                        type="button"
-                                                        style={{ width: 38, height: 38, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-                                                    >−</button>
-                                                    <span style={{ minWidth: 34, textAlign: 'center', color: '#fff', fontWeight: 600, fontSize: 14, lineHeight: 1 }}>
-                                                        {item.quantity}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                        disabled={updatingItems.has(item.id) || (item.product?.stock != null && item.quantity >= item.product.stock)}
-                                                        type="button"
-                                                        style={{ width: 38, height: 38, border: 'none', background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-                                                    >+</button>
-                                                </div>
+                                            {/* Unit price desktop */}
+                                            <div className="d-none d-md-block" style={{ flex: '0 0 80px', textAlign: 'center' }}>
+                                                {item.old_price > item.price && (
+                                                    <del style={{ display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 2 }}>
+                                                        {formatAmount(parseFloat(item.old_price))}
+                                                    </del>
+                                                )}
+                                                <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                                                    {formatAmount(parseFloat(item.price))}
+                                                </span>
+                                            </div>
 
-                                                {/* Line total */}
-                                                <div style={{ minWidth: 72, textAlign: 'right', fontWeight: 700, fontSize: 15, color: 'var(--base-color)', flexShrink: 0 }}>
-                                                    {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
-                                                </div>
+                                            {/* Qty stepper */}
+                                            <div style={{ flex: '0 0 120px', display: 'flex', alignItems: 'center', justifyContent: 'center', height: 40, borderRadius: 20, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', overflow: 'hidden' }}>
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                    disabled={updatingItems.has(item.id)}
+                                                    type="button"
+                                                    style={{ width: 40, height: 40, border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.6)', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s' }}
+                                                    onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                                                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                                                >−</button>
+                                                <span style={{ flex: 1, textAlign: 'center', color: '#fff', fontWeight: 700, fontSize: 14 }}>
+                                                    {updatingItems.has(item.id) ? '…' : item.quantity}
+                                                </span>
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    disabled={updatingItems.has(item.id) || (item.product?.stock != null && item.quantity >= item.product.stock)}
+                                                    type="button"
+                                                    style={{ width: 40, height: 40, border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.6)', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s' }}
+                                                    onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                                                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                                                >+</button>
+                                            </div>
 
-                                                {/* Remove */}
-                                                <button onClick={() => removeItem(item.id)} disabled={updatingItems.has(item.id)}
-                                                    style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: 20, lineHeight: 1, cursor: 'pointer', padding: '4px 0 4px 8px', flexShrink: 0, transition: 'color 0.2s' }}
-                                                    onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
-                                                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}>
-                                                    <i className="feather icon-feather-trash-2" style={{ fontSize: 16 }}></i>
-                                                </button>
+                                            {/* Line total */}
+                                            <div style={{ flex: '0 0 80px', textAlign: 'right', fontWeight: 700, fontSize: 16, color: 'var(--base-color,#c9a96e)' }}>
+                                                {formatAmount(parseFloat(item.subtotal || (item.price * item.quantity)))}
+                                            </div>
+
+                                            {/* Remove */}
+                                            <button
+                                                onClick={() => removeItem(item.id)}
+                                                disabled={updatingItems.has(item.id)}
+                                                type="button"
+                                                title="Remove item"
+                                                style={{ flex: '0 0 36px', width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease', padding: 0 }}
+                                                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239,68,68,0.3)'; (e.currentTarget as HTMLButtonElement).style.color = '#f87171'; }}
+                                                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.35)'; }}
+                                            >
+                                                <i className="feather icon-feather-x" style={{ fontSize: 13 }}></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* ── Coupon + Continue Shopping ── */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginTop: 28, flexWrap: 'wrap' }}>
+                                <div style={{ flex: '1 1 280px', maxWidth: 380 }}>
+                                    <div style={{ display: 'flex', height: 48, borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', overflow: 'hidden' }}>
+                                        <input
+                                            autoComplete="off"
+                                            data-form-type="other"
+                                            placeholder="Have a voucher code?"
+                                            type="text"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), applyCoupon())}
+                                            style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#fff', fontSize: 13, padding: '0 16px' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={applyCoupon}
+                                            style={{ padding: '0 20px', background: 'rgba(201,169,110,0.12)', border: 'none', borderLeft: '1px solid rgba(255,255,255,0.08)', color: 'var(--base-color,#c9a96e)', fontWeight: 700, fontSize: 12, letterSpacing: '1px', textTransform: 'uppercase', cursor: 'pointer', transition: 'background 0.2s', whiteSpace: 'nowrap' }}
+                                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(201,169,110,0.22)')}
+                                            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(201,169,110,0.12)')}
+                                        >Apply</button>
+                                    </div>
+                                    {couponMessage && (
+                                        <p style={{ margin: '8px 0 0', fontSize: 12, fontWeight: 500, color: couponDiscount > 0 ? 'var(--base-color,#c9a96e)' : '#f87171', display: 'flex', alignItems: 'center', gap: 5 }}>
+                                            <i className={`feather ${couponDiscount > 0 ? 'icon-feather-check-circle' : 'icon-feather-alert-circle'}`} style={{ fontSize: 13 }}></i>
+                                            {couponMessage}
+                                        </p>
+                                    )}
+                                </div>
+                                <a href="/shop" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 600, textDecoration: 'none', transition: 'color 0.2s' }}
+                                    onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                                    Continue Shopping
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* ── RIGHT: Order Summary ── */}
+                        <div style={{ position: 'sticky', top: 100 }}>
+                            <div style={{
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.09)',
+                                borderRadius: 18,
+                                overflow: 'hidden',
+                            }}>
+                                {/* Free shipping progress */}
+                                {freeShippingThreshold > 0 && (() => {
+                                    const remaining = freeShippingThreshold - subtotal;
+                                    const pct = Math.min((subtotal / freeShippingThreshold) * 100, 100);
+                                    return (
+                                        <div style={{ padding: '18px 24px', background: remaining > 0 ? 'rgba(201,169,110,0.06)' : 'rgba(34,197,94,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                                <i className={`feather ${remaining > 0 ? 'icon-feather-truck' : 'icon-feather-check-circle'}`} style={{ fontSize: 14, color: remaining > 0 ? 'var(--base-color,#c9a96e)' : '#4ade80' }}></i>
+                                                <span style={{ fontSize: 12, fontWeight: 600, color: remaining > 0 ? 'rgba(255,255,255,0.7)' : '#4ade80' }}>
+                                                    {remaining > 0
+                                                        ? <span>Add <strong style={{ color: 'var(--base-color,#c9a96e)' }}>{formatAmount(remaining)}</strong> more for free delivery</span>
+                                                        : 'Free delivery unlocked!'
+                                                    }
+                                                </span>
+                                            </div>
+                                            <div style={{ height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
+                                                <div style={{ height: '100%', width: `${pct}%`, background: remaining > 0 ? 'var(--base-color,#c9a96e)' : '#4ade80', borderRadius: 99, transition: 'width 0.5s ease' }} />
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+
+                                <div style={{ padding: '24px 24px 0' }}>
+                                    <h2 style={{ fontFamily: 'var(--primary-font,serif)', color: '#fff', fontSize: 20, fontWeight: 700, margin: '0 0 20px', letterSpacing: '-0.3px' }}>Order Summary</h2>
+
+                                    {/* Line rows */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Subtotal ({cartItems.length} items)</span>
+                                            <span style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{formatAmount(subtotal)}</span>
+                                        </div>
+                                        {totalTax > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Tax</span>
+                                                <span style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{formatAmount(totalTax)}</span>
+                                            </div>
+                                        )}
+                                        {couponDiscount > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Discount</span>
+                                                <span style={{ fontSize: 14, fontWeight: 600, color: '#4ade80' }}>−{formatAmount(couponDiscount)}</span>
+                                            </div>
+                                        )}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Shipping</span>
+                                            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>Calculated at checkout</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '20px 0' }} />
+
+                                    {/* Grand total */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
+                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', fontFamily: 'var(--primary-font,serif)' }}>Total</span>
+                                        <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--base-color,#c9a96e)', letterSpacing: '-0.5px' }}>{formatAmount(grandTotal)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Checkout button */}
+                                <div style={{ padding: '0 24px 24px' }}>
+                                    <a
+                                        href="/checkout"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                                            width: '100%', height: 52,
+                                            background: 'var(--base-color,#c9a96e)', color: '#0a0906',
+                                            borderRadius: 10, fontWeight: 700, fontSize: 13, letterSpacing: '1.5px',
+                                            textTransform: 'uppercase', textDecoration: 'none',
+                                            boxShadow: '0 6px 28px rgba(201,169,110,0.30)',
+                                            transition: 'background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease',
+                                        }}
+                                        onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = '#b8924f'; el.style.boxShadow = '0 8px 36px rgba(201,169,110,0.45)'; el.style.transform = 'translateY(-1px)'; }}
+                                        onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = 'var(--base-color,#c9a96e)'; el.style.boxShadow = '0 6px 28px rgba(201,169,110,0.30)'; el.style.transform = 'translateY(0)'; }}
+                                    >
+                                        Proceed to Checkout
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                    </a>
+
+                                    {/* Trust badges */}
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 16 }}>
+                                        {[
+                                            { icon: 'icon-feather-lock', label: 'Secure Payment' },
+                                            { icon: 'icon-feather-refresh-cw', label: 'Easy Returns' },
+                                            { icon: 'icon-feather-headphones', label: '24/7 Support' },
+                                        ].map(b => (
+                                            <div key={b.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '10px 4px', background: 'rgba(255,255,255,0.03)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <i className={`feather ${b.icon}`} style={{ fontSize: 14, color: 'var(--base-color,#c9a96e)' }}></i>
+                                                <span style={{ fontSize: 9.5, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textAlign: 'center', lineHeight: 1.3, letterSpacing: '0.3px' }}>{b.label}</span>
                                             </div>
                                         ))}
                                     </div>
-
-                                    {/* ── Coupon + Continue Shopping ── */}
-                                    <div className="row mt-30px align-items-center">
-                                        <div className="col-12 col-md-8 col-xl-7">
-                                            <div className="coupon-code-panel">
-                                                <input
-                                                    autoComplete="off"
-                                                    data-form-type="other"
-                                                    placeholder="Have a voucher?"
-                                                    type="text"
-                                                    value={couponCode}
-                                                    onChange={(e) => setCouponCode(e.target.value)}
-                                                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), applyCoupon())}
-                                                />
-                                                <button type="button" className="btn btn-small btn-round-edge btn-white fw-700 text-uppercase" onClick={applyCoupon} style={{ paddingLeft: '25px', paddingRight: '25px' }}>Apply</button>
-                                            </div>
-                                            {couponMessage && <p className={`fs-12 mt-12px mb-0 fw-500 ${couponDiscount > 0 ? 'text-base-color' : 'text-red'}`} style={{ letterSpacing: '0.3px' }}><i className={`feather ${couponDiscount > 0 ? 'icon-feather-check-circle' : 'icon-feather-alert-circle'} me-6px`}></i>{couponMessage}</p>}
-                                        </div>
-                                        <div className="col-12 col-md-4 col-xl-5 text-start text-md-end mt-20px mt-md-0">
-                                            <a className="btn btn-link btn-extra-large text-white text-transform-none icon-hover-push-left" href="/shop" style={{ padding: 0, textDecoration: 'none' }}>
-                                                <i className="feather icon-feather-arrow-left me-8px fs-16"></i>
-                                                <span className="fw-600">Continue Shopping</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="col-lg-4">
-                                    <div className="dark-card-bg border-radius-6px p-50px xl-p-30px lg-p-25px xs-p-20px ui-panel ui-panel-lg">
-
-                                        {/* Free shipping progress bar */}
-                                        {freeShippingThreshold > 0 && (() => {
-                                            const remaining = freeShippingThreshold - subtotal;
-                                            const pct = Math.min((subtotal / freeShippingThreshold) * 100, 100);
-                                            return (
-                                                <div className="mb-25px pb-25px" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                                                    {remaining > 0 ? (
-                                                        <p className="fs-13 text-white mb-10px" style={{ opacity: 0.8 }}>
-                                                            <i className="feather icon-feather-truck me-8px" style={{ color: 'var(--base-color)' }}></i>
-                                                            Add <strong style={{ color: 'var(--base-color)' }}>{formatAmount(remaining)}</strong> more for free delivery
-                                                        </p>
-                                                    ) : (
-                                                        <p className="fs-13 fw-600 mb-10px" style={{ color: 'var(--base-color)' }}>
-                                                            <i className="feather icon-feather-check-circle me-8px"></i>
-                                                            You've unlocked free delivery!
-                                                        </p>
-                                                    )}
-                                                    <div style={{ height: 5, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
-                                                        <div style={{ height: '100%', width: `${pct}%`, background: 'var(--base-color)', borderRadius: 99, transition: 'width 0.4s ease' }} />
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
-
-                                        <span className="fs-26 alt-font fw-600 text-white mb-5px d-block">Cart totals</span>
-                                        <table className="w-100 total-price-table">
-                                            <tbody>
-                                                <tr>
-                                                    <th className="fw-600 text-white alt-font">Subtotal</th>
-                                                    <td className="text-white fw-600 text-end">{formatAmount(subtotal)}</td>
-                                                </tr>
-                                                {(() => {
-                                                    const totalTax = cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0);
-                                                    return totalTax > 0 ? (
-                                                        <tr>
-                                                            <th className="fw-600 text-white alt-font">Tax</th>
-                                                            <td className="text-white fw-600 text-end">{formatAmount(totalTax)}</td>
-                                                        </tr>
-                                                    ) : null;
-                                                })()}
-                                                {couponDiscount > 0 && (
-                                                    <tr>
-                                                        <th className="fw-600 text-white alt-font">Discount</th>
-                                                        <td className="text-base-color fw-600 text-end">-{formatAmount(couponDiscount)}</td>
-                                                    </tr>
-                                                )}
-                                                <tr>
-                                                    <th className="fw-600 text-white alt-font">Shipping</th>
-                                                    <td className="text-white fw-500 text-end fs-13 opacity-7">Calculated at checkout</td>
-                                                </tr>
-                                                <tr className="total-amount">
-                                                    <th className="fw-600 text-white alt-font pb-0">Total</th>
-                                                    <td className="pb-0 text-end" data-title="Total">
-                                                        <h6 className="d-block fw-700 mb-0 text-white alt-font">
-                                                            {formatAmount(Math.max(
-                                                                subtotal
-                                                                + cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0)
-                                                                - couponDiscount,
-                                                                0
-                                                            ))}
-                                                        </h6>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <a className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-25px" href="/checkout">
-                                            <span>
-                                                <span className="btn-double-text" data-text="Proceed to checkout">Proceed to checkout</span>
-                                            </span>
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
-
-                            {/* Upsell — You might also like */}
-                            {suggestions.length > 0 && (
-                                <div style={{ marginTop: 56, paddingTop: 40, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                                    <p style={{ margin: '0 0 24px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}>You might also like</p>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
-                                        {suggestions.map((product: any) => {
-                                            const img = (product.cover || product.image || '').trim() || '/images/demo-decor-store-product-01.jpg';
-                                            const price = product.discounted_price || product.currency_price || '';
-                                            return (
-                                                <a key={product.id} href={`/product/${product.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                                                    <div style={{ background: 'rgba(15,15,25,0.95)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.2s' }}
-                                                        onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(197,160,89,0.3)')}
-                                                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                                                        <div style={{ aspectRatio: '4/3', overflow: 'hidden', background: 'rgba(255,255,255,0.03)' }}>
-                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                            <img src={img} alt={product.name}
-                                                                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.35s ease' }}
-                                                                onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.05)'; }}
-                                                                onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)'; }}
-                                                                onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/demo-decor-store-product-01.jpg'; }} />
-                                                        </div>
-                                                        <div style={{ padding: '14px 16px' }}>
-                                                            <p style={{ margin: '0 0 6px', color: '#fff', fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
-                                                            {price && <p style={{ margin: 0, color: 'var(--base-color)', fontWeight: 700, fontSize: 13 }}>{price}</p>}
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-                            </>
-                        ) : (
-                            <div>
-                                {/* Empty state */}
-                                <div className="text-center py-60px md-py-40px text-white">
-                                    <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-                                        <i className="bi bi-cart-x" style={{ fontSize: 40, color: 'rgba(255,255,255,0.2)' }}></i>
-                                    </div>
-                                    <h2 className="alt-font fw-600 mb-15px">Your cart is empty</h2>
-                                    <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', marginBottom: 32, maxWidth: 380, margin: '0 auto 32px' }}>
-                                        Looks like you haven't added anything yet. Explore our collections to find something you'll love.
-                                    </p>
-                                    <a href="/shop" className="btn btn-base-color btn-large btn-round-edge px-45px btn-box-shadow">
-                                        <span>
-                                            <span className="btn-double-text" data-text="Start Shopping">Start Shopping</span>
-                                        </span>
-                                    </a>
-                                </div>
-
-                                {/* Product suggestions */}
-                                {suggestions.length > 0 && (
-                                    <div style={{ marginTop: 48, paddingTop: 48, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                                        <p style={{ margin: '0 0 24px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}>You might like</p>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
-                                            {suggestions.map((product: any) => {
-                                                const img = (product.cover || product.image || '').trim() || '/images/demo-decor-store-product-01.jpg';
-                                                const price = product.discounted_price || product.currency_price || '';
-                                                return (
-                                                    <a key={product.id} href={`/product/${product.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                                                        <div style={{ background: 'rgba(15,15,25,0.95)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.2s' }}
-                                                            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(197,160,89,0.3)')}
-                                                            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                                                            <div style={{ aspectRatio: '4/3', overflow: 'hidden', background: 'rgba(255,255,255,0.03)' }}>
-                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                                <img src={img} alt={product.name}
-                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.35s ease' }}
-                                                                    onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.05)'; }}
-                                                                    onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)'; }}
-                                                                    onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/demo-decor-store-product-01.jpg'; }} />
-                                                            </div>
-                                                            <div style={{ padding: '14px 16px' }}>
-                                                                <p style={{ margin: '0 0 6px', color: '#fff', fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
-                                                                {price && <p style={{ margin: 0, color: 'var(--base-color)', fontWeight: 700, fontSize: 13 }}>{price}</p>}
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                        </div>
                     </div>
-                </div>
-            </section>
+                ) : (
+                    /* ── Empty cart ── */
+                    <div style={{ textAlign: 'center', paddingTop: 60, paddingBottom: 60 }}>
+                        <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+                            <i className="feather icon-feather-shopping-cart" style={{ fontSize: 38, color: 'rgba(201,169,110,0.4)' }}></i>
+                        </div>
+                        <h2 style={{ fontFamily: 'var(--primary-font,serif)', color: '#fff', fontWeight: 700, fontSize: 'clamp(22px,3vw,32px)', marginBottom: 14 }}>Your cart is empty</h2>
+                        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', maxWidth: 380, margin: '0 auto 32px', lineHeight: 1.6 }}>
+                            Looks like you haven't added anything yet. Explore our collections to find something you'll love.
+                        </p>
+                        <a
+                            href="/shop"
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 10,
+                                background: 'var(--base-color,#c9a96e)', color: '#0a0906',
+                                padding: '14px 36px', borderRadius: 8, fontWeight: 700,
+                                fontSize: 12, letterSpacing: '2px', textTransform: 'uppercase',
+                                textDecoration: 'none', boxShadow: '0 4px 24px rgba(201,169,110,0.3)',
+                                transition: 'all 0.25s ease',
+                            }}
+                            onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = '#b8924f'; el.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = 'var(--base-color,#c9a96e)'; el.style.transform = 'translateY(0)'; }}
+                        >
+                            Explore Collection
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                )}
+
+                {/* ── You might also like ── */}
+                {suggestions.length > 0 && (
+                    <div style={{ marginTop: 64, paddingTop: 48, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
+                            <span style={{ display: 'block', width: 24, height: 1, background: 'var(--base-color,#c9a96e)' }} />
+                            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--base-color,#c9a96e)' }}>You might also like</span>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 18 }}>
+                            {suggestions.map((product: any) => <SuggestionCard key={product.id} product={product} />)}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <style>{`
+                @media (max-width: 900px) {
+                    .cart-layout { grid-template-columns: 1fr !important; }
+                }
+                @media (max-width: 640px) {
+                    .d-none.d-md-grid { display: none !important; }
+                    .d-md-none { display: block !important; }
+                    .d-none.d-md-block { display: none !important; }
+                }
+            `}</style>
         </main>
     );
 }

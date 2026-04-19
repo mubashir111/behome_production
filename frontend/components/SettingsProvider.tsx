@@ -60,10 +60,13 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
             }
         } catch {}
 
+        const controller = new AbortController();
+
         async function fetchSettings() {
             try {
                 const res = await fetch(`/api/frontend/setting`, {
                     headers: { 'Accept': 'application/json' },
+                    signal: controller.signal,
                 });
                 if (!res.ok) return;
                 const json = await res.json();
@@ -84,12 +87,14 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
 
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({ currency, settings: data }));
                 setState(next);
-            } catch (error) {
+            } catch (error: any) {
+                if (error?.name === 'AbortError') return;
                 console.error('[SETTINGS_FETCH_ERROR]', error);
                 setState(prev => ({ ...prev, loading: false }));
             }
         }
         fetchSettings();
+        return () => controller.abort();
     }, []);
 
     return (
