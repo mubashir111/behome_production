@@ -39,11 +39,20 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
     const [cardHovered, setCardHovered] = useState(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Pick the active promotion card in sync with the slide, cycling around
+    // Independent promo card auto-cycle
+    const [promoIndex, setPromoIndex] = useState(0);
+    const promoRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (featuredPromotions.length <= 1) return;
+        promoRef.current = setInterval(() => {
+            setPromoIndex(i => (i + 1) % featuredPromotions.length);
+        }, 4000);
+        return () => { if (promoRef.current) clearInterval(promoRef.current); };
+    }, [featuredPromotions.length]);
+
     const activePromo: FeaturedPromotion | null =
-        featuredPromotions.length > 0
-            ? featuredPromotions[currentIndex % featuredPromotions.length]
-            : null;
+        featuredPromotions.length > 0 ? featuredPromotions[promoIndex] : null;
 
     const goToSlide = useCallback((index: number) => {
         if (isAnimating) return;
@@ -544,10 +553,10 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                                             <div
                                                 key={i}
                                                 style={{
-                                                    width: i === (currentIndex % featuredPromotions.length) ? '20px' : '5px',
+                                                    width: i === promoIndex ? '20px' : '5px',
                                                     height: '5px',
                                                     borderRadius: '3px',
-                                                    background: i === (currentIndex % featuredPromotions.length)
+                                                    background: i === promoIndex
                                                         ? 'var(--base-color,#c9a96e)'
                                                         : 'rgba(255,255,255,0.20)',
                                                     transition: 'all 0.4s ease',
@@ -599,6 +608,81 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* ── Mobile-only compact promo strip (above bottom bar) ── */}
+            {showPromoCard && (
+                <a
+                    href={activePromo?.link || '/shop'}
+                    className="hero-mobile-promo"
+                    style={{
+                        position: 'absolute',
+                        bottom: '76px',
+                        left: 'clamp(16px,5vw,40px)',
+                        right: 'clamp(16px,5vw,40px)',
+                        zIndex: 8,
+                        display: 'none',
+                        alignItems: 'center',
+                        gap: '12px',
+                        background: 'rgba(10,9,7,0.72)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(201,169,110,0.25)',
+                        borderRadius: '12px',
+                        padding: '10px 14px',
+                        textDecoration: 'none',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {/* Thumbnail */}
+                    <div style={{ flexShrink: 0, width: 48, height: 48, borderRadius: 8, overflow: 'hidden', position: 'relative', background: 'rgba(201,169,110,0.08)' }}>
+                        {activePromo?.image ? (
+                            <Image src={activePromo.image} alt={activePromo.name} fill unoptimized style={{ objectFit: 'cover' }} />
+                        ) : (
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <span style={{ color: 'rgba(201,169,110,0.5)', fontSize: 20, fontWeight: 800 }}>
+                                    {activePromo?.name?.charAt(0) ?? 'B'}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                    {/* Text */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ color: 'rgba(201,169,110,1)', fontSize: 9, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 2 }}>
+                            {activePromo?.badge_text || 'Sale'}
+                        </div>
+                        <div style={{ color: '#fff', fontSize: 13, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {activePromo?.name}
+                        </div>
+                        {activePromo?.discounted_price && (
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 2 }}>
+                                <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: 13, fontWeight: 800 }}>{activePromo.discounted_price}</span>
+                                {activePromo.currency_price && (
+                                    <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, textDecoration: 'line-through' }}>{activePromo.currency_price}</span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    {/* Arrow */}
+                    <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: '50%', background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--base-color,#c9a96e)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                    {/* Dot indicators */}
+                    {featuredPromotions.length > 1 && (
+                        <div style={{ position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3 }}>
+                            {featuredPromotions.map((_, i) => (
+                                <div key={i} style={{
+                                    width: i === promoIndex ? 12 : 4,
+                                    height: 3, borderRadius: 2,
+                                    background: i === promoIndex ? 'var(--base-color,#c9a96e)' : 'rgba(255,255,255,0.25)',
+                                    transition: 'all 0.4s ease',
+                                }} />
+                            ))}
+                        </div>
+                    )}
+                </a>
             )}
 
             {/* ── Bottom Bar: Left (arrows + dots) | Center (scroll) | Right (counter) ── */}
@@ -714,6 +798,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                         align-items: flex-end !important;
                     }
                     .hero-slider-right-panel { display: none !important; }
+                    .hero-mobile-promo { display: flex !important; }
                     .hero-slider-text-block h1 {
                         font-size: clamp(30px, 9vw, 44px) !important;
                         margin-bottom: 12px !important;

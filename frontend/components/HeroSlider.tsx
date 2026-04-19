@@ -15,15 +15,40 @@ interface Slide {
     status: number;
 }
 
-interface Props {
-    slides: Slide[];
+interface PromoCard {
+    name: string;
+    subtitle: string | null;
+    badge_text: string | null;
+    description: string | null;
+    link: string;
+    image: string | null;
+    discount_pct: number | null;
+    discounted_price: string | null;
+    currency_price: string | null;
 }
 
-export default function HeroSlider({ slides }: Props) {
+interface Props {
+    slides: Slide[];
+    featuredPromotions?: PromoCard[];
+}
+
+export default function HeroSlider({ slides, featuredPromotions = [] }: Props) {
     const activeSlides = slides.filter(s => s.status === 5);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Promo card auto-slide
+    const [promoIndex, setPromoIndex] = useState(0);
+    const promoRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (featuredPromotions.length <= 1) return;
+        promoRef.current = setInterval(() => {
+            setPromoIndex(i => (i + 1) % featuredPromotions.length);
+        }, 4000);
+        return () => { if (promoRef.current) clearInterval(promoRef.current); };
+    }, [featuredPromotions.length]);
 
     const goToSlide = useCallback((index: number) => {
         if (isAnimating) return;
@@ -258,172 +283,144 @@ export default function HeroSlider({ slides }: Props) {
                             </div>
                         </div>
 
-                        {/* Right — Shop by Room */}
+                        {/* Right — Promo Cards (offer products) or Shop by Room fallback */}
                         <div
                             className="hero-slider-right-panel"
                             style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                gap: '0',
                                 transition: 'all 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.15s',
                                 transform: index === currentIndex ? 'translateX(0)' : 'translateX(40px)',
                                 opacity: index === currentIndex ? 1 : 0,
-                                background: 'rgba(255,255,255,0.06)',
-                                backdropFilter: 'blur(20px)',
-                                border: '1px solid rgba(255,255,255,0.10)',
                                 borderRadius: '12px',
                                 overflow: 'hidden',
+                                position: 'relative',
                             }}
                         >
-                            {/* Panel header */}
-                            <div style={{
-                                padding: '18px 24px 14px',
-                                borderBottom: '1px solid rgba(255,255,255,0.08)',
-                            }}>
+                            {featuredPromotions.length > 0 ? (
+                                /* ── Promo slider panel ── */
+                                (() => {
+                                    const promo = featuredPromotions[promoIndex];
+                                    return (
+                                        <div style={{
+                                            borderRadius: '12px', overflow: 'hidden',
+                                            border: '1px solid rgba(255,255,255,0.10)',
+                                            background: '#111',
+                                            display: 'flex', flexDirection: 'column',
+                                            minHeight: '320px',
+                                        }}>
+                                            {/* Image area */}
+                                            <div style={{ position: 'relative', flex: 1, minHeight: '220px' }}>
+                                                {promo.image ? (
+                                                    <Image
+                                                        key={promo.link}
+                                                        src={promo.image}
+                                                        alt={promo.name}
+                                                        fill unoptimized
+                                                        style={{ objectFit: 'cover', objectPosition: 'center', transition: 'opacity 0.6s ease' }}
+                                                    />
+                                                ) : (
+                                                    <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.04)' }} />
+                                                )}
+                                                <div style={{
+                                                    position: 'absolute', inset: 0,
+                                                    background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)',
+                                                }} />
+                                                {promo.discount_pct && (
+                                                    <div style={{
+                                                        position: 'absolute', top: 12, right: 12,
+                                                        background: 'var(--base-color,#c9a96e)', color: '#0d0d0d',
+                                                        fontSize: '10px', fontWeight: '800', letterSpacing: '0.5px',
+                                                        padding: '4px 9px', borderRadius: '4px',
+                                                    }}>
+                                                        {promo.discount_pct}% OFF
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {/* Info area */}
+                                            <div style={{ padding: '16px 18px 14px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)' }}>
+                                                {promo.badge_text && (
+                                                    <span style={{
+                                                        fontSize: '9px', fontWeight: '700', letterSpacing: '3px',
+                                                        textTransform: 'uppercase', color: 'var(--base-color,#c9a96e)',
+                                                        display: 'block', marginBottom: '4px',
+                                                    }}>{promo.badge_text}</span>
+                                                )}
+                                                <a href={promo.link} style={{
+                                                    color: '#fff', fontWeight: '700', fontSize: '15px',
+                                                    textDecoration: 'none', display: 'block', marginBottom: '6px',
+                                                    lineHeight: 1.3,
+                                                }}>{promo.name}</a>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                    {promo.discounted_price && (
+                                                        <span style={{ color: 'var(--base-color,#c9a96e)', fontWeight: '800', fontSize: '16px' }}>
+                                                            {promo.discounted_price}
+                                                        </span>
+                                                    )}
+                                                    {promo.currency_price && promo.discounted_price && (
+                                                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', textDecoration: 'line-through' }}>
+                                                            {promo.currency_price}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {/* Dots */}
+                                                {featuredPromotions.length > 1 && (
+                                                    <div style={{ display: 'flex', gap: 5, marginTop: 10 }}>
+                                                        {featuredPromotions.map((_, di) => (
+                                                            <button key={di}
+                                                                onClick={() => setPromoIndex(di)}
+                                                                style={{
+                                                                    width: di === promoIndex ? '18px' : '6px', height: '6px',
+                                                                    borderRadius: '3px', border: 'none', padding: 0, cursor: 'pointer',
+                                                                    background: di === promoIndex ? 'var(--base-color,#c9a96e)' : 'rgba(255,255,255,0.3)',
+                                                                    transition: 'all 0.3s ease',
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })()
+                            ) : (
+                                /* ── Shop by Room fallback ── */
                                 <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
+                                    display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                                    background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(20px)',
+                                    border: '1px solid rgba(255,255,255,0.10)', borderRadius: '12px', overflow: 'hidden', height: '100%',
                                 }}>
-                                    <span style={{
-                                        display: 'block',
-                                        width: '20px',
-                                        height: '1px',
-                                        background: 'var(--base-color, #c9a96e)',
-                                    }} />
-                                    <span style={{
-                                        color: 'var(--base-color, #c9a96e)',
-                                        fontSize: '10px',
-                                        fontWeight: '700',
-                                        letterSpacing: '3px',
-                                        textTransform: 'uppercase',
-                                    }}>
-                                        Shop by Room
-                                    </span>
+                                    <div style={{ padding: '18px 24px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--base-color, #c9a96e)' }} />
+                                            <span style={{ color: 'var(--base-color, #c9a96e)', fontSize: '10px', fontWeight: '700', letterSpacing: '3px', textTransform: 'uppercase' }}>
+                                                Shop by Room
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {[
+                                        { label: 'Living Room', sub: 'Sofas, tables & accents', href: '/shop?category=living-room' },
+                                        { label: 'Bedroom', sub: 'Beds, wardrobes & lighting', href: '/shop?category=bedroom' },
+                                        { label: 'Dining', sub: 'Tables, chairs & sideboards', href: '/shop?category=dining' },
+                                        { label: 'Lighting', sub: 'Pendants, floor & table lamps', href: '/shop?category=lighting' },
+                                        { label: 'Decor & Art', sub: 'Objects, rugs & wall art', href: '/shop?category=decor' },
+                                    ].map((cat, i, arr) => (
+                                        <a key={cat.label} href={cat.href} style={{
+                                            display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 24px',
+                                            borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
+                                            textDecoration: 'none', transition: 'background 0.25s ease',
+                                        }}
+                                        onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(201,169,110,0.10)'; }}
+                                        onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; }}>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '600', marginBottom: '2px' }}>{cat.label}</div>
+                                                <div style={{ color: 'rgba(255,255,255,0.42)', fontSize: '11px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.sub}</div>
+                                            </div>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M9 18l6-6-6-6" />
+                                            </svg>
+                                        </a>
+                                    ))}
                                 </div>
-                            </div>
-
-                            {/* Category rows */}
-                            {[
-                                {
-                                    label: 'Living Room',
-                                    sub: 'Sofas, tables & accents',
-                                    href: '/shop?category=living-room',
-                                    icon: (
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                                            <polyline points="9 22 9 12 15 12 15 22" />
-                                        </svg>
-                                    ),
-                                },
-                                {
-                                    label: 'Bedroom',
-                                    sub: 'Beds, wardrobes & lighting',
-                                    href: '/shop?category=bedroom',
-                                    icon: (
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M2 4v16M2 8h18a2 2 0 012 2v10" />
-                                            <path d="M2 17h20M6 8v9" />
-                                        </svg>
-                                    ),
-                                },
-                                {
-                                    label: 'Dining',
-                                    sub: 'Tables, chairs & sideboards',
-                                    href: '/shop?category=dining',
-                                    icon: (
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2v0a5 5 0 00-5 5v6h5zm0 0v7" />
-                                        </svg>
-                                    ),
-                                },
-                                {
-                                    label: 'Lighting',
-                                    sub: 'Pendants, floor & table lamps',
-                                    href: '/shop?category=lighting',
-                                    icon: (
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="12" y1="1" x2="12" y2="3" />
-                                            <path d="M4.22 4.22l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M12 21v2M17.36 6.64l1.42-1.42" />
-                                            <path d="M12 6a6 6 0 000 12v0" />
-                                            <line x1="12" y1="18" x2="12" y2="18" />
-                                        </svg>
-                                    ),
-                                },
-                                {
-                                    label: 'Decor & Art',
-                                    sub: 'Objects, rugs & wall art',
-                                    href: '/shop?category=decor',
-                                    icon: (
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32" />
-                                        </svg>
-                                    ),
-                                },
-                            ].map((cat, i, arr) => (
-                                <a
-                                    key={cat.label}
-                                    href={cat.href}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '14px',
-                                        padding: '14px 24px',
-                                        borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
-                                        textDecoration: 'none',
-                                        transition: 'background 0.25s ease',
-                                        cursor: 'pointer',
-                                    }}
-                                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(201,169,110,0.10)'; }}
-                                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; }}
-                                >
-                                    {/* Icon circle */}
-                                    <div style={{
-                                        width: '38px',
-                                        height: '38px',
-                                        borderRadius: '8px',
-                                        background: 'rgba(201,169,110,0.10)',
-                                        border: '1px solid rgba(201,169,110,0.20)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexShrink: 0,
-                                        color: 'var(--base-color, #c9a96e)',
-                                    }}>
-                                        {cat.icon}
-                                    </div>
-
-                                    {/* Text */}
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{
-                                            color: '#ffffff',
-                                            fontSize: '13px',
-                                            fontWeight: '600',
-                                            letterSpacing: '0.2px',
-                                            marginBottom: '2px',
-                                        }}>
-                                            {cat.label}
-                                        </div>
-                                        <div style={{
-                                            color: 'rgba(255,255,255,0.42)',
-                                            fontSize: '11px',
-                                            fontWeight: '400',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {cat.sub}
-                                        </div>
-                                    </div>
-
-                                    {/* Arrow */}
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                                        <path d="M9 18l6-6-6-6" />
-                                    </svg>
-                                </a>
-                            ))}
+                            )}
                         </div>
                     </div>
                 </div>
