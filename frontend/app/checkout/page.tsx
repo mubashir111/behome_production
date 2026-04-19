@@ -678,19 +678,22 @@ export default function Checkout() {
             <section className="page-shell page-shell-tight">
                 <div className="container">
                     {paymentCancelled && (
-                        <div style={{
-                            display: 'flex', alignItems: 'flex-start', gap: 12,
-                            background: 'rgba(234,179,8,0.12)', border: '1px solid rgba(234,179,8,0.35)',
-                            borderRadius: 10, padding: '14px 18px', marginBottom: 28,
+                        <div className="animate__animated animate__fadeInDown" style={{
+                            display: 'flex', alignItems: 'flex-start', gap: 15,
+                            background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.25)',
+                            borderRadius: 12, padding: '18px 22px', marginBottom: 35,
+                            backdropFilter: 'blur(10px)'
                         }}>
-                            <i className="bi bi-info-circle-fill" style={{ color: '#eab308', fontSize: 18, marginTop: 2, flexShrink: 0 }}></i>
+                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(234,179,8,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <i className="feather icon-feather-info" style={{ color: '#eab308', fontSize: 18 }}></i>
+                            </div>
                             <div style={{ flex: 1 }}>
-                                <p style={{ color: '#fef08a', fontWeight: 600, margin: '0 0 2px' }}>Payment cancelled — you were not charged.</p>
-                                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: 0 }}>
-                                    Your order details are still saved below. Review them and click <strong style={{ color: '#fff' }}>Place Order</strong> to try again, or choose a different payment method.
+                                <p className="mb-1 fw-700 fs-15" style={{ color: '#fbbf24' }}>Payment Status: Cancelled</p>
+                                <p className="mb-0 fs-14 opacity-7" style={{ color: '#fff', lineHeight: 1.5 }}>
+                                    Your payment was cancelled and no charges were made. Your order details are saved below — simply click <strong className="text-white">Place Order</strong> to try again.
                                 </p>
                             </div>
-                            <button onClick={() => setPaymentCancelled(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 18, cursor: 'pointer', padding: 0, lineHeight: 1 }}>×</button>
+                            <button onClick={() => setPaymentCancelled(false)} className="bg-transparent border-0 opacity-4 hover-opacity-100 text-white p-0 fs-20" style={{ lineHeight: 1 }}>&times;</button>
                         </div>
                     )}
                     <form onSubmit={placeOrder}>
@@ -713,30 +716,29 @@ export default function Checkout() {
                                         </select>
                                     </div>
                                 )}
-                                <div className="row">
-                                    <div className="col-md-6 mb-20px">
-                                        <label className="mb-10px">First name <span className="text-red">*</span></label>
-                                        <input name="first_name" value={formData.first_name} onChange={handleInputChange} className="border-radius-4px input-small" required type="text" />
+                                <div className="row g-4">
+                                    <div className="col-md-6">
+                                        <label className="mb-8px fs-14 fw-600 text-white">First name <span className="text-red">*</span></label>
+                                        <input name="first_name" value={formData.first_name} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white" required type="text" placeholder="John" />
                                     </div>
-                                    <div className="col-md-6 mb-20px">
-                                        <label className="mb-10px">Last name <span className="text-red">*</span></label>
-                                        <input name="last_name" value={formData.last_name} onChange={handleInputChange} className="border-radius-4px input-small" required type="text" />
+                                    <div className="col-md-6">
+                                        <label className="mb-8px fs-14 fw-600 text-white">Last name <span className="text-red">*</span></label>
+                                        <input name="last_name" value={formData.last_name} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white" required type="text" placeholder="Doe" />
                                     </div>
-                                    <div className="col-12 mb-20px">
-                                        <label className="mb-10px">Email address <span className="text-red">*</span></label>
-                                        <input name="email" value={formData.email} onChange={handleInputChange} className="border-radius-4px input-small" required type="email" />
+                                    <div className="col-12">
+                                        <label className="mb-8px fs-14 fw-600 text-white">Email address <span className="text-red">*</span></label>
+                                        <input name="email" value={formData.email} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white" required type="email" placeholder="john@example.com" />
                                     </div>
-                                    <div className="col-12 mb-20px">
-                                        <label className="mb-10px">Phone <span className="text-red">*</span></label>
-                                        <input name="phone" value={formData.phone} onChange={handleInputChange} className="border-radius-4px input-small" required type="text" />
+                                    <div className="col-12">
+                                        <label className="mb-8px fs-14 fw-600 text-white">Phone number <span className="text-red">*</span></label>
+                                        <div className="d-flex gap-2">
+                                            <input name="country_code" value={formData.country_code} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white w-25" placeholder="+971" type="text" />
+                                            <input name="phone" value={formData.phone} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white flex-grow-1" required type="text" placeholder="50 123 4567" />
+                                        </div>
                                     </div>
-                                    <div className="col-md-6 mb-20px">
-                                        <label className="mb-10px">Country code</label>
-                                        <input name="country_code" value={formData.country_code} onChange={handleInputChange} className="border-radius-4px input-small" placeholder="+44" type="text" />
-                                    </div>
-                                    <div className="col-md-6 mb-20px">
-                                        <label className="mb-10px">Country <span className="text-red">*</span></label>
-                                        <select name="country" value={formData.country} onChange={handleInputChange} className="border-radius-4px input-small" required>
+                                    <div className="col-12">
+                                        <label className="mb-8px fs-14 fw-600 text-white">Country / Region <span className="text-red">*</span></label>
+                                        <select name="country" value={formData.country} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white" required>
                                             {[
                                                 'United Arab Emirates',
                                                 'Saudi Arabia',
@@ -744,41 +746,32 @@ export default function Checkout() {
                                                 'Qatar',
                                                 'Bahrain',
                                                 'Oman',
-                                            ].map(c => <option key={c} value={c}>{c}</option>)}
+                                            ].map(c => <option key={c} value={c} style={{ background: '#111' }}>{c}</option>)}
                                         </select>
                                     </div>
-                                    <div className="col-12 mb-20px">
-                                        <label className="mb-10px">Street address <span className="text-red">*</span></label>
-                                        <input name="address" value={formData.address} onChange={handleInputChange} className="border-radius-4px input-small mb-10px" placeholder="House number and street name" required type="text" />
+                                    <div className="col-12">
+                                        <label className="mb-8px fs-14 fw-600 text-white">Street address <span className="text-red">*</span></label>
+                                        <input name="address" value={formData.address} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white" placeholder="House number and street name" required type="text" />
                                     </div>
-                                    <div className="col-md-6 mb-20px">
-                                        <label className="mb-10px">Town / City <span className="text-red">*</span></label>
-                                        <input name="city" value={formData.city} onChange={handleInputChange} className="border-radius-4px input-small" required type="text" />
+                                    <div className="col-md-6 text-align-middle">
+                                        <label className="mb-8px fs-14 fw-600 text-white">Town / City <span className="text-red">*</span></label>
+                                        <input name="city" value={formData.city} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white" required type="text" placeholder="Dubai" />
                                     </div>
-                                    <div className="col-md-6 mb-20px">
-                                        <label className="mb-10px">State</label>
-                                        <input name="state" value={formData.state} onChange={handleInputChange} className="border-radius-4px input-small" type="text" />
+                                    <div className="col-md-6">
+                                        <label className="mb-8px fs-14 fw-600 text-white">State</label>
+                                        <input name="state" value={formData.state} onChange={handleInputChange} className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white" type="text" placeholder="Dubai" />
                                     </div>
-                                    <div className="col-md-6 mb-20px">
-                                        <label className="mb-10px">ZIP <span className="text-red">*</span></label>
-                                        <input name="zip" value={formData.zip} onChange={handleInputChange} className="border-radius-4px input-small" required type="text" />
-                                    </div>
-                                    <div className="col-12 mb-20px">
-                                        <label className="mb-10px">Notes & details <span className="text-white opacity-5 fs-12">(optional)</span></label>
+                                    <div className="col-12">
+                                        <label className="mb-8px fs-14 fw-600 text-white">Notes & details <span className="text-white opacity-4 fw-400 fs-12 ms-1">(optional)</span></label>
                                         <textarea
                                             name="order_note"
                                             value={formData.order_note}
                                             onChange={handleInputChange}
-                                            className="border-radius-4px input-small"
-                                            rows={4}
+                                            className="border-radius-8px input-small bg-transparent border-color-transparent-white-light text-white"
+                                            rows={3}
                                             maxLength={700}
-                                            placeholder="Add delivery notes or order instructions"
+                                            placeholder="Notes about your order, e.g. special instructions for delivery."
                                         />
-                                        {formData.order_note.length > 600 && (
-                                            <p className="fs-11 mt-5px" style={{ color: formData.order_note.length >= 700 ? '#ef4444' : 'rgba(255,255,255,0.4)' }}>
-                                                {formData.order_note.length}/700
-                                            </p>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -935,65 +928,67 @@ export default function Checkout() {
 
                                     {/* Inline error panel */}
                                     {orderError && (
-                                        <div style={{
-                                            display: 'flex', alignItems: 'flex-start', gap: 12,
+                                        <div className="animate__animated animate__shakeX" style={{
+                                            display: 'flex', alignItems: 'flex-start', gap: 15,
                                             background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)',
-                                            borderRadius: 10, padding: '14px 16px', marginBottom: 16,
+                                            borderRadius: 12, padding: '16px 20px', marginBottom: 20,
                                         }}>
-                                            <i className="bi bi-exclamation-triangle-fill" style={{ color: '#f87171', fontSize: 16, marginTop: 2, flexShrink: 0 }}></i>
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(248,113,113,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                                                <i className="feather icon-feather-alert-triangle" style={{ color: '#f87171', fontSize: 16 }}></i>
+                                            </div>
                                             <div style={{ flex: 1 }}>
-                                                <p style={{ color: '#fca5a5', fontWeight: 600, margin: '0 0 2px', fontSize: 13 }}>
-                                                    {orderError.action === 'address' ? 'Address error' :
-                                                     orderError.action === 'payment' ? 'Payment error' :
-                                                     orderError.action === 'network' ? 'Connection error' : 'Order error'}
+                                                <p style={{ color: '#fca5a5', fontWeight: 700, margin: '0 0 4px', fontSize: 14 }}>
+                                                    {orderError.action.charAt(0).toUpperCase() + orderError.action.slice(1)} Error
                                                 </p>
-                                                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                                                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
                                                     {orderError.message}
                                                 </p>
-                                                {orderError.orderId && (
-                                                    <p style={{ margin: '6px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-                                                        Order reference: <strong style={{ color: 'rgba(255,255,255,0.6)' }}>#{orderError.orderId}</strong>
-                                                    </p>
-                                                )}
                                             </div>
-                                            <button onClick={() => setOrderError(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 18, cursor: 'pointer', padding: 0, lineHeight: 1, flexShrink: 0 }}>×</button>
+                                            <button onClick={() => setOrderError(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 22, cursor: 'pointer', padding: 0, lineHeight: 1 }}>&times;</button>
                                         </div>
                                     )}
 
                                     {/* T&C agreement */}
-                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 14, marginTop: 4 }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={agreedToTerms}
-                                            onChange={e => setAgreedToTerms(e.target.checked)}
-                                            style={{ marginTop: 3, flexShrink: 0, accentColor: 'var(--base-color)', width: 15, height: 15 }}
-                                        />
-                                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-                                            I have read and agree to the{' '}
-                                            <a href="/privacy-policy" target="_blank" style={{ color: 'var(--base-color)', textDecoration: 'none' }}>Privacy Policy</a>,{' '}
-                                            <a href="/shipping-policy" target="_blank" style={{ color: 'var(--base-color)', textDecoration: 'none' }}>Shipping Policy</a>, and{' '}
-                                            <a href="/returns-policy" target="_blank" style={{ color: 'var(--base-color)', textDecoration: 'none' }}>Returns Policy</a>.
-                                        </span>
-                                    </label>
+                                    <div className="d-flex align-items-start gap-12px mb-20px mt-10px">
+                                        <div className="position-relative d-flex align-items-center" style={{ marginTop: '2px' }}>
+                                            <input
+                                                type="checkbox"
+                                                id="tc-agree"
+                                                checked={agreedToTerms}
+                                                onChange={e => setAgreedToTerms(e.target.checked)}
+                                                className="visually-hidden"
+                                            />
+                                            <label htmlFor="tc-agree" className="d-flex align-items-center justify-content-center border-radius-4px transition-all" style={{ width: 18, height: 18, border: `1.5px solid ${agreedToTerms ? 'var(--base-color)' : 'rgba(255,255,255,0.2)'}`, background: agreedToTerms ? 'var(--base-color)' : 'transparent', cursor: 'pointer' }}>
+                                                {agreedToTerms && <i className="feather icon-feather-check" style={{ color: '#000', fontSize: 12 }}></i>}
+                                            </label>
+                                        </div>
+                                        <label htmlFor="tc-agree" className="fs-12 opacity-6 hover-opacity-100 transition-all cursor-pointer" style={{ color: '#fff', lineHeight: 1.7 }}>
+                                            I have read and agree to the <a href="/privacy-policy" target="_blank" className="text-base-color text-decoration-line-bottom">Privacy Policy</a>, <a href="/shipping-policy" target="_blank" className="text-base-color text-decoration-line-bottom">Shipping Policy</a>, and <a href="/returns-policy" target="_blank" className="text-base-color text-decoration-line-bottom">Returns Policy</a>.
+                                        </label>
+                                    </div>
 
-                                    <button type="submit" disabled={placingOrder || !agreedToTerms || paymentGateways.length === 0} className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none mt-10px" style={{ opacity: (agreedToTerms && paymentGateways.length > 0) ? 1 : 0.5 }}>
+                                    <button type="submit" disabled={placingOrder || !agreedToTerms || paymentGateways.length === 0} className="btn btn-base-color btn-extra-large btn-switch-text btn-round-edge btn-box-shadow w-100 text-transform-none" style={{ opacity: (agreedToTerms && paymentGateways.length > 0) ? 1 : 0.4 }}>
                                         <span>
-                                            <span className="btn-double-text" data-text={placingOrder ? "Placing order..." : "Place order"}>{placingOrder ? "Placing order..." : "Place order"}</span>
+                                            <span className="btn-double-text" data-text={placingOrder ? "Processing..." : "Place Order Now"}>{placingOrder ? "Processing..." : "Place Order Now"}</span>
                                         </span>
                                     </button>
 
                                     {/* Trust badges */}
-                                    <div style={{ marginTop: 18, borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 18, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-                                        {[
-                                            { icon: 'icon-feather-lock',       label: 'SSL Secured'     },
-                                            { icon: 'icon-feather-rotate-ccw', label: '30-Day Returns'  },
-                                            { icon: 'icon-feather-shield',     label: 'Safe Checkout'   },
-                                        ].map(({ icon, label }) => (
-                                            <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '10px 6px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                                                <i className={`feather ${icon}`} style={{ fontSize: 16, color: 'var(--base-color)' }} />
-                                                <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.45)', textAlign: 'center', letterSpacing: '0.03em', textTransform: 'uppercase' }}>{label}</span>
-                                            </div>
-                                        ))}
+                                    <div className="mt-30px pt-25px border-top border-color-transparent-white-light">
+                                        <div className="row g-2 justify-content-center">
+                                            {[
+                                                { icon: 'icon-feather-lock',       label: 'SSL Secured'     },
+                                                { icon: 'icon-feather-rotate-ccw', label: '30-Day Returns'  },
+                                                { icon: 'icon-feather-shield',     label: 'Safe Checkout'   },
+                                            ].map(({ icon, label }) => (
+                                                <div key={label} className="col-4">
+                                                    <div className="d-flex flex-column align-items-center gap-1 p-2 border-radius-8px bg-transparent-white-light border border-color-transparent-white-light">
+                                                        <i className={`feather ${icon} text-base-color mb-1px fs-15`}></i>
+                                                        <span className="fs-9 fw-700 text-white-50 text-uppercase text-center ls-05px" style={{ lineHeight: 1.2 }}>{label}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

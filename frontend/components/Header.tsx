@@ -107,83 +107,15 @@ export default async function Header() {
                                     <ul className="navbar-nav">
                                         <li className="nav-item"><a className="nav-link text-white-hover" href="/">Home</a>
                                         </li>
-                                        <li className="nav-item dropdown submenu">
+                                        <li className="nav-item">
                                             <a className="nav-link text-white-hover" href="/shop">Shop
                                                 <span
                                                     className="badge bg-base-color text-dark-gray fw-700 py-1 px-2 rounded-1 ms-1"
-                                                    style={{ fontSize: '10px', verticalAlign: 'middle' }}>HOT</span></a>
-                                            <i aria-expanded="false" className="fa-solid fa-angle-down dropdown-toggle"
-                                                data-bs-toggle="dropdown" id="navbarDropdownMenuLink1" role="button"></i>
-                                            <div aria-labelledby="navbarDropdownMenuLink1"
-                                                className="dropdown-menu submenu-content">
-                                                <div className="d-lg-flex mega-menu m-auto flex-column">
-                                                    <div className="row row-cols-1 row-cols-lg-5 mb-60px md-mb-30px sm-mb-20px">
-                                                        {categories.slice(0, 5).map((category: any) => (
-                                                            <div className="col" key={category.id}>
-                                                                <ul>
-                                                                    <li className="sub-title">{category.name}</li>
-                                                                    <li><a href={`/shop?category=${category.slug}`}>View All</a></li>
-                                                                    {category.children?.map((child: any) => (
-                                                                        <li key={child.id}><a href={`/shop?category=${child.slug}`}>{child.name}</a></li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                    <div className="row row-cols-1 row-cols-md-2">
-                                                        <div className="col">
-                                                            <a href="/shop"><Image alt="" className="w-100"
-                                                                src="/images/demo-decor-store-menu-banner-01.jpg" width={640} height={420} /></a>
-                                                        </div>
-                                                        <div className="col">
-                                                            <a href="/shop"><Image alt="" className="w-100"
-                                                                src="/images/demo-decor-store-menu-banner-02.jpg" width={640} height={420} /></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                    style={{ fontSize: '10px', verticalAlign: 'middle' }}>HOT</span>
+                                            </a>
                                         </li>
-                                        <li className="nav-item dropdown submenu">
-                                            <a className="nav-link text-white-hover"
-                                                href="/collections">Collections</a>
-                                            <i aria-expanded="false" className="fa-solid fa-angle-down dropdown-toggle"
-                                                data-bs-toggle="dropdown" id="navbarDropdownMenuLink2" role="button"></i>
-                                            <div aria-labelledby="navbarDropdownMenuLink2"
-                                                className="dropdown-menu submenu-content">
-                                                <div className="d-lg-flex mega-menu m-auto flex-column">
-                                                    <div
-                                                        className="row row-cols-2 row-cols-lg-6 row-cols-sm-3 md-pt-15px align-items-center justify-content-center mb-60px md-mb-30px sm-mb-0">
-                                                        {(categories.length > 0 ? categories : []).slice(0, 6).map((cat: any, idx: number) => {
-                                                            const imgSrc = cat.cover || cat.thumb || `/images/demo-decor-store-menu-category-0${(idx % 6) + 1}.jpg`;
-                                                            return (
-                                                                <div className="col md-mb-30px" key={cat.id}>
-                                                                    <a className="text-center" href={`/shop?category=${cat.slug}`}>
-                                                                        <Image alt={cat.name}
-                                                                            src={imgSrc} width={240} height={240} />
-                                                                    </a>
-                                                                    <a className="btn btn-hover-animation text-uppercase-inherit fw-600 ls-0px justify-content-center"
-                                                                        href={`/shop?category=${cat.slug}`}>
-                                                                        <span>
-                                                                            <span className="btn-text text-dark-gray fs-16">{cat.name}</span>
-                                                                            <span className="btn-icon"><i className="fa-solid fa-arrow-right m-0"></i></span>
-                                                                        </span>
-                                                                    </a>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                    <div className="row row-cols-1 row-cols-md-2">
-                                                        <div className="col">
-                                                            <a href="/collections"><Image alt=""
-                                                                src="/images/demo-decor-store-menu-banner-03.jpg" width={640} height={420} /></a>
-                                                        </div>
-                                                        <div className="col">
-                                                            <a href="/collections"><Image alt=""
-                                                                src="/images/demo-decor-store-menu-banner-04.jpg" width={640} height={420} /></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <li className="nav-item">
+                                            <a className="nav-link text-white-hover" href="/collections">Collections</a>
                                         </li>
                                         <li className="nav-item"><a className="nav-link text-white-hover"
                                             href="/contact">Contact</a>

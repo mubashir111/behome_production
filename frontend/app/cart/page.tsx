@@ -351,23 +351,26 @@ export default function Cart() {
                                     </div>
 
                                     {/* ── Coupon + Continue Shopping ── */}
-                                    <div className="row mt-20px">
-                                        <div className="col-12 col-md-7 col-xl-7">
+                                    <div className="row mt-30px align-items-center">
+                                        <div className="col-12 col-md-8 col-xl-7">
                                             <div className="coupon-code-panel">
                                                 <input
-                                                    className="bg-dark-gray border-radius-4px text-white border-color-transparent-white-light"
-                                                    placeholder="Coupon code"
+                                                    className="bg-transparent border-radius-8px text-white border-color-transparent-white-light"
+                                                    placeholder="Enter coupon code"
                                                     type="text"
                                                     value={couponCode}
                                                     onChange={(e) => setCouponCode(e.target.value)}
                                                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), applyCoupon())}
                                                 />
-                                                <button type="button" className="btn apply-coupon-btn fs-13 fw-600 text-uppercase text-white" onClick={applyCoupon}>Apply</button>
+                                                <button type="button" className="btn btn-small btn-round-edge btn-white fw-700 text-uppercase" onClick={applyCoupon} style={{ paddingLeft: '25px', paddingRight: '25px' }}>Apply</button>
                                             </div>
-                                            {couponMessage && <p className={`fs-13 mt-10px mb-0 ${couponDiscount > 0 ? 'text-base-color' : 'text-red'}`}>{couponMessage}</p>}
+                                            {couponMessage && <p className={`fs-12 mt-12px mb-0 fw-500 ${couponDiscount > 0 ? 'text-base-color' : 'text-red'}`} style={{ letterSpacing: '0.3px' }}><i className={`feather ${couponDiscount > 0 ? 'icon-feather-check-circle' : 'icon-feather-alert-circle'} me-6px`}></i>{couponMessage}</p>}
                                         </div>
-                                        <div className="col-12 col-md-5 col-xl-5 text-start text-md-end mt-15px mt-md-0">
-                                            <a className="btn btn-small border-1 btn-round-edge btn-transparent-white-light text-white text-transform-none" href="/shop">Continue Shopping</a>
+                                        <div className="col-12 col-md-4 col-xl-5 text-start text-md-end mt-20px mt-md-0">
+                                            <a className="btn btn-link btn-extra-large text-white text-transform-none icon-hover-push-left" href="/shop" style={{ padding: 0, textDecoration: 'none' }}>
+                                                <i className="feather icon-feather-arrow-left me-8px fs-16"></i>
+                                                <span className="fw-600">Continue Shopping</span>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -403,31 +406,31 @@ export default function Cart() {
                                         <table className="w-100 total-price-table">
                                             <tbody>
                                                 <tr>
-                                                    <th className="w-45 fw-600 text-white alt-font">Subtotal</th>
-                                                    <td className="text-white fw-600">{formatAmount(subtotal)}</td>
+                                                    <th className="fw-600 text-white alt-font">Subtotal</th>
+                                                    <td className="text-white fw-600 text-end">{formatAmount(subtotal)}</td>
                                                 </tr>
                                                 {(() => {
                                                     const totalTax = cartItems.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0);
                                                     return totalTax > 0 ? (
                                                         <tr>
-                                                            <th className="w-45 fw-600 text-white alt-font">Tax</th>
-                                                            <td className="text-white fw-600">{formatAmount(totalTax)}</td>
+                                                            <th className="fw-600 text-white alt-font">Tax</th>
+                                                            <td className="text-white fw-600 text-end">{formatAmount(totalTax)}</td>
                                                         </tr>
                                                     ) : null;
                                                 })()}
                                                 {couponDiscount > 0 && (
                                                     <tr>
-                                                        <th className="w-45 fw-600 text-white alt-font">Discount</th>
-                                                        <td className="text-base-color fw-600">-{formatAmount(couponDiscount)}</td>
+                                                        <th className="fw-600 text-white alt-font">Discount</th>
+                                                        <td className="text-base-color fw-600 text-end">-{formatAmount(couponDiscount)}</td>
                                                     </tr>
                                                 )}
                                                 <tr>
-                                                    <th className="w-45 fw-600 text-white alt-font">Shipping</th>
-                                                    <td className="text-white fw-600">Calculated at checkout</td>
+                                                    <th className="fw-600 text-white alt-font">Shipping</th>
+                                                    <td className="text-white fw-500 text-end fs-13 opacity-7">Calculated at checkout</td>
                                                 </tr>
                                                 <tr className="total-amount">
                                                     <th className="fw-600 text-white alt-font pb-0">Total</th>
-                                                    <td className="pb-0" data-title="Total">
+                                                    <td className="pb-0 text-end" data-title="Total">
                                                         <h6 className="d-block fw-700 mb-0 text-white alt-font">
                                                             {formatAmount(Math.max(
                                                                 subtotal
