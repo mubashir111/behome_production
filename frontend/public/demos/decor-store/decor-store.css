@@ -4547,3 +4547,424 @@ header .navbar.header-light {
     background: transparent !important;
     background-color: transparent !important;
 }
+
+/* ============================================================
+   GLOBAL CLEAN-UP — typography, layout, forms, buttons
+   ============================================================ */
+
+/* ── Base typography ─────────────────────────────────────── */
+body {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+/* ── Utility: UI section titles ──────────────────────────── */
+.ui-section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+}
+
+/* ── Utility: panels (dark cards) ───────────────────────── */
+.ui-panel {
+    padding: 32px;
+    border-radius: 12px;
+}
+
+.ui-panel.ui-panel-lg {
+    padding: 40px;
+}
+
+.ui-panel.ui-panel-sm {
+    padding: 20px;
+}
+
+.ui-panel-header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    margin-bottom: 20px;
+}
+
+/* ── Utility: vertical stacks ────────────────────────────── */
+.ui-stack-sm { display: flex; flex-direction: column; gap: 12px; }
+.ui-stack-md { display: flex; flex-direction: column; gap: 24px; }
+.ui-stack-lg { display: flex; flex-direction: column; gap: 40px; }
+
+/* ── Utility: content offset (sidebar + content layout) ── */
+.ui-content-offset {
+    padding-left: 24px;
+}
+
+@media (max-width: 991px) {
+    .ui-content-offset { padding-left: 0; }
+}
+
+/* ── Content layout wrapper (cart/checkout two-col) ─────── */
+.content-layout-wrapper {
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+/* ── Page sections: consistent vertical padding ─────────── */
+.page-shell {
+    padding-top: 50px;
+    padding-bottom: 60px;
+}
+
+.page-shell-tight {
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+@media (max-width: 767px) {
+    .page-shell        { padding-top: 30px; padding-bottom: 40px; }
+    .page-shell-tight  { padding-top: 20px; padding-bottom: 30px; }
+}
+
+/* ── Breadcrumb ──────────────────────────────────────────── */
+.breadcrumb-style-01 ul {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.breadcrumb-style-01 ul li + li::before {
+    content: '/';
+    margin-right: 6px;
+    opacity: 0.4;
+}
+
+.breadcrumb-link {
+    color: rgba(255, 255, 255, 0.55) !important;
+    text-decoration: none !important;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link:hover {
+    color: var(--base-color) !important;
+}
+
+/* ── Form inputs (dark theme) — all pages ────────────────── */
+.page-shell input[type="text"],
+.page-shell input[type="email"],
+.page-shell input[type="tel"],
+.page-shell input[type="password"],
+.page-shell input[type="number"],
+.page-shell textarea,
+.page-shell select,
+.bh-input {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+    font-size: 14px;
+    padding: 11px 14px !important;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.page-shell input[type="text"]:focus,
+.page-shell input[type="email"]:focus,
+.page-shell input[type="tel"]:focus,
+.page-shell input[type="password"]:focus,
+.page-shell input[type="number"]:focus,
+.page-shell textarea:focus,
+.page-shell select:focus,
+.bh-input:focus {
+    border-color: var(--base-color) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12) !important;
+}
+
+.page-shell input::placeholder,
+.page-shell textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.page-shell label {
+    display: block;
+    color: rgba(255, 255, 255, 0.65) !important;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+/* ── Coupon row (cart page) ──────────────────────────────── */
+.coupon-code-panel {
+    display: flex;
+    gap: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.coupon-code-panel input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: #fff !important;
+    font-size: 14px;
+    padding: 11px 16px !important;
+    outline: none;
+    min-width: 0;
+}
+
+.coupon-code-panel input::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.coupon-code-panel input:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+}
+
+.apply-coupon-btn {
+    flex-shrink: 0;
+    padding: 11px 20px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: none !important;
+    border-left: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em;
+    text-transform: uppercase !important;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    border-radius: 0 !important;
+}
+
+.apply-coupon-btn:hover {
+    background: var(--base-color) !important;
+    color: #000 !important;
+}
+
+/* ── Cart totals table ───────────────────────────────────── */
+.total-price-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.total-price-table th,
+.total-price-table td {
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: middle;
+}
+
+.total-price-table th {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: left;
+    width: 50%;
+}
+
+.total-price-table td {
+    text-align: right;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+}
+
+.total-price-table tr.total-amount th,
+.total-price-table tr.total-amount td {
+    border-bottom: none;
+    padding-top: 16px;
+    font-size: 16px;
+    color: #fff;
+}
+
+.total-price-table tr.total-amount h6 {
+    font-size: 20px;
+    color: var(--base-color);
+    margin: 0;
+}
+
+/* ── Account sidebar nav ─────────────────────────────────── */
+.account-sidebar {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.account-sidebar li a,
+.account-sidebar li button {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.18s, color 0.18s;
+}
+
+.account-sidebar li a:hover,
+.account-sidebar li button:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.account-sidebar li.active-link a {
+    background: rgba(197, 160, 89, 0.12);
+    color: var(--base-color);
+}
+
+/* ── Ghost / secondary button (consistent) ───────────────── */
+.btn-transparent-white-light {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    background: transparent !important;
+}
+
+.btn-transparent-white-light:hover {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Checkout section headings ───────────────────────────── */
+.checkout-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0 0 6px;
+}
+
+.checkout-section-heading {
+    font-size: clamp(18px, 3.5vw, 24px);
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+}
+
+.checkout-section-sub {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+    margin: 0 0 24px;
+}
+
+/* ── Checkout option cards (sign in / register / guest) ──── */
+.checkout-option-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.checkout-option-card:hover {
+    border-color: rgba(197, 160, 89, 0.4);
+}
+
+.checkout-option-card--primary {
+    background: var(--base-color);
+    border-color: var(--base-color) !important;
+}
+
+.checkout-option-card--secondary {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.checkout-option-card--ghost {
+    background: rgba(255, 255, 255, 0.03);
+    width: 100%;
+}
+
+.checkout-option-label {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.checkout-option-sub {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+/* ── Divider with label ───────────────────────────────────── */
+.bh-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.bh-divider::before,
+.bh-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.bh-divider-label {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* ── Thin gold accent bar (top of cards) ─────────────────── */
+.bh-card-accent {
+    height: 3px;
+    background: linear-gradient(90deg, var(--base-color), rgba(197, 160, 89, 0.15));
+    border-radius: 3px 3px 0 0;
+}
+
+/* ── Dark card / gate container ──────────────────────────── */
+.bh-gate-card {
+    background: rgba(12, 12, 20, 0.97);
+    border: 1px solid rgba(197, 160, 89, 0.18);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.bh-gate-body {
+    padding: 36px 40px 32px;
+}
+
+@media (max-width: 575px) {
+    .bh-gate-body { padding: 24px 20px 20px; }
+}
+
+/* ── Responsive column spacing ───────────────────────────── */
+@media (max-width: 991px) {
+    .ui-panel        { padding: 20px; }
+    .ui-panel-lg     { padding: 22px !important; }
+    .ui-panel-header { padding: 20px 20px 16px; }
+}
+
+@media (max-width: 575px) {
+    .ui-panel        { padding: 16px; }
+    .ui-panel-lg     { padding: 18px !important; }
+    .ui-section-title { font-size: 18px; }
+    .bh-gate-body     { padding: 20px 16px; }
+}
