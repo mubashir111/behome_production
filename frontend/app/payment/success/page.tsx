@@ -179,18 +179,22 @@ function PaymentSuccessContent() {
             addr.country,
         ].filter(Boolean).map(esc) : [];
 
-        // Items — use pre-formatted currency_price fields
+        // Items — show actual price paid: (price × qty) - discount
+        // Uses formatAmount from useCurrency for consistent rounding with order totals
         const rows = products.map((item: any) => {
-            const name    = esc(item.product_name || item.product?.name || 'Product');
-            const qty     = item.quantity || 1;
-            const price   = esc(item.currency_price || item.price || '');
-            const total   = esc(item.total_currency_price || item.subtotal_currency_price || '');
-            const variant = item.variation_names ? `<br/><small style="color:#666">${esc(item.variation_names)}</small>` : '';
+            const name        = esc(item.product_name || item.product?.name || 'Product');
+            const qty         = Math.abs(item.quantity || 1);
+            const priceRaw    = parseFloat(item.price || 0);
+            const discountRaw = parseFloat(item.discount || 0);
+            const lineTotal   = (priceRaw * qty) - discountRaw;
+            const unitEff     = qty > 0 ? lineTotal / qty : lineTotal;
+            const variant     = item.variation_names ? `<br/><small style="color:#666">${esc(item.variation_names)}</small>` : '';
+            const origHtml    = discountRaw > 0 ? `<br/><small style="color:#aaa;text-decoration:line-through">${esc(item.currency_price)}</small>` : '';
             return `<tr>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee">${name}${variant}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:center">${qty}</td>
-                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right">${price}</td>
-                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:600">${total}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right">${esc(formatAmount(unitEff))}${origHtml}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:600">${esc(formatAmount(lineTotal))}</td>
             </tr>`;
         }).join('');
 
@@ -369,10 +373,11 @@ function PaymentSuccessContent() {
                                     </div>
                                     <div style={{ padding: '8px 0' }}>
                                         {products.map((item: any, i: number) => {
-                                            const itemPrice = parseFloat(item.price || item.unit_price || 0);
-                                            const itemQty   = parseInt(item.quantity || 1);
-                                            const itemTotal = parseFloat(item.total || item.subtotal || (itemPrice * itemQty));
-                                            const imgSrc    = item.product?.cover || item.cover || '';
+                                            const itemPrice    = parseFloat(item.price || item.unit_price || 0);
+                                            const itemQty      = Math.abs(parseInt(item.quantity || 1));
+                                            const itemDiscount = parseFloat(item.discount || 0);
+                                            const originalTotal = itemPrice * itemQty;
+                                            const imgSrc       = item.product?.cover || item.cover || '';
                                             return (
                                                 <div key={i} style={{
                                                     display: 'flex', alignItems: 'center', gap: 16,
@@ -400,10 +405,17 @@ function PaymentSuccessContent() {
                                                         )}
                                                         <p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>Qty: {itemQty}</p>
                                                     </div>
-                                                    {/* Price */}
-                                                    <p style={{ margin: 0, color: 'var(--base-color)', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
-                                                        {formatAmount(itemTotal)}
-                                                    </p>
+                                                    {/* Price — show original, with effective price below if discounted */}
+                                                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                                        <p style={{ margin: 0, color: 'var(--base-color)', fontWeight: 700, fontSize: 14 }}>
+                                                            {formatAmount(originalTotal)}
+                                                        </p>
+                                                        {itemDiscount > 0 && (
+                                                            <p style={{ margin: '2px 0 0', color: '#4ade80', fontSize: 11, fontWeight: 600 }}>
+                                                                -{formatAmount(itemDiscount)} off
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             );
                                         })}

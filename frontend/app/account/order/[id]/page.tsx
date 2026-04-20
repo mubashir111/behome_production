@@ -6,6 +6,7 @@ import { apiFetch } from '@/lib/api';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/components/ToastProvider';
+import { useCurrency } from '@/components/SettingsProvider';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import StripePaymentForm from '@/components/StripePaymentForm';
@@ -30,6 +31,7 @@ export default function OrderDetail() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { showToast } = useToast();
+    const { formatAmount } = useCurrency();
     const id = params.id as string;
     const [isNewOrder, setIsNewOrder] = useState(false);
 
@@ -290,19 +292,28 @@ export default function OrderDetail() {
             addr.country,
         ].filter(Boolean).map(esc) : [];
 
-        // Products: use pre-formatted currency_price fields from API
+        // Products: show actual amount paid = (price × qty) - discount
+        // Uses formatAmount from useCurrency hook for consistent rounding with order totals
         const products: any[] = order.order_products ?? [];
+
         const rows = products.map((item: any) => {
-            const name    = esc(item.product_name || 'Product');
-            const qty     = item.quantity || 1;
-            const price   = esc(item.currency_price || item.price || '');
-            const total   = esc(item.total_currency_price || item.subtotal_currency_price || '');
-            const variant = item.variation_names ? `<br/><small style="color:#666">${esc(item.variation_names)}</small>` : '';
+            const name        = esc(item.product_name || 'Product');
+            const qty         = Math.abs(item.quantity || 1);
+            const priceRaw    = parseFloat(item.price ?? 0);
+            const discountRaw = parseFloat(item.discount ?? 0);
+            const lineTotal   = (priceRaw * qty) - discountRaw;
+            const unitEff     = qty > 0 ? lineTotal / qty : lineTotal;
+            const lineTotalFmt = esc(formatAmount(lineTotal));
+            const unitPriceFmt = esc(formatAmount(unitEff));
+            const variant     = item.variation_names ? `<br/><small style="color:#666">${esc(item.variation_names)}</small>` : '';
+            const origPriceHtml = discountRaw > 0
+                ? `<br/><small style="color:#aaa;text-decoration:line-through">${esc(item.currency_price)}</small>`
+                : '';
             return `<tr>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee">${name}${variant}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:center">${qty}</td>
-                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right">${price}</td>
-                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:600">${total}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right">${unitPriceFmt}${origPriceHtml}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:600">${lineTotalFmt}</td>
             </tr>`;
         }).join('');
 
@@ -431,9 +442,17 @@ export default function OrderDetail() {
                                     <p className="text-white opacity-6 mb-0 fs-14">{order.order_datetime}</p>
                                 </div>
                                 <div className="d-flex align-items-center gap-3 flex-wrap justify-content-lg-end">
-                                    <span className="badge px-15px py-8px fs-13 fw-600 border-radius-6px text-nowrap" style={{ background: `${statusColor}22`, color: statusColor, border: `1px solid ${statusColor}44` }}>
-                                        {order.status_name || STATUS_NAMES[order.status] || 'Unknown'}
-                                    </span>
+                                    {(order.status === 15 || order.status === 20) ? (
+                                        <span className="btn btn-small btn-round-edge px-20px text-nowrap d-inline-flex align-items-center gap-2"
+                                            style={{ height: 40, background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', fontSize: 13, cursor: 'default' }}>
+                                            <i className="feather icon-feather-x-circle" style={{ fontSize: 14 }}></i>
+                                            {order.status === 15 ? 'Cancelled' : 'Rejected'}
+                                        </span>
+                                    ) : (
+                                        <span className="badge px-15px py-8px fs-13 fw-600 border-radius-6px text-nowrap" style={{ background: `${statusColor}22`, color: statusColor, border: `1px solid ${statusColor}44` }}>
+                                            {order.status_name || STATUS_NAMES[order.status] || 'Unknown'}
+                                        </span>
+                                    )}
                                     {order.status !== 15 && order.status !== 20 && (
                                         <button onClick={printInvoice} className="btn btn-small btn-round-edge px-20px text-nowrap d-inline-flex align-items-center gap-2" style={{ background: 'rgba(197,160,89,0.1)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--base-color)', fontSize: 13, height: '40px' }}>
                                             <i className="feather icon-feather-download fs-14"></i> Invoice
@@ -490,11 +509,22 @@ export default function OrderDetail() {
                     })() : (
                         <div className="row mb-35px">
                             <div className="col-12">
-                                <div className="p-20px border-radius-6px d-flex align-items-center gap-15px" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
-                                    <i className="feather icon-feather-x-circle fs-22" style={{ color: '#ef4444', flexShrink: 0 }}></i>
-                                    <div>
-                                        <p className="fw-600 mb-2px" style={{ color: '#f87171' }}>Order {order.status === 15 ? 'Cancelled' : 'Rejected'}</p>
-                                        <p className="mb-0 fs-13" style={{ color: 'rgba(255,255,255,0.45)' }}>This order has been {order.status === 15 ? 'cancelled' : 'rejected'}. If you have questions, please contact support.</p>
+                                <div className="border-radius-12px overflow-hidden" style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.05)' }}>
+                                    {/* Red top accent line */}
+                                    <div style={{ height: 3, background: 'linear-gradient(90deg,#ef4444,rgba(239,68,68,0.2))' }} />
+                                    <div className="p-25px d-flex align-items-center gap-18px">
+                                        <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(239,68,68,0.12)', border: '1.5px solid rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <i className="feather icon-feather-x fs-18" style={{ color: '#ef4444' }}></i>
+                                        </div>
+                                        <div>
+                                            <p className="fw-700 fs-15 mb-4px" style={{ color: '#f87171' }}>Order {order.status === 15 ? 'Cancelled' : 'Rejected'}</p>
+                                            <p className="mb-0 fs-13" style={{ color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>
+                                                This order has been {order.status === 15 ? 'cancelled' : 'rejected'}.{' '}
+                                                <a href="#" onClick={e => { e.preventDefault(); setShowMessages(true); }} style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'underline' }}>
+                                                    Contact support
+                                                </a> if you have any questions.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -561,27 +591,45 @@ export default function OrderDetail() {
                                 <div className="ui-panel-header px-30px pt-30px pb-20px">
                                     <span className="text-white fw-600 fs-17 alt-font">Order Items</span>
                                 </div>
-                                {order.order_products?.map((item: any, idx: number) => (
-                                    <div key={idx} className="px-25px py-20px d-flex align-items-center gap-20px" style={{ borderBottom: idx < order.order_products.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
-                                        <div className="flex-shrink-0" style={{ marginRight: '20px' }}>
-                                            <Image
-                                                src={item.product_image || '/images/demo-decor-store-product-01.jpg'}
-                                                alt={item.product_name}
-                                                width={70} height={70} unoptimized
-                                                style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 8 }}
-                                            />
-                                        </div>
-                                        <div className="flex-grow-1">
-                                            <a href={`/product/${item.product_slug}`} className="text-white fw-600 fs-15 d-block mb-5px breadcrumb-link">
+                                {order.order_products?.map((item: any, idx: number) => {
+                                    const qty = Math.abs(item.quantity || 1);
+                                    const priceRaw = parseFloat(item.price ?? 0);
+                                    const discountRaw = parseFloat(item.discount ?? 0);
+                                    const originalTotal = formatAmount(priceRaw * qty);
+                                    const hasDiscount = discountRaw > 0;
+                                    return (
+                                    <div key={idx} className="order-item-product-row" style={{ borderBottom: idx < order.order_products.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
+                                        <Image
+                                            src={item.product_image || '/images/demo-decor-store-product-01.jpg'}
+                                            alt={item.product_name}
+                                            width={64} height={64} unoptimized
+                                            className="order-item-product-img"
+                                        />
+                                        <div className="order-item-product-info">
+                                            <a href={`/product/${item.product_slug}`} className="order-item-product-name breadcrumb-link">
                                                 {item.product_name}
                                             </a>
-                                            <p className="text-white opacity-5 fs-13 mb-0">Qty: {Math.abs(item.quantity)} × {item.currency_price}</p>
+                                            {item.variation_names && (
+                                                <span className="order-item-product-variant">{item.variation_names}</span>
+                                            )}
+                                            <span className="order-item-product-meta">
+                                                Qty: {qty}
+                                            </span>
                                         </div>
-                                        <div className="text-end flex-shrink-0">
-                                            <span className="text-white fw-600">{item.total_currency_price}</span>
+                                        <div className="order-item-product-price">
+                                            <span className="order-item-product-total">{originalTotal}</span>
+                                            {hasDiscount && (
+                                                <span className="order-item-product-unit" style={{ color: '#4ade80' }}>
+                                                    -{formatAmount(discountRaw)} off
+                                                </span>
+                                            )}
+                                            {!hasDiscount && (
+                                                <span className="order-item-product-unit">{formatAmount(priceRaw)} each</span>
+                                            )}
                                         </div>
                                     </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Return Status (if submitted) */}
@@ -809,13 +857,13 @@ export default function OrderDetail() {
                                     <span className="text-white opacity-6 fs-14">Subtotal</span>
                                     <span className="text-white fs-14">{order.subtotal_currency_price}</span>
                                 </div>
-                                {order.tax_currency_price && (
+                                {!!(order.tax && parseFloat(order.tax) > 0) && (
                                     <div className="d-flex justify-content-between mb-15px">
                                         <span className="text-white-light fs-14">Tax</span>
                                         <span className="text-white fs-14 fw-600">{order.tax_currency_price}</span>
                                     </div>
                                 )}
-                                {!!order.shipping_charge_currency_price && (
+                                {!!(order.shipping_charge && parseFloat(order.shipping_charge) > 0) && (
                                     <div className="d-flex justify-content-between mb-15px">
                                         <span className="text-white-light fs-14">Shipping</span>
                                         <span className="text-white fs-14 fw-600">{order.shipping_charge_currency_price}</span>

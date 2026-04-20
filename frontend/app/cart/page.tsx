@@ -355,8 +355,9 @@ export default function Cart() {
                                         <div className="col-12 col-md-8 col-xl-7">
                                             <div className="coupon-code-panel">
                                                 <input
-                                                    className="bg-transparent border-radius-8px text-white border-color-transparent-white-light"
-                                                    placeholder="Enter coupon code"
+                                                    autoComplete="off"
+                                                    data-form-type="other"
+                                                    placeholder="Have a voucher?"
                                                     type="text"
                                                     value={couponCode}
                                                     onChange={(e) => setCouponCode(e.target.value)}

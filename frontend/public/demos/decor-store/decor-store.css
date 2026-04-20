@@ -4710,9 +4710,16 @@ body {
     border: 1.5px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Remove template's injected scissors icon (all.min.css line 28484) */
+.coupon-code-panel::before {
+    display: none !important;
+    content: none !important;
+}
+
 .coupon-code-panel input {
     flex: 1;
     background: rgba(255, 255, 255, 0.05) !important;
+    background-image: none !important;
     border: none !important;
     border-radius: 0 !important;
     color: #fff !important;
@@ -4720,6 +4727,21 @@ body {
     padding: 11px 16px !important;
     outline: none;
     min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Suppress Chrome's native promo/coupon icon overlay */
+.coupon-code-panel input::-webkit-contacts-auto-fill-button,
+.coupon-code-panel input::-webkit-credentials-auto-fill-button,
+.coupon-code-panel input::-webkit-caps-lock-indicator,
+.coupon-code-panel input::-webkit-clear-button,
+.coupon-code-panel input::-webkit-inner-spin-button,
+.coupon-code-panel input::-webkit-search-cancel-button,
+.coupon-code-panel input::-webkit-search-decoration {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 .coupon-code-panel input::placeholder {
