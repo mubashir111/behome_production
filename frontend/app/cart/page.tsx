@@ -288,10 +288,10 @@ export default function Cart() {
                             <span style={{ display: 'block', width: 28, height: 1, background: 'var(--base-color,#c9a96e)' }} />
                             <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: 10, fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Your Selection</span>
                         </div>
-                        <h1 style={{ fontFamily: 'var(--primary-font,serif)', color: '#fff', fontWeight: 700, fontSize: 'clamp(26px,3.5vw,42px)', margin: 0, letterSpacing: '-0.5px' }}>
+                        <h1 style={{ fontFamily: 'var(--font-heading, sans-serif)', color: '#fff', fontWeight: 700, fontSize: 'clamp(26px,3.5vw,42px)', margin: 0, letterSpacing: '-0.5px' }}>
                             Shopping Cart
                             {cartItems.length > 0 && (
-                                <span style={{ marginLeft: 14, fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--secondary-font,sans-serif)', letterSpacing: 0 }}>
+                                <span style={{ marginLeft: 14, fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-body, sans-serif)', letterSpacing: 0 }}>
                                     {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
                                 </span>
                             )}
@@ -501,7 +501,7 @@ export default function Cart() {
                                 })()}
 
                                 <div style={{ padding: '24px 24px 0' }}>
-                                    <h2 style={{ fontFamily: 'var(--primary-font,serif)', color: '#fff', fontSize: 20, fontWeight: 700, margin: '0 0 20px', letterSpacing: '-0.3px' }}>Order Summary</h2>
+                                    <h2 style={{ fontFamily: 'var(--font-heading, sans-serif)', color: '#fff', fontSize: 20, fontWeight: 700, margin: '0 0 20px', letterSpacing: '-0.3px' }}>Order Summary</h2>
 
                                     {/* Line rows */}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -532,7 +532,7 @@ export default function Cart() {
 
                                     {/* Grand total */}
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', fontFamily: 'var(--primary-font,serif)' }}>Total</span>
+                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', fontFamily: 'var(--font-heading, sans-serif)' }}>Total</span>
                                         <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--base-color,#c9a96e)', letterSpacing: '-0.5px' }}>{formatAmount(grandTotal)}</span>
                                     </div>
                                 </div>
@@ -580,7 +580,7 @@ export default function Cart() {
                         <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
                             <i className="feather icon-feather-shopping-cart" style={{ fontSize: 38, color: 'rgba(201,169,110,0.4)' }}></i>
                         </div>
-                        <h2 style={{ fontFamily: 'var(--primary-font,serif)', color: '#fff', fontWeight: 700, fontSize: 'clamp(22px,3vw,32px)', marginBottom: 14 }}>Your cart is empty</h2>
+                        <h2 style={{ fontFamily: 'var(--font-heading, sans-serif)', color: '#fff', fontWeight: 700, fontSize: 'clamp(22px,3vw,32px)', marginBottom: 14 }}>Your cart is empty</h2>
                         <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', maxWidth: 380, margin: '0 auto 32px', lineHeight: 1.6 }}>
                             Looks like you haven't added anything yet. Explore our collections to find something you'll love.
                         </p>

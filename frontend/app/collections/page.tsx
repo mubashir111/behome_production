@@ -103,7 +103,7 @@ export default function Collections() {
                     {loading ? (
                         <div className="row g-4">
                             {Array.from({ length: 5 }).map((_, i) => (
-                                <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-cust5">
+                                <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <div className="shop-shimmer" style={{ height: 340, borderRadius: 12 }} />
                                 </div>
                             ))}
@@ -130,7 +130,7 @@ export default function Collections() {
                                 const img = cat.cover || cat.thumb || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
                                 const count = cat.products_count ?? 0;
                                 return (
-                                    <div key={cat.id} className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-cust5">
+                                    <div key={cat.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <a href={`/shop?category=${cat.slug}`} className="collection-card d-block text-decoration-none" style={{
                                             position: 'relative', display: 'block',
                                             borderRadius: 12, overflow: 'hidden',
@@ -181,7 +181,7 @@ export default function Collections() {
                                                 zIndex: 2,
                                             }}>
                                                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
-                                                    <div>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
                                                         <div style={{
                                                             display: 'inline-flex', alignItems: 'center', gap: 6,
                                                             marginBottom: 6,
@@ -192,12 +192,17 @@ export default function Collections() {
                                                             </span>
                                                         </div>
                                                         <div style={{
-                                                            fontFamily: 'var(--primary-font,serif)',
+                                                            fontFamily: 'var(--font-heading, sans-serif)',
                                                             color: '#fff',
-                                                            fontSize: 'clamp(18px,2vw,24px)',
+                                                            fontSize: 'clamp(18px,2vw,22px)',
                                                             fontWeight: 700,
                                                             letterSpacing: '-0.3px',
-                                                            lineHeight: 1.2,
+                                                            lineHeight: 1.25,
+                                                            display: '-webkit-box',
+                                                            WebkitLineClamp: 2,
+                                                            WebkitBoxOrient: 'vertical',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
                                                         }}>
                                                             {cat.name}
                                                         </div>
@@ -254,12 +259,7 @@ export default function Collections() {
             </section>
 
             <style>{`
-                @media (min-width: 1200px) {
-                    .col-xl-cust5 {
-                        flex: 0 0 auto;
-                        width: 20%;
-                    }
-                }
+
                 .collection-card:hover .collection-card-img {
                     transform: scale(1.06);
                 }
