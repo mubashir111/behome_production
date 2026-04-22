@@ -1928,17 +1928,25 @@ footer.footer-dark ul:not(.small-icon) li a:hover {
 
 /* ── Brand Logo Strip ─────────────────────────────────────────── */
 .brand-logo-img {
-    max-height: 55px;
-    max-width: 140px;
-    object-fit: contain;
-    /* filter: grayscale(100%); */
-    opacity: 0.55;
-    transition: filter 0.3s ease, opacity 0.3s ease;
+    max-height: 100px !important;
+    max-width: 200px !important;
+    object-fit: contain !important;
+    filter: none !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: transform 0.3s ease;
+}
+
+.clients-style-08 .swiper-slide {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .brand-logo-img:hover {
-    filter: grayscale(0%);
-    opacity: 1;
+    transform: scale(1.08);
 }
 
 /* ── Active filter chip ───────────────────────────────────────── */

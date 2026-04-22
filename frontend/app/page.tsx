@@ -354,7 +354,7 @@ export default async function Home() {
             data-anime='{"translate":[0,0],"opacity":[0,1],"duration":600,"delay":100,"easing":"easeOutQuad"}'>
             <div className="container">
                 <div className="row position-relative clients-style-08" style={{ minHeight: 120, alignItems: 'center' }}>
-                    <div className="col swiper text-center feather-shadow"
+                    <div className="col swiper text-center"
                         data-slider-options='{"slidesPerView":1,"spaceBetween":0,"speed":3000,"loop":true,"allowTouchMove":false,"autoplay":{"delay":0,"disableOnInteraction":false},"breakpoints":{"1200":{"slidesPerView":4},"992":{"slidesPerView":3},"768":{"slidesPerView":3},"576":{"slidesPerView":2}},"effect":"slide"}'>
                         <div className="swiper-wrapper marquee-slide">
                             {(brands.length > 0 ? [...brands, ...brands] : [1,2,3,4,5,1,2,3].map((n, i) => ({
