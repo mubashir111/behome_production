@@ -1,5 +1,15 @@
 /* CSS files are loaded via <link> tags in layout.tsx for parallel loading */
 
+body {
+    font-family: var(--font-body), sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: var(--font-heading), sans-serif !important;
+    letter-spacing: -0.02em;
+}
+
+
 /* Hide cookie popup until JS initializes — prevents LCP interference */
 #cookies-model {
   display: none !important;
@@ -1451,7 +1461,7 @@ textarea.form-control {
 
 .slider-product-name {
   color: #333 !important;
-  font-family: var(--alt-font);
+  font-family: var(--font-heading);
   font-size: 1.25rem !important;
   font-weight: 500 !important;
   margin-bottom: 5px !important;
@@ -1459,7 +1469,7 @@ textarea.form-control {
 }
 
 .slider-product-price {
-  font-family: var(--alt-font);
+  font-family: var(--font-heading);
   font-size: 1.1rem;
   font-weight: 600;
   color: #333;
@@ -1659,7 +1669,7 @@ li:hover .item-qty {
 
 
 .ui-sidebar-title {
-  font-family: var(--alt-font);
+  font-family: var(--font-heading);
   font-size: 16px;
   font-weight: 600;
   color: #fff;

@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
-import { Marcellus, Outfit } from 'next/font/google';
+import { Montserrat, Plus_Jakarta_Sans } from 'next/font/google';
 import NavbarRevealer from '@/components/NavbarRevealer';
 
-const marcellus = Marcellus({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--font-marcellus' });
-const outfit = Outfit({ weight: ['300','400','500','600','700'], subsets: ['latin'], display: 'swap', variable: '--font-outfit' });
+const headingFont = Montserrat({ weight: ['400', '500', '600', '700', '800'], subsets: ['latin'], display: 'swap', variable: '--font-heading' });
+const bodyFont = Plus_Jakarta_Sans({ weight: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'], display: 'swap', variable: '--font-body' });
 import './globals.css';
 
 import Header from '@/components/Header';
@@ -43,7 +43,7 @@ export default function RootLayout({
         {/* Decor-store theme overrides + FA Brands font-face */}
         <link rel="stylesheet" href="/demos/decor-store/decor-store.css?v=2" />
       </head>
-      <body className={`bg-dark-gray ${marcellus.variable} ${outfit.variable}`} data-mobile-nav-style="classic">
+      <body className={`bg-dark-gray ${headingFont.variable} ${bodyFont.variable}`} data-mobile-nav-style="classic">
         <SettingsProvider>
           <CartProvider>
             <ToastProvider>

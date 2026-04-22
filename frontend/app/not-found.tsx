@@ -15,14 +15,14 @@ export default function NotFound() {
             <div style={{ position: 'relative', zIndex: 1, maxWidth: 560 }}>
 
                 {/* 404 numeral */}
-                <p style={{ fontSize: 'clamp(100px, 20vw, 160px)', fontWeight: 800, lineHeight: 1, color: 'rgba(255,255,255,0.04)', letterSpacing: '-6px', margin: '0 0 -30px', fontFamily: 'var(--font-outfit, sans-serif)', userSelect: 'none' }}>
+                <p style={{ fontSize: 'clamp(100px, 20vw, 160px)', fontWeight: 800, lineHeight: 1, color: 'rgba(255,255,255,0.04)', letterSpacing: '-6px', margin: '0 0 -30px', fontFamily: 'var(--font-body, sans-serif)', userSelect: 'none' }}>
                     404
                 </p>
 
                 {/* Gold divider line */}
                 <div style={{ width: 48, height: 2, background: 'var(--base-color)', margin: '0 auto 24px', borderRadius: 2 }} />
 
-                <h1 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 700, color: '#fff', marginBottom: 14, letterSpacing: '-0.5px', fontFamily: 'var(--font-marcellus, serif)' }}>
+                <h1 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 700, color: '#fff', marginBottom: 14, letterSpacing: '-0.5px', fontFamily: 'var(--font-heading, sans-serif)' }}>
                     Page not found
                 </h1>
                 <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 15, marginBottom: 40, lineHeight: 1.7 }}>

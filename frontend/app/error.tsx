@@ -34,7 +34,7 @@ export default function Error({
                         color: 'rgba(255,255,255,0.06)',
                         letterSpacing: '-4px',
                         marginBottom: '0',
-                        fontFamily: 'var(--font-outfit, sans-serif)',
+                        fontFamily: 'var(--font-body, sans-serif)',
                     }}
                 >
                     500

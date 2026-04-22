@@ -112,7 +112,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                         <span style={{ color: 'var(--base-color,#c9a96e)', fontSize: 10, fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase' }}>Premium Collection</span>
                     </div>
                     <h1 style={{
-                        fontFamily: 'var(--primary-font,serif)', color: '#fff', fontWeight: 700,
+                        fontFamily: 'var(--font-heading, sans-serif)', color: '#fff', fontWeight: 700,
                         fontSize: 'clamp(36px,6vw,96px)', lineHeight: 1.04,
                         letterSpacing: 'clamp(-1px,-0.025em,-2.5px)', marginBottom: 18, maxWidth: 600,
                     }}>
@@ -261,7 +261,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                             )}
 
                             <h1 style={{
-                                fontFamily: 'var(--primary-font,serif)', color: '#ffffff', fontWeight: '700',
+                                fontFamily: 'var(--font-heading, sans-serif)', color: '#ffffff', fontWeight: '700',
                                 fontSize: 'clamp(38px,5.5vw,96px)', lineHeight: '1.04',
                                 letterSpacing: 'clamp(-1px,-0.025em,-2.5px)', marginBottom: '20px', maxWidth: '580px',
                             }}>
@@ -398,7 +398,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                                         justifyContent: 'center',
                                     }}>
                                         <span style={{
-                                            fontFamily: 'var(--primary-font,serif)',
+                                            fontFamily: 'var(--font-heading, sans-serif)',
                                             fontSize: '72px',
                                             fontWeight: '800',
                                             color: 'rgba(201,169,110,0.18)',
@@ -493,7 +493,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
 
                                 {/* Promotion name */}
                                 <div style={{
-                                    fontFamily: 'var(--primary-font,serif)',
+                                    fontFamily: 'var(--font-heading, sans-serif)',
                                     color: '#ffffff',
                                     fontSize: 'clamp(17px,1.5vw,21px)',
                                     fontWeight: '700',
@@ -772,7 +772,7 @@ export default function HeroSliderAlt({ slides, featuredPromotions = [] }: Props
                 {/* Right: counter */}
                 <div className="hero-bottom-bar-counter" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     {activeSlides.length > 1 && (
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontFamily: 'var(--primary-font,serif)' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontFamily: 'var(--font-body, sans-serif)' }}>
                             <span style={{ color: '#ffffff', fontSize: 'clamp(18px,2vw,26px)', fontWeight: '700', letterSpacing: '-0.5px' }}>
                                 {padNum(currentIndex + 1)}
                             </span>

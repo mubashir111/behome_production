@@ -172,7 +172,7 @@ export default function HeroSlider({ slides, featuredPromotions = [] }: Props) {
                                         background: 'var(--base-color, #c9a96e)',
                                     }} />
                                     <span style={{
-                                        fontFamily: 'var(--primary-font, sans-serif)',
+                                        fontFamily: 'var(--font-body, sans-serif)',
                                         color: 'var(--base-color, #c9a96e)',
                                         fontSize: '11px',
                                         fontWeight: '700',
@@ -186,7 +186,7 @@ export default function HeroSlider({ slides, featuredPromotions = [] }: Props) {
 
                             {/* Title */}
                             <h1 style={{
-                                fontFamily: 'var(--primary-font, serif)',
+                                fontFamily: 'var(--font-heading, sans-serif)',
                                 color: '#ffffff',
                                 fontWeight: '700',
                                 fontSize: 'clamp(38px, 5.5vw, 96px)',
@@ -524,7 +524,7 @@ export default function HeroSlider({ slides, featuredPromotions = [] }: Props) {
                         display: 'flex',
                         alignItems: 'baseline',
                         gap: '6px',
-                        fontFamily: 'var(--primary-font, serif)',
+                        fontFamily: 'var(--font-body, sans-serif)',
                     }}>
                         <span style={{ color: '#ffffff', fontSize: 'clamp(18px, 2vw, 26px)', fontWeight: '700', letterSpacing: '-0.5px' }}>
                             {padNum(currentIndex + 1)}

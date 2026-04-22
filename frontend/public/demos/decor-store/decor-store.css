@@ -23,8 +23,8 @@
     /* Secondary Dark Gray */
     --white: #F5F4F0;
     /* Alabaster White Text */
-    --font-heading: 'Marcellus', serif;
-    --primary-font: 'Outfit', sans-serif;
+    --font-heading: var(--font-heading), sans-serif;
+    --primary-font: var(--font-body), sans-serif;
     --glass-bg: rgba(255, 255, 255, 0.05);
     /* Refined Glass */
     --glass-border: rgba(255, 255, 255, 0.08);

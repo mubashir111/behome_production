@@ -175,7 +175,7 @@ export default function QuickViewModal({ slug, onClose }: QuickViewModalProps) {
                 .qv-title {
                     margin: 0;
                     color: #fff;
-                    font-family: serif;
+                    font-family: var(--font-heading, sans-serif);
                     font-size: clamp(24px, 5vw, 36px);
                     font-weight: 400;
                     line-height: 1.1;
