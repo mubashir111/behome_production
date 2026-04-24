@@ -32,19 +32,21 @@ export default function HomeProductTabs({
                                 onClick={() => setActiveTab('new-arrivals')}
                                 className="bg-transparent border-0 alt-font fs-32 ls-minus-05px text-transform-none position-relative px-0"
                                 style={{
-                                    color: activeTab === 'new-arrivals' ? '#ffffff' : 'rgba(255,255,255,0.45)',
+                                    color: activeTab === 'new-arrivals' ? 'var(--base-color)' : 'rgba(255,255,255,0.4)',
                                     fontWeight: 600,
+                                    transition: 'color 0.3s ease',
                                 }}
                             >
                                 New arrivals
                                 <span
-                                    className="d-block mt-10px"
+                                    className="d-block mt-5px"
                                     style={{
-                                        height: 2,
+                                        height: 3,
                                         width: '100%',
                                         background: 'var(--base-color)',
+                                        borderRadius: '2px',
                                         opacity: activeTab === 'new-arrivals' ? 1 : 0,
-                                        transition: 'opacity 0.2s ease',
+                                        transition: 'opacity 0.3s ease',
                                     }}
                                 />
                             </button>
@@ -53,19 +55,21 @@ export default function HomeProductTabs({
                                 onClick={() => setActiveTab('ready-to-ship')}
                                 className="bg-transparent border-0 alt-font fs-32 ls-minus-05px text-transform-none position-relative px-0"
                                 style={{
-                                    color: activeTab === 'ready-to-ship' ? '#ffffff' : 'rgba(255,255,255,0.45)',
+                                    color: activeTab === 'ready-to-ship' ? 'var(--base-color)' : 'rgba(255,255,255,0.4)',
                                     fontWeight: 600,
+                                    transition: 'color 0.3s ease',
                                 }}
                             >
                                 Ready to ship
                                 <span
-                                    className="d-block mt-10px"
+                                    className="d-block mt-5px"
                                     style={{
-                                        height: 2,
+                                        height: 3,
                                         width: '100%',
                                         background: 'var(--base-color)',
+                                        borderRadius: '2px',
                                         opacity: activeTab === 'ready-to-ship' ? 1 : 0,
-                                        transition: 'opacity 0.2s ease',
+                                        transition: 'opacity 0.3s ease',
                                     }}
                                 />
                             </button>
@@ -74,19 +78,21 @@ export default function HomeProductTabs({
                                 onClick={() => setActiveTab('trending-now')}
                                 className="bg-transparent border-0 alt-font fs-32 ls-minus-05px text-transform-none position-relative px-0"
                                 style={{
-                                    color: activeTab === 'trending-now' ? '#ffffff' : 'rgba(255,255,255,0.45)',
+                                    color: activeTab === 'trending-now' ? 'var(--base-color)' : 'rgba(255,255,255,0.4)',
                                     fontWeight: 600,
+                                    transition: 'color 0.3s ease',
                                 }}
                             >
                                 Trending now
                                 <span
-                                    className="d-block mt-10px"
+                                    className="d-block mt-5px"
                                     style={{
-                                        height: 2,
+                                        height: 3,
                                         width: '100%',
                                         background: 'var(--base-color)',
+                                        borderRadius: '2px',
                                         opacity: activeTab === 'trending-now' ? 1 : 0,
-                                        transition: 'opacity 0.2s ease',
+                                        transition: 'opacity 0.3s ease',
                                     }}
                                 />
                             </button>

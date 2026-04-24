@@ -259,8 +259,8 @@ export default async function Home() {
                         <div className="swiper-wrapper pb-20px swiper-width-auto marquee-slide">
                             {tickerItems.map((item: any, idx: number) => (
                                 <div key={`ticker-${item.id}-${idx}`} className="swiper-slide">
-                                    <div className="marquee-ticker-text fs-50 text-white alt-font fw-700 ls-minus-1px">
-                                        <span className="w-15px h-15px border border-2 border-radius-100 border-color-medium-gray d-inline-block align-middle ms-50px me-50px"></span>
+                                    <div className="marquee-ticker-text fs-35 text-white alt-font fw-700 ls-minus-1px">
+                                        <span className="w-15px h-15px border border-transparent bg-base-color border-radius-100 d-inline-block align-middle ms-50px me-50px"></span>
                                         {item.title}
                                     </div>
                                 </div>
@@ -279,10 +279,10 @@ export default async function Home() {
                         data-anime='{"translateX":[-50,0],"opacity":[0,1],"duration":600,"delay":150,"easing":"easeOutQuad"}'
                         style={{ backgroundImage: featurePromo?.image ? `url('${featurePromo.image}')` : "url('images/demo-decor-store-banner-04.jpg')" }}>
                         <div className="pt-13 pb-13 pe-5 w-40 xl-w-45 lg-w-55 md-w-65 sm-w-75 float-end" style={{ maxWidth: '100%' }}>
-                            <span className="fs-15 fw-700 text-dark-gray text-uppercase mb-20px xs-mb-15px d-inline-block text-decoration-line-bottom-medium">
+                            <span className="fs-15 fw-700 text-white text-uppercase mb-20px xs-mb-15px d-inline-block text-decoration-line-bottom-medium">
                                 {featurePromo?.subtitle || 'New Collection 2025'}
                             </span>
-                            <h1 className="alt-font fw-400 text-dark-gray mb-40px lg-mb-35px xs-mb-25px ls-minus-1px">
+                            <h1 className="alt-font fw-500 text-white mb-40px lg-mb-35px xs-mb-25px ls-minus-1px">
                                 {featurePromo?.name
                                     ? <>{featurePromo.name}</>
                                     : <>Lounge <span className="fw-700">collection</span></>}
