@@ -83,7 +83,7 @@ class RealProductSeeder extends Seeder
 
         // 4. Create a Dummy Supplier and Purchase to handle Stock Inventory
         $supplier = \App\Models\Supplier::updateOrCreate(
-            ['email' => 'importer@behome.com'],
+            ['email' => 'importer@behom.com'],
             [
                 'company' => 'Luxury Furniture Importer',
                 'name' => 'John Importer',

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import ProductGrid from './ProductGrid';
 
-const KEY = 'behome_recently_viewed';
+const KEY = 'behom_recently_viewed';
 const MAX = 6;
 
 export interface RecentlyViewedProduct {

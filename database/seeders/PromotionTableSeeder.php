@@ -38,7 +38,7 @@ class PromotionTableSeeder extends Seeder
         ],
         [
             'name'     => 'Signature Lounge',
-            'subtitle' => 'Exclusively at Behome',
+            'subtitle' => 'Exclusively at Behom',
             'link'     => '/shop?category=sofa',
             'type'     => 1, // FEATURE
             'image'    => 'database/seeders/images/ink_shadow_modular_sofa_v5_1774928925715.png'

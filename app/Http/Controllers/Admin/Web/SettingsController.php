@@ -158,9 +158,9 @@ class SettingsController extends Controller
         $request->validate(['test_email' => 'required|email']);
         try {
             \Illuminate\Support\Facades\Mail::raw(
-                'This is a test email from Behome admin panel. Your SMTP configuration is working correctly.',
+                'This is a test email from Behom admin panel. Your SMTP configuration is working correctly.',
                 function ($msg) use ($request) {
-                    $msg->to($request->test_email)->subject('Behome — SMTP Test Email');
+                    $msg->to($request->test_email)->subject('Behom — SMTP Test Email');
                 }
             );
             return back()->with('success', 'Test email sent to ' . $request->test_email);

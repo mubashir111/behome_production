@@ -49,7 +49,7 @@ export default function Footer() {
                     {/* Brand column */}
                     <div className="col-12 col-lg-4 last-paragraph-no-margin pe-lg-5">
                         <a className="footer-logo mb-20px d-inline-block" href="/">
-                            <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={100} height={100} priority style={{ maxHeight: '70px', width: 'auto', height: 'auto' }} />
+                            <Image alt="Behom Logo" src="/images/new/logo/Behome%20Final%20.png" width={100} height={100} priority style={{ maxHeight: '70px', width: 'auto', height: 'auto' }} />
                         </a>
                         <p className="opacity-7 fs-14 lh-26 mb-20px" style={{ maxWidth: 280 }}>
                             Exquisite architectural decor and premium furniture for the modern luxury interior.
@@ -144,7 +144,7 @@ export default function Footer() {
                 <div className="container">
                     <div className="row align-items-center g-3">
                         <div className="col-12 col-md-5 text-center text-md-start">
-                            <p className="fs-13 mb-0 opacity-6">© 2026 Behome. All rights reserved.</p>
+                            <p className="fs-13 mb-0 opacity-6">© 2026 Behom. All rights reserved.</p>
                             <p className="fs-12 mb-0 mt-3px" style={{ color: 'rgba(255,255,255,0.3)' }}>
                                 Designed &amp; developed by{' '}
                                 <a href="https://spider-web.in/" target="_blank" rel="noopener noreferrer" className="footer-dev-credit" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>
@@ -160,8 +160,8 @@ export default function Footer() {
                         </div>
                         <div className="col-6 col-md-3 text-center text-md-end">
                             <span className="d-block fs-12 opacity-5 mb-3px">Customer care</span>
-                            <a className="fs-14 text-white fw-500" href={`mailto:${(mounted && settings?.company_email) ? settings.company_email : 'hello@behome.co.uk'}`}>
-                                {(mounted && settings?.company_email) ? settings.company_email : 'hello@behome.co.uk'}
+                            <a className="fs-14 text-white fw-500" href={`mailto:${(mounted && settings?.company_email) ? settings.company_email : 'hello@behom.co.uk'}`}>
+                                {(mounted && settings?.company_email) ? settings.company_email : 'hello@behom.co.uk'}
                             </a>
                         </div>
                     </div>

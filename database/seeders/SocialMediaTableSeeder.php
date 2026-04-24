@@ -18,10 +18,10 @@ class SocialMediaTableSeeder extends Seeder
     {
 
         Settings::group('social_media')->set([
-            'social_media_facebook'  => env('DEMO', false) ? 'https://www.facebook.com/behome' : '',
-            'social_media_youtube'   => env('DEMO', false) ? 'https://www.youtube.com/@behome' : '',
-            'social_media_instagram' => env('DEMO', false) ? 'https://www.instagram.com/behome' : '',
-            'social_media_twitter'   => env('DEMO', false) ? 'https://twitter.com/behome' : ''
+            'social_media_facebook'  => env('DEMO', false) ? 'https://www.facebook.com/behom' : '',
+            'social_media_youtube'   => env('DEMO', false) ? 'https://www.youtube.com/@behom' : '',
+            'social_media_instagram' => env('DEMO', false) ? 'https://www.instagram.com/behom' : '',
+            'social_media_twitter'   => env('DEMO', false) ? 'https://twitter.com/behom' : ''
         ]);
     }
 }

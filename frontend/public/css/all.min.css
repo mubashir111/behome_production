@@ -32414,7 +32414,7 @@ footer.footer-dark.bg-dark-gray.cover-background::before {
 
 /* ---- 1. KEYFRAME DEFINITIONS ---- */
 
-@keyframes behomeFadeUp {
+@keyframes behomFadeUp {
     from {
         opacity: 0;
         transform: translateY(40px);
@@ -32426,7 +32426,7 @@ footer.footer-dark.bg-dark-gray.cover-background::before {
     }
 }
 
-@keyframes behomeSlideDown {
+@keyframes behomSlideDown {
     from {
         opacity: 0;
         transform: translateY(-15px);
@@ -32438,7 +32438,7 @@ footer.footer-dark.bg-dark-gray.cover-background::before {
     }
 }
 
-@keyframes behomeGoldPulse {
+@keyframes behomGoldPulse {
 
     0%,
     100% {
@@ -32506,38 +32506,38 @@ footer.footer-dark.bg-dark-gray.cover-background::before {
 
 @media (min-width: 992px) {
     .navbar .navbar-nav .dropdown-menu.submenu-content {
-        animation: behomeSlideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation: behomSlideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     /* Stagger mega menu columns */
     .mega-menu .row>.col:nth-child(1),
     .mega-menu .row>div:nth-child(1) {
-        animation: behomeFadeUp 0.4s 0.05s ease both;
+        animation: behomFadeUp 0.4s 0.05s ease both;
     }
 
     .mega-menu .row>.col:nth-child(2),
     .mega-menu .row>div:nth-child(2) {
-        animation: behomeFadeUp 0.4s 0.10s ease both;
+        animation: behomFadeUp 0.4s 0.10s ease both;
     }
 
     .mega-menu .row>.col:nth-child(3),
     .mega-menu .row>div:nth-child(3) {
-        animation: behomeFadeUp 0.4s 0.15s ease both;
+        animation: behomFadeUp 0.4s 0.15s ease both;
     }
 
     .mega-menu .row>.col:nth-child(4),
     .mega-menu .row>div:nth-child(4) {
-        animation: behomeFadeUp 0.4s 0.20s ease both;
+        animation: behomFadeUp 0.4s 0.20s ease both;
     }
 
     .mega-menu .row>.col:nth-child(5),
     .mega-menu .row>div:nth-child(5) {
-        animation: behomeFadeUp 0.4s 0.25s ease both;
+        animation: behomFadeUp 0.4s 0.25s ease both;
     }
 
     .mega-menu .row>.col:nth-child(6),
     .mega-menu .row>div:nth-child(6) {
-        animation: behomeFadeUp 0.4s 0.30s ease both;
+        animation: behomFadeUp 0.4s 0.30s ease both;
     }
 }
 
@@ -32646,7 +32646,7 @@ footer.footer-dark ul li a:hover {
 /* ---- 11. LOGO SUBTLE PULSE ON HOVER ---- */
 
 .glass-logo-wrapper:hover .glass-logo-box {
-    animation: behomeGoldPulse 1s ease infinite;
+    animation: behomGoldPulse 1s ease infinite;
     border-color: rgba(197, 160, 89, 0.4) !important;
 }
 

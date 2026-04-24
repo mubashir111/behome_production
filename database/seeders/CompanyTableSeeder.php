@@ -11,7 +11,7 @@ class CompanyTableSeeder extends Seeder
     public function run()
     {
         Settings::group('company')->set([
-            'company_name'         => 'Behome',
+            'company_name'         => 'Behom',
             'company_email'        => '',
             'company_calling_code' => '+1',
             'company_phone'        => '',

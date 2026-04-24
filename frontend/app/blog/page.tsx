@@ -35,8 +35,8 @@ async function getInitialPosts() {
 export async function generateMetadata(): Promise<Metadata> {
     const data = await getBlogPageData();
     return constructMetadata({
-        title: data?.meta_title || 'Blog | Behome',
-        description: data?.meta_description || 'Explore interior design inspiration, home decor trends, styling guides, and expert tips from the Behome team.',
+        title: data?.meta_title || 'Blog | Behom',
+        description: data?.meta_description || 'Explore interior design inspiration, home decor trends, styling guides, and expert tips from the Behom team.',
     });
 }
 
@@ -56,7 +56,7 @@ export default async function Blog() {
 
                     <div className="row justify-content-center mb-60px xs-mb-40px text-center">
                         <div className="col-lg-7">
-                            <span className="fs-13 fw-600 text-uppercase ls-3px text-base-color d-block mb-15px">Behome Journal</span>
+                            <span className="fs-13 fw-600 text-uppercase ls-3px text-base-color d-block mb-15px">Behom Journal</span>
                             <h1 className="alt-font fw-600 text-white ls-minus-1px mb-0">{title}</h1>
                             {intro && <p className="text-white opacity-7 fs-16 lh-30 mt-20px mb-0">{intro}</p>}
                         </div>

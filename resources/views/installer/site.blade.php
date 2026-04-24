@@ -44,7 +44,7 @@
                 {{ trans('installer.site.label.app_name') }} <span class="text-[#E93C3C]">*</span>
             </label>
             <input name="app_name" type="text" value="{{ old('app_name') }}"
-                   placeholder="Behome"
+                   placeholder="Behom"
                    class="w-full h-12 rounded-lg px-4 border border-[#D9DBE9]">
             @if ($errors->has('app_name'))
                 <small class="block mt-2 text-sm font-medium text-[#E93C3C]">{{ $errors->first('app_name') }}</small>
@@ -155,7 +155,7 @@
                     {{ trans('installer.site.label.mail_from_name') }} <span class="text-[#E93C3C]">*</span>
                 </label>
                 <input name="mail_from_name" type="text" value="{{ old('mail_from_name') }}"
-                       placeholder="Behome"
+                       placeholder="Behom"
                        class="w-full h-12 rounded-lg px-4 border border-[#D9DBE9]">
                 @if ($errors->has('mail_from_name'))
                     <small class="block mt-2 text-sm font-medium text-[#E93C3C]">{{ $errors->first('mail_from_name') }}</small>

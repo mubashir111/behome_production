@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { SERVER_API_URL, API_KEY } from '@/lib/config';
 
 export const metadata: Metadata = {
-    title: 'FAQ | Behome',
-    description: 'Frequently asked questions about shopping, shipping, returns, payment, and ordering from Behome.',
+    title: 'FAQ | Behom',
+    description: 'Frequently asked questions about shopping, shipping, returns, payment, and ordering from Behom.',
 };
 
 

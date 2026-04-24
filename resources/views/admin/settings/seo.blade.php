@@ -38,7 +38,7 @@
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Site Title</label>
                     <input type="text" name="seo_site_title" value="{{ $seo_site_title }}"
-                           placeholder="e.g. Behome — Luxury Decor"
+                           placeholder="e.g. Behom — Luxury Decor"
                            class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-indigo-600 outline-none transition-all bg-white text-slate-900">
                     <p class="mt-1 text-[10px] text-slate-500 font-medium">Default title appended to all page titles.</p>
                 </div>

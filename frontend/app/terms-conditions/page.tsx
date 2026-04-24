@@ -21,8 +21,8 @@ async function getPageData() {
 export async function generateMetadata(): Promise<Metadata> {
     const data = await getPageData();
     return constructMetadata({
-        title: data?.meta_title || 'Terms & Conditions | Behome',
-        description: data?.meta_description || 'Read the Behome terms and conditions.',
+        title: data?.meta_title || 'Terms & Conditions | Behom',
+        description: data?.meta_description || 'Read the Behom terms and conditions.',
     });
 }
 

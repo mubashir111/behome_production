@@ -2,11 +2,11 @@
 
 
 return [
-    'title'       => 'مثبت Behome',
+    'title'       => 'مثبت Behom',
     'next'        => 'الخطوة التالية',
     'welcome'     => [
         'templateTitle' => 'مرحبا',
-        'title'         => 'مثبت Behome',
+        'title'         => 'مثبت Behom',
         'message'       => 'معالج التثبيت والإعداد السهل.',
         'next'          => 'التحقق من المتطلبات',
     ],
@@ -63,7 +63,7 @@ return [
         'next'            => 'إنهاء',
     ],
     'installed'   => [
-        'success_log_message' => 'تم تثبيت Behome بنجاح',
-        'update_log_message'  => 'تم تحديث مثبت Behome بنجاح',
+        'success_log_message' => 'تم تثبيت Behom بنجاح',
+        'update_log_message'  => 'تم تحديث مثبت Behom بنجاح',
     ]
 ];

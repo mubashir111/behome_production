@@ -18,7 +18,7 @@ class MailTableSeeder extends Seeder
             'mail_username'   => '',
             'mail_password'   => '',
             'mail_encryption' => 'tls',
-            'mail_from_name'  => 'Behome',
+            'mail_from_name'  => 'Behom',
             'mail_from_email' => ''
         ]);
 

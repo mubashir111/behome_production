@@ -409,7 +409,7 @@ export default function ProductPageClient({ params }: { params: { slug: string }
 
     const shareToWhatsApp = () => {
         const url = typeof window !== 'undefined' ? window.location.href : '';
-        const text = encodeURIComponent(`Check out this ${product?.name} at Behome! ${url}`);
+        const text = encodeURIComponent(`Check out this ${product?.name} at Behom! ${url}`);
         window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         setShowShareMenu(false);
     };

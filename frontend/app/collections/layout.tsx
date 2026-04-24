@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Collections | Behome',
-    description: 'Browse all Behome collections — curated categories of luxury furniture, architectural decor, lighting, and more.',
+    title: 'Collections | Behom',
+    description: 'Browse all Behom collections — curated categories of luxury furniture, architectural decor, lighting, and more.',
 };
 
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {

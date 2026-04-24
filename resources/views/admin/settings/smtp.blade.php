@@ -114,7 +114,7 @@
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">From Name</label>
                     <input type="text" name="mail_from_name" value="{{ $mail_from_name }}"
-                           placeholder="Behome"
+                           placeholder="Behom"
                            class="w-full px-5 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-600 outline-none transition-all bg-white text-slate-900">
                     <p class="mt-1 text-[10px] text-slate-500 font-medium">Display name shown to email recipients.</p>
                 </div>

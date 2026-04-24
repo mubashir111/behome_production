@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { SITE_URL } from './config';
 
 export function constructMetadata({
-    title = 'Behome - Premium Architectural Decor & Luxury Furniture',
-    description = 'Behome - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
+    title = 'Behom - Premium Architectural Decor & Luxury Furniture',
+    description = 'Behom - Premium E-commerce experience for architectural decor, luxury furniture, and high-end interior design.',
     image = '/images/og-default.png',
     icons = '/images/favicon.png',
     noIndex = false,
@@ -17,13 +17,13 @@ export function constructMetadata({
     return {
         title: {
             default: title,
-            template: '%s | Behome',
+            template: '%s | Behom',
         },
         description,
         openGraph: {
             title,
             description,
-            siteName: 'Behome',
+            siteName: 'Behom',
             images: [
                 {
                     url: image,

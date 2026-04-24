@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const KEY = 'behome_recently_viewed';
+const KEY = 'behom_recently_viewed';
 const MAX = 6;
 
 export function useRecentlyViewed(currentSlug?: string) {

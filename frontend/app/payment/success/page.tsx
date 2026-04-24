@@ -238,7 +238,7 @@ function PaymentSuccessContent() {
             @media print{body{padding:20px}button{display:none!important}}
         </style></head><body>
         <div class="header">
-            <div><div class="brand">Behome</div><div style="font-size:12px;color:#777;margin-top:4px">Premium Architectural Decor &amp; Furniture</div></div>
+            <div><div class="brand">Behom</div><div style="font-size:12px;color:#777;margin-top:4px">Premium Architectural Decor &amp; Furniture</div></div>
             <div class="invoice-meta">
                 <strong>INVOICE</strong>
                 Order #${esc(orderId)}<br/>
@@ -261,7 +261,7 @@ function PaymentSuccessContent() {
                 </tr>
             </tbody>
         </table>
-        <div class="footer">Thank you for shopping with Behome &nbsp;·&nbsp; For support visit behome.co.uk/contact</div>
+        <div class="footer">Thank you for shopping with Behom &nbsp;·&nbsp; For support visit behom.co.uk/contact</div>
         <script>window.onload=function(){window.print();}<\/script>
         </body></html>`);
         win.document.close();

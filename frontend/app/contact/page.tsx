@@ -22,8 +22,8 @@ async function getContactData() {
 export async function generateMetadata(): Promise<Metadata> {
     const data = await getContactData();
     return constructMetadata({
-        title: data?.meta_title || 'Contact Us | Behome',
-        description: data?.meta_description || 'Get in touch with the Behome team.',
+        title: data?.meta_title || 'Contact Us | Behom',
+        description: data?.meta_description || 'Get in touch with the Behom team.',
     });
 }
 
@@ -33,8 +33,8 @@ export default async function Contact() {
 
     const address     = s.address       || 'London, United Kingdom';
     const phones: string[]  = s.phones  || ['+44 207 123 4567', '+44 800 123 4567'];
-    const emails: string[]  = s.emails  || ['hello@behome.co.uk', 'support@behome.co.uk'];
-    const careersEmail = s.careers_email || 'careers@behome.co.uk';
+    const emails: string[]  = s.emails  || ['hello@behom.co.uk', 'support@behom.co.uk'];
+    const careersEmail = s.careers_email || 'careers@behom.co.uk';
 
     return (
         <main>
@@ -99,7 +99,7 @@ export default async function Contact() {
 <div className="container">
 <div className="row mb-20px">
 <div className="col-lg-10 col-md-12" data-anime='{ "effect": "slide", "color": "#1B3250", "direction":"rl", "easing": "easeOutQuad", "delay":50}'>
-<Image alt="Behome showroom" src="/images/demo-decor-store-contact-01.jpg" width={1200} height={720} style={{ width: '100%', height: 'auto' }}/>
+<Image alt="Behom showroom" src="/images/demo-decor-store-contact-01.jpg" width={1200} height={720} style={{ width: '100%', height: 'auto' }}/>
 </div>
 </div>
 <div className="row align-items-end">

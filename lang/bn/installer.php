@@ -2,11 +2,11 @@
 
 
 return [
-    'title'       => 'Behome ইনস্টলার',
+    'title'       => 'Behom ইনস্টলার',
     'next'        => 'পরবর্তী ধাপ',
     'welcome'     => [
         'templateTitle' => 'স্বাগতম',
-        'title'         => 'Behome ইনস্টলার',
+        'title'         => 'Behom ইনস্টলার',
         'message'       => 'সহজ ইনস্টলেশন এবং সেটআপ উইজার্ড।',
         'next'          => 'পরিশীলন প্রয়োজনীয়তা',
     ],
@@ -63,7 +63,7 @@ return [
         'next'            => 'শেষ',
     ],
     'installed'   => [
-        'success_log_message' => 'Behome ইনস্টলার সফলভাবে ইনস্টল করা হয়েছে ',
-        'update_log_message'  => 'Behome ইনস্টলার সফলভাবে আপডেট হয়েছে ',
+        'success_log_message' => 'Behom ইনস্টলার সফলভাবে ইনস্টল করা হয়েছে ',
+        'update_log_message'  => 'Behom ইনস্টলার সফলভাবে আপডেট হয়েছে ',
     ],
 ];

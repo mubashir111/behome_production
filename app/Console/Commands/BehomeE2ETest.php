@@ -43,7 +43,7 @@ class BehomeE2ETest extends Command
     {
         $this->newLine();
         $this->line('╔══════════════════════════════════════════════════════════════╗');
-        $this->line('║          BEHOME  END-TO-END  TEST  SUITE                    ║');
+        $this->line('║          BEHOM  END-TO-END  TEST  SUITE                    ║');
         $this->line('╚══════════════════════════════════════════════════════════════╝');
         $this->newLine();
 
@@ -83,12 +83,12 @@ class BehomeE2ETest extends Command
         $this->assert($user !== null, 'Admin user exists (admin@example.com)');
 
         // Need a test customer (not admin) for orders
-        $customer = User::where('email', 'test_customer@behome.test')->first();
+        $customer = User::where('email', 'test_customer@behom.test')->first();
         if (!$customer) {
             $customer = User::create([
                 'name'              => 'Test Customer',
                 'username'          => 'test_customer_e2e',
-                'email'             => 'test_customer@behome.test',
+                'email'             => 'test_customer@behom.test',
                 'password'          => bcrypt('password'),
                 'email_verified_at' => now(),
                 'status'            => Status::ACTIVE,

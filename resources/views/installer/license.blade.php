@@ -28,7 +28,7 @@
     <span class="my-6 w-full h-[1px] bg-[#EFF0F6]"></span>
 
     <div class="w-full max-h-48 overflow-y-auto rounded-lg border border-[#D9DBE9] p-4 mb-5 text-sm text-gray-600 leading-relaxed">
-        <p class="font-semibold text-heading mb-2">Behome E-Commerce Platform</p>
+        <p class="font-semibold text-heading mb-2">Behom E-Commerce Platform</p>
         <p>By installing this software you agree that you will use it in accordance with applicable laws and regulations. You may not redistribute, resell, or sublicense this software without explicit written permission.</p>
         <p class="mt-2">The software is provided "as is" without warranty of any kind. The authors shall not be liable for any damages arising from the use of this software.</p>
         <p class="mt-2">You are responsible for maintaining the security of your installation, keeping credentials safe, and complying with data protection regulations applicable to your jurisdiction.</p>

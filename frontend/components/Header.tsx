@@ -37,9 +37,9 @@ export default async function Header() {
                             </a>
                             <a className="glass-logo-wrapper" href="/">
                                 <div className="glass-logo-box">
-                                    <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
+                                    <Image alt="Behom Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
                                 </div>
-                                <span className="logo-text">BEHOME</span>
+                                <span className="logo-text">BEHOM</span>
                             </a>
                         </div>
                         <div className="col-12 col-xl-5 col-lg-6 order-3 order-lg-2 menu-order position-static">
@@ -49,9 +49,9 @@ export default async function Header() {
                                     <div className="mobile-logo">
                                         <a className="glass-logo-wrapper" href="/">
                                             <div className="glass-logo-box">
-                                                <Image alt="Behome Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
+                                                <Image alt="Behom Logo" src="/images/new/logo/Behome%20Final%20.png" width={72} height={72} priority style={{ objectFit: 'contain' }} />
                                             </div>
-                                            <span className="logo-text">BEHOME</span>
+                                            <span className="logo-text">BEHOM</span>
                                         </a>
                                     </div>
                                     <div className="mobile-icons">
@@ -138,9 +138,9 @@ export default async function Header() {
 
                                     {/* Contact + social row */}
                                     <div className="mobile-nav-contact-row">
-                                        <a href={`mailto:${settings?.company_email || 'hello@behome.co.uk'}`} className="mobile-nav-contact-item">
+                                        <a href={`mailto:${settings?.company_email || 'hello@behom.co.uk'}`} className="mobile-nav-contact-item">
                                             <i className="feather icon-feather-mail"></i>
-                                            {settings?.company_email || 'hello@behome.co.uk'}
+                                            {settings?.company_email || 'hello@behom.co.uk'}
                                         </a>
                                         <a href={`tel:${settings?.company_phone || '+442071234567'}`} className="mobile-nav-contact-item">
                                             <i className="feather icon-feather-phone"></i>

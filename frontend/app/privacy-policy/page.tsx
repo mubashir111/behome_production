@@ -21,14 +21,14 @@ async function getPageData() {
 export async function generateMetadata(): Promise<Metadata> {
     const data = await getPageData();
     return constructMetadata({
-        title: data?.meta_title || 'Privacy Policy | Behome',
-        description: data?.meta_description || 'Read the Behome Privacy Policy.',
+        title: data?.meta_title || 'Privacy Policy | Behom',
+        description: data?.meta_description || 'Read the Behom Privacy Policy.',
     });
 }
 
 const DEFAULT_CONTENT = `
 <h2>Privacy Policy</h2>
-<p>At Behome, we are committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information when you use our website and services.</p>
+<p>At Behom, we are committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information when you use our website and services.</p>
 <h3>Information We Collect</h3>
 <p>We collect information you provide directly to us, such as your name, email address, shipping address, and payment details when you place an order.</p>
 <h3>How We Use Your Information</h3>
@@ -36,7 +36,7 @@ const DEFAULT_CONTENT = `
 <h3>Data Security</h3>
 <p>We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction.</p>
 <h3>Contact Us</h3>
-<p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:hello@behome.com">hello@behome.com</a>.</p>
+<p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:hello@behom.com">hello@behom.com</a>.</p>
 `;
 
 export default async function PrivacyPolicy() {

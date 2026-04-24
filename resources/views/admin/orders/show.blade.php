@@ -685,7 +685,7 @@ function printInvoice() {
     </div>
 
     <div class="footer">
-        <p>Thank you for your order — Behome Premium Decor &amp; Luxury Furniture</p>
+        <p>Thank you for your order — Behom Premium Decor &amp; Luxury Furniture</p>
         <p style="margin-top:4px;">This invoice was generated on ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}.</p>
     </div>
 </body>

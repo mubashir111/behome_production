@@ -1,11 +1,11 @@
 <?php
 
 return [
-    'title'       => 'Behome Installer',
+    'title'       => 'Behom Installer',
     'next'        => 'Next Step',
     'welcome'     => [
         'templateTitle' => 'Welcome',
-        'title'         => 'Behome Installer',
+        'title'         => 'Behom Installer',
         'message'       => 'Easy Installation and Setup Wizard.',
         'next'          => 'Check Requirements',
     ],
@@ -79,7 +79,7 @@ return [
         'next'            => 'Finish & Launch',
     ],
     'installed'   => [
-        'success_log_message' => 'Behome successfully INSTALLED on ',
-        'update_log_message'  => 'Behome successfully UPDATED on ',
+        'success_log_message' => 'Behom successfully INSTALLED on ',
+        'update_log_message'  => 'Behom successfully UPDATED on ',
     ],
 ];

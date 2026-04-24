@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     const data = await getPageData(params.slug);
     if (!data) return constructMetadata({ title: 'Page Not Found' });
     return constructMetadata({
-        title: data.meta_title || `${data.title} | Behome`,
+        title: data.meta_title || `${data.title} | Behom`,
         description: data.meta_description || '',
     });
 }

@@ -296,7 +296,7 @@ export default async function Home() {
                     <div className="col-md-4 premium-slider-container"
                         data-anime='{"translateX":[50,0],"opacity":[0,1],"duration":600,"delay":150,"easing":"easeOutQuad"}'>
                         <div className="swiper position-relative h-100"
-                            data-slider-options='{"slidesPerView":1,"loop":true,"allowTouchMove":true,"autoplay":{"delay":3000,"disableOnInteraction":false},"navigation":{"nextEl":".slider-one-slide-next-1","prevEl":".slider-one-slide-prev-1"},"effect":"fade"}'>
+                            data-slider-options='{"slidesPerView":1,"loop":true,"allowTouchMove":true,"autoplay":{"delay":3000,"disableOnInteraction":false},"navigation":{"nextEl":".slider-one-slide-next-1","prevEl":".slider-one-slide-prev-1"},"effect":"slide"}'>
                             <div className="swiper-wrapper">
                                 {featuredProducts.length > 0 ? featuredProducts.map((product: any) => (
                                     <div key={product.id} className="swiper-slide h-100 text-center d-flex flex-column align-items-center justify-content-center p-4"
@@ -312,15 +312,15 @@ export default async function Home() {
                                         <div className="slider-product-info">
                                             <a className="slider-product-name"
                                                 href={`/product/${product.slug}`}>{product.name}</a>
-                                            <div className="slider-product-price">
+                                            <div className="d-flex flex-column align-items-center justify-content-center mt-2" style={{ gap: '2px', zIndex: 10, position: 'relative' }}>
                                                 {product.is_offer
                                                     ? (
                                                         <>
-                                                            <span className="price-original">{product.currency_price}</span>
-                                                            <span className="price-discount">{product.discounted_price}</span>
+                                                            <span className="text-decoration-line-through text-medium-gray fs-14 m-0 lh-1">{product.currency_price}</span>
+                                                            <span className="fs-18 fw-800 text-dark-gray m-0 lh-1">{product.discounted_price}</span>
                                                         </>
                                                     )
-                                                    : <span className="price-discount">{product.currency_price}</span>
+                                                    : <span className="fs-18 fw-800 text-dark-gray m-0 lh-1">{product.currency_price}</span>
                                                 }
                                             </div>
                                         </div>
